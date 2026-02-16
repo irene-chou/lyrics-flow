@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyrics Flow - OBS Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #7c6aef;
+    --accent-glow: rgba(124, 106, 239, 0.3);
+    --active-lyric: #ffffff;
+    --active-bg: rgba(124, 106, 239, 0.15);
+    --passed-lyric: #5a5a70;
+    --upcoming-lyric: #9090a8;
+    --text-dim: #55556a;
+    --font-main: 'Noto Sans TC', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-main);
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .lyrics-scroll-container {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding: 20vh 32px;
+  }
+
+  .lyrics-scroll-container::-webkit-scrollbar { width: 0; }
+
+  .lyric-line {
+    padding: 12px 20px;
+    margin: 4px 0;
+    border-radius: 10px;
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-dim);
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  .lyric-line.passed {
+    color: var(--passed-lyric);
+  }
+
+  .lyric-line.active {
+    color: var(--active-lyric);
+    font-weight: 700;
+    font-size: 42px;
+    background: var(--active-bg);
+    transform: scale(1.01);
+    padding: 16px 24px;
+    text-shadow: 0 0 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  .lyric-line.upcoming {
+    color: var(--upcoming-lyric);
+  }
+
+  .lyric-line.interlude {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .lyric-line.interlude::before {
+    content: '\266A';
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  .waiting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: var(--text-dim);
+    font-size: 18px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+</style>
+</head>
+<body>
+
+<div class="lyrics-scroll-container" id="lyricsContainer">
+  <div class="waiting" id="waitingState">等待控制頁面連線...</div>
+</div>
+
+<script>
+  let lyrics = [];
+  let currentLineIndex = -1;
+  let baseFontSize = 36;
+
+  const bc = new BroadcastChannel('lyrics-sync');
+
+  // Request full state on load
+  bc.postMessage({ type: 'REQUEST_STATE', data: null });
+
+  bc.onmessage = (event) => {
+    const { type, data } = event.data;
+    switch (type) {
+      case 'FULL_STATE':
+        lyrics = data.lyrics || [];
+        currentLineIndex = data.currentLineIndex;
+        baseFontSize = data.baseFontSize || 36;
+        renderLyrics();
+        updateActiveLine();
+        break;
+      case 'LYRICS_LOADED':
+        lyrics = data.lyrics || [];
+        currentLineIndex = -1;
+        renderLyrics();
+        break;
+      case 'SYNC_UPDATE':
+        if (data.currentLineIndex !== currentLineIndex) {
+          currentLineIndex = data.currentLineIndex;
+          updateActiveLine();
+        }
+        break;
+      case 'FONT_SIZE':
+        baseFontSize = data.baseFontSize;
+        updateActiveLine();
+        break;
+    }
+  };
+
+  function renderLyrics() {
+    const container = document.getElementById('lyricsContainer');
+    container.innerHTML = '';
+
+    if (lyrics.length === 0) {
+      container.innerHTML = '<div class="waiting">等待載入歌詞...</div>';
+      return;
+    }
+
+    lyrics.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'lyric-line upcoming';
+      div.id = `lyric-${index}`;
+      div.style.fontSize = baseFontSize + 'px';
+
+      if (item.text === '' || item.text === '//') {
+        div.classList.add('interlude');
+        div.appendChild(document.createTextNode('\u9593\u594F'));
+      } else {
+        div.appendChild(document.createTextNode(item.text));
+      }
+
+      container.appendChild(div);
+    });
+  }
+
+  function updateActiveLine() {
+    const lines = document.querySelectorAll('.lyric-line');
+    lines.forEach((line, i) => {
+      line.classList.remove('active', 'passed', 'upcoming');
+      if (i < currentLineIndex) {
+        line.classList.add('passed');
+        line.style.fontSize = baseFontSize + 'px';
+      } else if (i === currentLineIndex) {
+        line.classList.add('active');
+        line.style.fontSize = (baseFontSize + 6) + 'px';
+      } else {
+        line.classList.add('upcoming');
+        line.style.fontSize = baseFontSize + 'px';
+      }
+    });
+
+    if (currentLineIndex >= 0) {
+      const activeLine = document.getElementById(`lyric-${currentLineIndex}`);
+      if (activeLine) {
+        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+</script>
+
+</body>
+</html>

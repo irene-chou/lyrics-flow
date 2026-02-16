@@ -726,6 +726,21 @@
   let syncInterval = null;
   let isOBSMode = false;
 
+  // ========== BroadcastChannel (OBS Sync) ==========
+  const bc = new BroadcastChannel('lyrics-sync');
+  bc.onmessage = (event) => {
+    if (event.data.type === 'REQUEST_STATE') {
+      bc.postMessage({
+        type: 'FULL_STATE',
+        data: { lyrics, currentLineIndex, baseFontSize, offset }
+      });
+    }
+  };
+
+  function broadcast(type, data) {
+    try { bc.postMessage({ type, data }); } catch (e) {}
+  }
+
   // ========== YouTube API ==========
   let playerReady = false;
   let pendingVideoId = null;
@@ -950,6 +965,7 @@
     });
 
     currentLineIndex = -1;
+    broadcast('LYRICS_LOADED', { lyrics });
   }
 
   // ========== Manual Timer State ==========
@@ -1089,6 +1105,7 @@
     if (newIndex !== currentLineIndex) {
       currentLineIndex = newIndex;
       updateActiveLine();
+      broadcast('SYNC_UPDATE', { currentLineIndex });
     }
   }
 
@@ -1147,11 +1164,13 @@
     document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
     // Re-sync immediately
     currentLineIndex = -1;
+    broadcast('OFFSET', { offset });
   }
 
   function adjustFontSize(delta) {
     baseFontSize = Math.max(14, Math.min(60, baseFontSize + delta));
     document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
+    broadcast('FONT_SIZE', { baseFontSize });
     if (lyrics.length > 0) {
       updateActiveLine();
     }
@@ -1177,11 +1196,12 @@
   }
 
   function copyOBSUrl() {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-      alert('已複製當前頁面 URL。\n\n在 OBS 中新增「瀏覽器來源」並貼上此 URL，然後在頁面上點擊「OBS 模式」切換為透明背景。');
+    const base = window.location.href.replace(/[^/]*$/, '');
+    const obsUrl = base + 'obs.html';
+    navigator.clipboard.writeText(obsUrl).then(() => {
+      alert('已複製 OBS 歌詞顯示頁面 URL。\n\n在 OBS 中新增「瀏覽器來源」並貼上此 URL。\n保持此控制頁面開啟，歌詞會自動同步到 OBS。');
     }).catch(() => {
-      prompt('請手動複製此 URL 到 OBS 瀏覽器來源：', url);
+      prompt('請手動複製此 URL 到 OBS 瀏覽器來源：', obsUrl);
     });
   }
 
