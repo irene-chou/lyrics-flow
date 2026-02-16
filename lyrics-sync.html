@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>歌詞同步器 - Lyrics Sync for OBS</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #1a1a26;
+    --bg-input: #22222e;
+    --border: #2a2a3a;
+    --text-primary: #e8e8f0;
+    --text-secondary: #8888a0;
+    --text-dim: #55556a;
+    --accent: #7c6aef;
+    --accent-glow: rgba(124, 106, 239, 0.3);
+    --active-lyric: #ffffff;
+    --active-bg: rgba(124, 106, 239, 0.15);
+    --passed-lyric: #5a5a70;
+    --upcoming-lyric: #9090a8;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --radius: 12px;
+    --font-main: 'Noto Sans TC', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-main);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== Layout ========== */
+  .app {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    gap: 0;
+  }
+
+  .header {
+    grid-column: 1 / -1;
+    padding: 16px 28px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header h1 .dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--accent-glow);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mode-badge {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .mode-badge.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(124, 106, 239, 0.08);
+  }
+
+  /* ========== Control Panel (Left) ========== */
+  .control-panel {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  input[type="text"], textarea {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  textarea {
+    font-family: var(--font-main);
+    font-size: 13px;
+    resize: vertical;
+    min-height: 180px;
+    line-height: 1.7;
+  }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background: var(--bg-card);
+    border-color: var(--text-dim);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .btn-primary:hover {
+    background: #6b59de;
+    border-color: #6b59de;
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  /* YouTube Player Container */
+  .player-wrapper {
+    background: #000;
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    position: relative;
+  }
+
+  .player-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Playback Info */
+  .playback-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .time-display {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 110px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-input);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .status-dot.playing {
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .status-dot.paused {
+    background: #eab308;
+  }
+
+  /* Offset Control */
+  .offset-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .offset-control .offset-value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    min-width: 60px;
+    text-align: center;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Lyrics Source Info */
+  .lyrics-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    line-height: 1.6;
+  }
+
+  .lyrics-info .count {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ========== Lyrics Display (Right) ========== */
+  .lyrics-display {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lyrics-display-header {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-primary);
+    z-index: 2;
+  }
+
+  .lyrics-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding: 30vh 48px;
+    position: relative;
+  }
+
+  .lyrics-scroll-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .lyrics-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+  }
+
+  .lyric-line {
+    padding: 12px 20px;
+    margin: 4px 0;
+    border-radius: 10px;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-dim);
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .lyric-line:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .lyric-line.passed {
+    color: var(--passed-lyric);
+    font-weight: 400;
+  }
+
+  .lyric-line.active {
+    color: var(--active-lyric);
+    font-weight: 700;
+    font-size: 32px;
+    background: var(--active-bg);
+    transform: scale(1.01);
+    padding: 16px 24px;
+  }
+
+  .lyric-line.upcoming {
+    color: var(--upcoming-lyric);
+  }
+
+  .lyric-line .time-tag {
+    position: absolute;
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .lyric-line:hover .time-tag {
+    opacity: 1;
+  }
+
+  /* Interlude / instrumental indicator */
+  .lyric-line.interlude {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .lyric-line.interlude::before {
+    content: '♪';
+    margin-right: 8px;
+    opacity: 0.5;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 48px;
+    gap: 16px;
+  }
+
+  .empty-state .icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+
+  .empty-state p {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* ========== OBS Overlay Mode ========== */
+  body.obs-mode {
+    background: transparent !important;
+  }
+
+  body.obs-mode .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    background: transparent;
+  }
+
+  body.obs-mode .header,
+  body.obs-mode .control-panel,
+  body.obs-mode .lyrics-display-header {
+    display: none !important;
+  }
+
+  body.obs-mode .lyrics-display {
+    background: transparent;
+  }
+
+  body.obs-mode .lyrics-scroll-container {
+    padding: 20vh 32px;
+  }
+
+  body.obs-mode .lyric-line {
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    font-size: 36px;
+  }
+
+  body.obs-mode .lyric-line.active {
+    font-size: 42px;
+    text-shadow: 0 0 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  /* ========== Tabs ========== */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    padding: 3px;
+  }
+
+  .tab {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    font-family: var(--font-main);
+  }
+
+  .tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  /* ========== Sample LRC hint ========== */
+  .hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding: 8px 0;
+  }
+
+  .hint code {
+    font-family: var(--font-mono);
+    background: var(--bg-input);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+  }
+
+  /* ========== Manual Timer Mode ========== */
+  .manual-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .manual-controls .timer-display {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 80px;
+    text-align: center;
+  }
+
+  .embed-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+    text-align: center;
+    aspect-ratio: 16/9;
+  }
+
+  .embed-error p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .embed-error .error-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--danger);
+  }
+
+  /* ========== Font Size Control ========== */
+  .font-size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .font-size-control span {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  /* Responsive: if narrow, stack */
+  @media (max-width: 900px) {
+    .app {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+    }
+    .control-panel {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      max-height: 50vh;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <h1><span class="dot"></span>歌詞同步器 Lyrics Sync</h1>
+    <div class="header-actions">
+      <span class="mode-badge" id="statusBadge">IDLE</span>
+      <button class="btn btn-sm" onclick="toggleOBSMode()" title="切換 OBS 透明模式">OBS 模式</button>
+    </div>
+  </header>
+
+  <!-- Left: Control Panel -->
+  <div class="control-panel">
+    <!-- YouTube URL -->
+    <div class="input-group">
+      <div class="section-label">YouTube 伴奏</div>
+      <div class="input-row">
+        <input type="text" id="ytUrl" placeholder="貼上 YouTube 連結或影片 ID" />
+        <button class="btn btn-primary" onclick="loadVideo()">載入</button>
+      </div>
+    </div>
+
+    <!-- Player (embed mode) -->
+    <div id="embedMode">
+      <div class="player-wrapper">
+        <div id="ytPlayer"></div>
+      </div>
+      <div class="playback-info">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        <div class="progress-bar" id="progressBar" onclick="seekFromBar(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual timer (fallback when embed blocked) -->
+    <div id="manualMode" style="display:none;">
+      <div class="embed-error">
+        <div class="error-title">此影片不允許嵌入播放</div>
+        <p>請在其他視窗開啟 YouTube 播放伴奏，<br>然後用下方計時器手動同步歌詞。</p>
+        <button class="btn btn-sm" id="openYtBtn" onclick="openYouTubeExternal()">在新視窗開啟 YouTube</button>
+      </div>
+      <div style="margin-top: 12px;">
+        <div class="section-label">手動計時器</div>
+        <div class="manual-controls">
+          <button class="btn btn-primary" id="manualPlayBtn" onclick="manualTogglePlay()">▶ 開始</button>
+          <span class="timer-display" id="manualTimerDisplay">00:00</span>
+          <button class="btn btn-sm" onclick="manualSeek(-5)">-5s</button>
+          <button class="btn btn-sm" onclick="manualSeek(5)">+5s</button>
+          <button class="btn btn-sm btn-danger" onclick="manualReset()">重置</button>
+        </div>
+        <div class="hint" style="margin-top:6px;">
+          提示：在 YouTube 按播放的同時點「開始」，歌詞就會同步滾動。
+        </div>
+      </div>
+    </div>
+
+    <!-- LRC Lyrics Input -->
+    <div class="input-group">
+      <div class="section-label">LRC 歌詞</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('paste', this)">貼上歌詞</button>
+        <button class="tab" onclick="switchTab('file', this)">讀取檔案</button>
+      </div>
+
+      <div id="tabPaste">
+        <textarea id="lrcInput" placeholder="在此貼上 LRC 格式歌詞...&#10;&#10;範例：&#10;[00:12.50]第一句歌詞&#10;[00:18.30]第二句歌詞&#10;[00:24.10]第三句歌詞"></textarea>
+        <button class="btn" onclick="parseLRC()" style="margin-top:6px; width:100%;">解析歌詞</button>
+      </div>
+
+      <div id="tabFile" style="display:none;">
+        <input type="text" id="lrcFileInput" placeholder="點擊選擇 .lrc 檔案" readonly onclick="document.getElementById('fileInput').click()" style="cursor:pointer;" />
+        <input type="file" id="fileInput" accept=".lrc,.txt" onchange="loadLRCFile(event)" style="display:none;" />
+      </div>
+
+      <div class="hint">
+        提示：可從 <code>lrclib.net</code> 或 <code>megalobiz.com</code> 搜尋下載中文歌的 LRC 檔。
+      </div>
+    </div>
+
+    <!-- Lyrics Info -->
+    <div class="lyrics-info" id="lyricsInfo" style="display:none;">
+      已載入 <span class="count" id="lineCount">0</span> 行歌詞
+    </div>
+
+    <!-- Offset -->
+    <div class="input-group">
+      <div class="section-label">歌詞偏移 (Offset)</div>
+      <div class="offset-control">
+        <button class="btn btn-sm" onclick="adjustOffset(-0.5)">-0.5s</button>
+        <button class="btn btn-sm" onclick="adjustOffset(-0.1)">-0.1s</button>
+        <span class="offset-value" id="offsetDisplay">0.0s</span>
+        <button class="btn btn-sm" onclick="adjustOffset(0.1)">+0.1s</button>
+        <button class="btn btn-sm" onclick="adjustOffset(0.5)">+0.5s</button>
+      </div>
+      <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
+    </div>
+
+    <!-- Font Size for OBS -->
+    <div class="input-group">
+      <div class="section-label">歌詞字體大小</div>
+      <div class="font-size-control">
+        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
+        <span id="fontSizeDisplay">28px</span>
+        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
+      </div>
+    </div>
+
+    <!-- Demo LRC -->
+    <div class="input-group">
+      <button class="btn btn-sm" onclick="loadDemoLRC()">載入範例歌詞（測試用）</button>
+    </div>
+  </div>
+
+  <!-- Right: Lyrics Display -->
+  <div class="lyrics-display">
+    <div class="lyrics-display-header">
+      <div class="section-label" style="margin:0;">歌詞預覽</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-sm" onclick="copyOBSUrl()">複製 OBS 瀏覽器來源 URL</button>
+      </div>
+    </div>
+    <div class="lyrics-scroll-container" id="lyricsContainer">
+      <div class="empty-state" id="emptyState">
+        <div class="icon">♪</div>
+        <p>
+          1. 貼上 YouTube 伴奏連結<br>
+          2. 貼上或載入 LRC 歌詞<br>
+          3. 播放後歌詞會自動同步滾動
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- YouTube IFrame API -->
+<script>
+  // ========== State ==========
+  let player = null;
+  let lyrics = []; // [{time: seconds, text: "..."}, ...]
+  let currentLineIndex = -1;
+  let offset = 0;
+  let baseFontSize = 28;
+  let syncInterval = null;
+  let isOBSMode = false;
+
+  // ========== YouTube API ==========
+  let playerReady = false;
+  let pendingVideoId = null;
+
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  tag.onerror = () => console.error('Failed to load YouTube IFrame API');
+  document.head.appendChild(tag);
+
+  function onYouTubeIframeAPIReady() {
+    console.log('YouTube IFrame API loaded');
+    // Don't create the player yet — wait until user loads a video
+  }
+
+  function createPlayer(videoId) {
+    if (player) {
+      // Player already exists, just load the new video
+      player.loadVideoById(videoId);
+      return;
+    }
+    player = new YT.Player('ytPlayer', {
+      height: '100%',
+      width: '100%',
+      videoId: videoId,
+      playerVars: {
+        autoplay: 1,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0,
+      },
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+        onError: onPlayerError,
+      }
+    });
+  }
+
+  function onPlayerReady(event) {
+    console.log('YouTube Player ready');
+    playerReady = true;
+  }
+
+  function onPlayerError(event) {
+    console.error('YouTube Player error:', event.data);
+    const embedErrors = [101, 150, 153];
+    if (embedErrors.includes(event.data)) {
+      // Switch to manual timer mode
+      switchToManualMode();
+    } else {
+      const codes = {2:'無效的影片 ID', 5:'不支援 HTML5', 100:'找不到影片'};
+      alert('播放錯誤：' + (codes[event.data] || '未知錯誤 (' + event.data + ')'));
+    }
+  }
+
+  function onPlayerStateChange(event) {
+    const state = event.data;
+    const dot = document.getElementById('statusDot');
+    const badge = document.getElementById('statusBadge');
+
+    if (state === YT.PlayerState.PLAYING) {
+      dot.className = 'status-dot playing';
+      badge.className = 'mode-badge active';
+      badge.textContent = 'PLAYING';
+      startSync();
+    } else if (state === YT.PlayerState.PAUSED) {
+      dot.className = 'status-dot paused';
+      badge.className = 'mode-badge';
+      badge.textContent = 'PAUSED';
+      stopSync();
+    } else if (state === YT.PlayerState.ENDED) {
+      dot.className = 'status-dot';
+      badge.className = 'mode-badge';
+      badge.textContent = 'ENDED';
+      stopSync();
+    } else {
+      dot.className = 'status-dot';
+      badge.className = 'mode-badge';
+      badge.textContent = 'IDLE';
+    }
+  }
+
+  function extractVideoId(input) {
+    input = input.trim();
+    // Direct ID (11 chars)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+    // Various YouTube URL formats
+    const patterns = [
+      /(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    ];
+    for (const p of patterns) {
+      const m = input.match(p);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function loadVideo() {
+    const input = document.getElementById('ytUrl').value;
+    const videoId = extractVideoId(input);
+    if (!videoId) {
+      alert('無法解析 YouTube 連結，請確認格式正確。');
+      return;
+    }
+    if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+      alert('YouTube API 尚未載入，請稍候再試。');
+      return;
+    }
+    currentVideoId = videoId;
+    // Reset to embed mode first
+    useManualMode = false;
+    document.getElementById('embedMode').style.display = 'block';
+    document.getElementById('manualMode').style.display = 'none';
+    manualReset();
+    createPlayer(videoId);
+  }
+
+  // ========== LRC Parsing ==========
+  function parseLRCText(text) {
+    const lines = text.split('\n');
+    const result = [];
+
+    for (const line of lines) {
+      // Match multiple time tags on same line: [mm:ss.xx] or [mm:ss:xx] or [mm:ss]
+      const timeRegex = /\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g;
+      const times = [];
+      let match;
+
+      while ((match = timeRegex.exec(line)) !== null) {
+        const min = parseInt(match[1]);
+        const sec = parseInt(match[2]);
+        let ms = 0;
+        if (match[3]) {
+          const msStr = match[3];
+          ms = msStr.length === 3 ? parseInt(msStr) : parseInt(msStr) * 10;
+        }
+        times.push(min * 60 + sec + ms / 1000);
+      }
+
+      // Extract text (everything after the last time tag)
+      const textPart = line.replace(/\[\d{1,3}:\d{2}(?:[.:]\d{1,3})?\]/g, '').trim();
+
+      // Skip metadata tags like [ti:...], [ar:...], [al:...], etc.
+      if (/^\[(?:ti|ar|al|by|offset|re|ve):/i.test(line)) continue;
+
+      for (const t of times) {
+        result.push({ time: t, text: textPart });
+      }
+    }
+
+    // Sort by time
+    result.sort((a, b) => a.time - b.time);
+    return result;
+  }
+
+  function parseLRC() {
+    const text = document.getElementById('lrcInput').value;
+    if (!text.trim()) {
+      alert('請先貼上 LRC 歌詞內容。');
+      return;
+    }
+    lyrics = parseLRCText(text);
+    renderLyrics();
+  }
+
+  function loadLRCFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById('lrcFileInput').value = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      document.getElementById('lrcInput').value = text;
+      lyrics = parseLRCText(text);
+      renderLyrics();
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // ========== Lyrics Rendering ==========
+  function renderLyrics() {
+    const container = document.getElementById('lyricsContainer');
+    const emptyState = document.getElementById('emptyState');
+    const info = document.getElementById('lyricsInfo');
+    const countEl = document.getElementById('lineCount');
+
+    if (lyrics.length === 0) {
+      emptyState.style.display = 'flex';
+      info.style.display = 'none';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+    info.style.display = 'block';
+    countEl.textContent = lyrics.length;
+
+    // Clear and rebuild
+    container.innerHTML = '';
+
+    lyrics.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'lyric-line upcoming';
+      div.id = `lyric-${index}`;
+      div.style.fontSize = baseFontSize + 'px';
+      div.onclick = () => seekToLyric(index);
+
+      // Time tag (hover to see)
+      const timeTag = document.createElement('span');
+      timeTag.className = 'time-tag';
+      timeTag.textContent = formatTime(item.time);
+      div.appendChild(timeTag);
+
+      // Text or interlude
+      if (item.text === '' || item.text === '//') {
+        div.classList.add('interlude');
+        div.appendChild(document.createTextNode('間奏'));
+      } else {
+        div.appendChild(document.createTextNode(item.text));
+      }
+
+      container.appendChild(div);
+    });
+
+    currentLineIndex = -1;
+  }
+
+  // ========== Manual Timer State ==========
+  let useManualMode = false;
+  let manualTime = 0;        // seconds elapsed
+  let manualPlaying = false;
+  let manualTimerInterval = null;
+  let manualLastTick = null;
+  let currentVideoId = null;
+
+  function switchToManualMode() {
+    useManualMode = true;
+    document.getElementById('embedMode').style.display = 'none';
+    document.getElementById('manualMode').style.display = 'block';
+    // Destroy the broken embed player
+    if (player) {
+      try { player.destroy(); } catch(e) {}
+      player = null;
+      playerReady = false;
+    }
+    // Recreate the ytPlayer div for potential future use
+    const wrapper = document.querySelector('.player-wrapper');
+    if (wrapper && !document.getElementById('ytPlayer')) {
+      const div = document.createElement('div');
+      div.id = 'ytPlayer';
+      wrapper.appendChild(div);
+    }
+  }
+
+  function openYouTubeExternal() {
+    if (currentVideoId) {
+      window.open('https://www.youtube.com/watch?v=' + currentVideoId, '_blank');
+    }
+  }
+
+  function manualTogglePlay() {
+    const btn = document.getElementById('manualPlayBtn');
+    const dot = document.getElementById('statusDot');
+    const badge = document.getElementById('statusBadge');
+
+    if (manualPlaying) {
+      // Pause
+      manualPlaying = false;
+      clearInterval(manualTimerInterval);
+      manualTimerInterval = null;
+      btn.textContent = '▶ 繼續';
+      dot.className = 'status-dot paused';
+      badge.className = 'mode-badge';
+      badge.textContent = 'PAUSED';
+      stopSync();
+    } else {
+      // Play
+      manualPlaying = true;
+      manualLastTick = performance.now();
+      manualTimerInterval = setInterval(manualTick, 50);
+      btn.textContent = '⏸ 暫停';
+      dot.className = 'status-dot playing';
+      badge.className = 'mode-badge active';
+      badge.textContent = 'PLAYING';
+      startSync();
+    }
+  }
+
+  function manualTick() {
+    const now = performance.now();
+    manualTime += (now - manualLastTick) / 1000;
+    manualLastTick = now;
+    document.getElementById('manualTimerDisplay').textContent = formatTime(manualTime);
+  }
+
+  function manualSeek(delta) {
+    manualTime = Math.max(0, manualTime + delta);
+    document.getElementById('manualTimerDisplay').textContent = formatTime(manualTime);
+    currentLineIndex = -1; // force re-sync
+  }
+
+  function manualReset() {
+    manualTime = 0;
+    manualPlaying = false;
+    clearInterval(manualTimerInterval);
+    manualTimerInterval = null;
+    manualLastTick = null;
+    document.getElementById('manualTimerDisplay').textContent = '00:00';
+    document.getElementById('manualPlayBtn').textContent = '▶ 開始';
+    document.getElementById('statusDot').className = 'status-dot';
+    document.getElementById('statusBadge').className = 'mode-badge';
+    document.getElementById('statusBadge').textContent = 'IDLE';
+    currentLineIndex = -1;
+    stopSync();
+    if (lyrics.length > 0) renderLyrics();
+  }
+
+  // ========== Sync Engine ==========
+  function getCurrentTime() {
+    if (useManualMode) return manualTime;
+    if (player && player.getCurrentTime) return player.getCurrentTime();
+    return 0;
+  }
+
+  function startSync() {
+    if (syncInterval) return;
+    syncInterval = setInterval(syncLyrics, 80);
+  }
+
+  function stopSync() {
+    if (syncInterval) {
+      clearInterval(syncInterval);
+      syncInterval = null;
+    }
+  }
+
+  function syncLyrics() {
+    if (lyrics.length === 0) return;
+    if (!useManualMode && (!player || !player.getCurrentTime)) return;
+
+    const rawTime = getCurrentTime();
+    const currentTime = rawTime + offset;
+
+    // Update time display (embed mode only)
+    if (!useManualMode && player && player.getDuration) {
+      const duration = player.getDuration() || 1;
+      document.getElementById('timeDisplay').textContent =
+        `${formatTime(rawTime)} / ${formatTime(duration)}`;
+      const pct = (rawTime / duration) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+    }
+
+    // Find current line
+    let newIndex = -1;
+    for (let i = lyrics.length - 1; i >= 0; i--) {
+      if (currentTime >= lyrics[i].time) {
+        newIndex = i;
+        break;
+      }
+    }
+
+    if (newIndex !== currentLineIndex) {
+      currentLineIndex = newIndex;
+      updateActiveLine();
+    }
+  }
+
+  function updateActiveLine() {
+    const container = document.getElementById('lyricsContainer');
+    const lines = container.querySelectorAll('.lyric-line');
+
+    lines.forEach((line, i) => {
+      line.classList.remove('active', 'passed', 'upcoming');
+
+      if (i < currentLineIndex) {
+        line.classList.add('passed');
+        line.style.fontSize = baseFontSize + 'px';
+      } else if (i === currentLineIndex) {
+        line.classList.add('active');
+        line.style.fontSize = (baseFontSize + 4) + 'px';
+      } else {
+        line.classList.add('upcoming');
+        line.style.fontSize = baseFontSize + 'px';
+      }
+    });
+
+    // Scroll to active line
+    if (currentLineIndex >= 0) {
+      const activeLine = document.getElementById(`lyric-${currentLineIndex}`);
+      if (activeLine) {
+        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  // ========== Controls ==========
+  function seekToLyric(index) {
+    const time = lyrics[index].time - offset;
+    if (useManualMode) {
+      manualTime = Math.max(0, time);
+      document.getElementById('manualTimerDisplay').textContent = formatTime(manualTime);
+      currentLineIndex = -1;
+    } else if (player && player.seekTo) {
+      player.seekTo(Math.max(0, time), true);
+    }
+  }
+
+  function seekFromBar(event) {
+    if (!player || !player.getDuration) return;
+    const bar = document.getElementById('progressBar');
+    const rect = bar.getBoundingClientRect();
+    const pct = (event.clientX - rect.left) / rect.width;
+    const duration = player.getDuration();
+    player.seekTo(pct * duration, true);
+  }
+
+  function adjustOffset(delta) {
+    offset += delta;
+    offset = Math.round(offset * 10) / 10;
+    document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
+    // Re-sync immediately
+    currentLineIndex = -1;
+  }
+
+  function adjustFontSize(delta) {
+    baseFontSize = Math.max(14, Math.min(60, baseFontSize + delta));
+    document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
+    if (lyrics.length > 0) {
+      updateActiveLine();
+    }
+  }
+
+  function formatTime(seconds) {
+    if (!seconds || seconds < 0) seconds = 0;
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function switchTab(tabName, el) {
+    document.getElementById('tabPaste').style.display = tabName === 'paste' ? 'block' : 'none';
+    document.getElementById('tabFile').style.display = tabName === 'file' ? 'block' : 'none';
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function toggleOBSMode() {
+    isOBSMode = !isOBSMode;
+    document.body.classList.toggle('obs-mode', isOBSMode);
+  }
+
+  function copyOBSUrl() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('已複製當前頁面 URL。\n\n在 OBS 中新增「瀏覽器來源」並貼上此 URL，然後在頁面上點擊「OBS 模式」切換為透明背景。');
+    }).catch(() => {
+      prompt('請手動複製此 URL 到 OBS 瀏覽器來源：', url);
+    });
+  }
+
+  // ========== Demo LRC ==========
+  function loadDemoLRC() {
+    const demo = `[ti:示範歌詞]
+[ar:Demo]
+
+[00:00.00]♪ 前奏
+[00:05.00]這是第一句示範歌詞
+[00:10.00]歌詞會跟著音樂自動滾動
+[00:15.00]當前播放的那一行會高亮顯示
+[00:20.00]已經唱過的歌詞會變暗
+[00:25.00]
+[00:30.00]你可以調整偏移量來微調同步
+[00:35.00]也可以點擊任意一行跳轉到那個時間
+[00:40.00]這個工具可以搭配 OBS 使用
+[00:45.00]在 OBS 中用瀏覽器來源嵌入
+[00:50.00]切換 OBS 模式後背景會變透明
+[00:55.00]
+[01:00.00]祝你直播順利 ♪`;
+
+    document.getElementById('lrcInput').value = demo;
+    lyrics = parseLRCText(demo);
+    renderLyrics();
+  }
+</script>
+
+</body>
+</html>
