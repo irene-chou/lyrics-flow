@@ -97,11 +97,15 @@
     flex-shrink: 0;
   }
   .btn-obs-url {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    z-index: 10;
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: transparent;
+    background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text-secondary);
@@ -124,6 +128,24 @@
   .btn-obs-url .obs-url-icon.check { display: none; }
   .btn-obs-url.copied .obs-url-icon.link { display: none; }
   .btn-obs-url.copied .obs-url-icon.check { display: block; }
+
+  .btn-header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-header-icon:hover {
+    color: #fff;
+  }
 
   .sidebar-song-name {
     display: flex;
@@ -859,23 +881,6 @@
     color: var(--accent);
     background: rgba(124, 106, 239, 0.08);
   }
-  .btn-new-song {
-    flex: 1;
-    padding: 10px 12px;
-    border: 2px dashed var(--border);
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-secondary);
-    font-family: var(--font-main);
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-new-song:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(124, 106, 239, 0.05);
-  }
 
   /* New Song Modal */
   .new-song-backdrop {
@@ -993,14 +998,10 @@
     </div>
     <div class="header-actions">
       <span class="mode-badge" id="statusBadge" style="display:none;">IDLE</span>
-      <button class="btn-obs-url" id="obsUrlBtn" onclick="copyOBSUrl()" title="複製 OBS 瀏覽器來源 URL">
-        <span>OBS</span>
-        <svg class="obs-url-icon link" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" />
-        </svg>
-        <svg class="obs-url-icon check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12" />
+      <button class="btn-header-icon" onclick="toggleSongDrawer()" title="歌曲庫">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z" />
         </svg>
       </button>
     </div>
@@ -1019,8 +1020,6 @@
         </svg>
       </button>
     </div>
-
-    <button class="btn-new-song" onclick="openNewSongModal()">+ 新增歌曲</button>
 
     <!-- Hidden inputs for form state (used by saveCurrent and other JS) -->
     <input type="hidden" id="ytUrl" />
@@ -1123,7 +1122,7 @@
       <div class="section-label">歌詞行距</div>
       <div class="font-size-control">
         <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
-        <span id="lineHeightDisplay">1.6</span>
+        <span id="lineHeightDisplay">1.0</span>
         <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
       </div>
     </div>
@@ -1133,6 +1132,16 @@
 
   <!-- Right: Lyrics Display -->
   <div class="lyrics-display">
+    <button class="btn-obs-url" id="obsUrlBtn" onclick="copyOBSUrl()" title="複製 OBS 瀏覽器來源 URL">
+      <span>OBS</span>
+      <svg class="obs-url-icon link" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" />
+      </svg>
+      <svg class="obs-url-icon check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </button>
     <div class="lyrics-scroll-container" id="lyricsContainer">
       <div class="empty-state" id="emptyState">
         <div class="icon">♪</div>
@@ -1146,10 +1155,12 @@
   </div>
 </div>
 
-<!-- Song Library FAB -->
-<button class="fab" id="fabLibrary" onclick="toggleSongDrawer()" title="歌曲庫">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z" />
+<!-- New Song FAB -->
+<button class="fab" id="fabNewSong" onclick="openNewSongModal()" title="新增歌曲">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+    stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 </button>
 
@@ -1249,7 +1260,7 @@
   let currentLineIndex = -1;
   let offset = 0;
   let baseFontSize = 28;
-  let baseLineHeight = 1.6;
+  let baseLineHeight = 1.0;
   let syncInterval = null;
   let isOBSMode = false;
   let useLocalAudio = false;
