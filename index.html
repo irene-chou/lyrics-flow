@@ -565,6 +565,18 @@
     text-align: center;
   }
 
+  /* Select (Song Library) */
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
   /* Responsive: if narrow, stack */
   @media (max-width: 900px) {
     .app {
@@ -593,48 +605,101 @@
 
   <!-- Left: Control Panel -->
   <div class="control-panel">
-    <!-- YouTube URL -->
+    <!-- Song Library -->
     <div class="input-group">
-      <div class="section-label">YouTube 伴奏</div>
+      <div class="section-label">歌曲庫</div>
       <div class="input-row">
-        <input type="text" id="ytUrl" placeholder="貼上 YouTube 連結或影片 ID" />
-        <button class="btn btn-primary" onclick="loadVideo()">載入</button>
+        <select id="songSelect" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:var(--font-main); font-size:13px; outline:none;">
+          <option value="">-- 選擇歌曲 --</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="loadSelectedSong()">載入</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSelectedSong()">刪除</button>
+      </div>
+      <div class="input-row">
+        <button class="btn btn-sm" onclick="saveCurrent()" style="flex:1;">儲存目前歌曲</button>
+        <button class="btn btn-sm" onclick="exportSongs()">匯出</button>
+        <button class="btn btn-sm" onclick="document.getElementById('importFileInput').click()">匯入</button>
+        <input type="file" id="importFileInput" accept=".json" onchange="importSongs(event)" style="display:none;" />
       </div>
     </div>
 
-    <!-- Player (embed mode) -->
-    <div id="embedMode">
-      <div class="player-wrapper">
-        <div id="ytPlayer"></div>
+    <!-- Audio Source Tabs -->
+    <div class="input-group">
+      <div class="section-label">伴奏來源</div>
+      <div class="tabs" id="audioSourceTabs">
+        <button class="tab active" onclick="switchAudioSource('youtube', this)">YouTube</button>
+        <button class="tab" onclick="switchAudioSource('local', this)">本地音檔</button>
       </div>
-      <div class="playback-info">
-        <div class="status-dot" id="statusDot"></div>
-        <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
-        <div class="progress-bar" id="progressBar" onclick="seekFromBar(event)">
-          <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- YouTube Source -->
+    <div id="audioSourceYoutube">
+      <div class="input-group">
+        <div class="input-row">
+          <input type="text" id="ytUrl" placeholder="貼上 YouTube 連結或影片 ID" />
+          <button class="btn btn-primary" onclick="loadVideo()">載入</button>
+        </div>
+      </div>
+
+      <!-- Player (embed mode) -->
+      <div id="embedMode">
+        <div class="player-wrapper">
+          <div id="ytPlayer"></div>
+        </div>
+        <div class="playback-info">
+          <div class="status-dot" id="statusDot"></div>
+          <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+          <div class="progress-bar" id="progressBar" onclick="seekFromBar(event)">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual timer (fallback when embed blocked) -->
+      <div id="manualMode" style="display:none;">
+        <div class="embed-error">
+          <div class="error-title">此影片不允許嵌入播放</div>
+          <p>請在其他視窗開啟 YouTube 播放伴奏，<br>然後用下方計時器手動同步歌詞。</p>
+          <button class="btn btn-sm" id="openYtBtn" onclick="openYouTubeExternal()">在新視窗開啟 YouTube</button>
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="section-label">手動計時器</div>
+          <div class="manual-controls">
+            <button class="btn btn-primary" id="manualPlayBtn" onclick="manualTogglePlay()">▶ 開始</button>
+            <span class="timer-display" id="manualTimerDisplay">00:00</span>
+            <button class="btn btn-sm" onclick="manualSeek(-5)">-5s</button>
+            <button class="btn btn-sm" onclick="manualSeek(5)">+5s</button>
+            <button class="btn btn-sm btn-danger" onclick="manualReset()">重置</button>
+          </div>
+          <div class="hint" style="margin-top:6px;">
+            提示：在 YouTube 按播放的同時點「開始」，歌詞就會同步滾動。
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Manual timer (fallback when embed blocked) -->
-    <div id="manualMode" style="display:none;">
-      <div class="embed-error">
-        <div class="error-title">此影片不允許嵌入播放</div>
-        <p>請在其他視窗開啟 YouTube 播放伴奏，<br>然後用下方計時器手動同步歌詞。</p>
-        <button class="btn btn-sm" id="openYtBtn" onclick="openYouTubeExternal()">在新視窗開啟 YouTube</button>
+    <!-- Local Audio Source -->
+    <div id="audioSourceLocal" style="display:none;">
+      <div class="input-group">
+        <div class="input-row">
+          <input type="text" id="audioFileName" placeholder="點擊選擇音檔（mp3, m4a, wav, ogg...）" readonly
+                 onclick="document.getElementById('audioFileInput').click()" style="cursor:pointer;" />
+          <button class="btn btn-primary" onclick="document.getElementById('audioFileInput').click()">選擇檔案</button>
+        </div>
+        <input type="file" id="audioFileInput" accept="audio/*" onchange="loadAudioFile(event)" style="display:none;" />
       </div>
-      <div style="margin-top: 12px;">
-        <div class="section-label">手動計時器</div>
-        <div class="manual-controls">
-          <button class="btn btn-primary" id="manualPlayBtn" onclick="manualTogglePlay()">▶ 開始</button>
-          <span class="timer-display" id="manualTimerDisplay">00:00</span>
-          <button class="btn btn-sm" onclick="manualSeek(-5)">-5s</button>
-          <button class="btn btn-sm" onclick="manualSeek(5)">+5s</button>
-          <button class="btn btn-sm btn-danger" onclick="manualReset()">重置</button>
+      <audio id="audioPlayer" style="display:none;"></audio>
+      <div class="playback-info" id="audioPlaybackInfo" style="display:none;">
+        <div class="status-dot" id="audioStatusDot"></div>
+        <div class="time-display" id="audioTimeDisplay">00:00 / 00:00</div>
+        <div class="progress-bar" id="audioProgressBar" onclick="audioSeekFromBar(event)">
+          <div class="progress-fill" id="audioProgressFill"></div>
         </div>
-        <div class="hint" style="margin-top:6px;">
-          提示：在 YouTube 按播放的同時點「開始」，歌詞就會同步滾動。
-        </div>
+      </div>
+      <div class="manual-controls" id="audioControls" style="display:none;">
+        <button class="btn btn-primary" id="audioPlayBtn" onclick="audioTogglePlay()">▶ 播放</button>
+        <button class="btn btn-sm" onclick="audioSeek(-5)">-5s</button>
+        <button class="btn btn-sm" onclick="audioSeek(5)">+5s</button>
       </div>
     </div>
 
@@ -726,6 +791,291 @@
   let baseFontSize = 28;
   let syncInterval = null;
   let isOBSMode = false;
+  let useLocalAudio = false;
+  let audioEl = null;
+  let currentSongTitle = ''; // from LRC [ti:] or user input
+
+  // ========== IndexedDB (Song Library) ==========
+  const DB_NAME = 'lyrics-flow-db';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'songs';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function saveSong(song) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(song);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function getAllSongs() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function deleteSong(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // ========== Song Library Functions ==========
+  async function refreshSongList() {
+    const select = document.getElementById('songSelect');
+    const songs = await getAllSongs();
+    select.innerHTML = '<option value="">-- 選擇歌曲 --</option>';
+    songs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    songs.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      select.appendChild(opt);
+    });
+  }
+
+  async function saveCurrent() {
+    const lrcText = document.getElementById('lrcInput').value.trim();
+    if (!lrcText && lyrics.length === 0) {
+      alert('請先載入歌詞再儲存。');
+      return;
+    }
+    const defaultName = currentSongTitle || '未命名歌曲';
+    const name = prompt('輸入歌曲名稱：', defaultName);
+    if (!name) return;
+
+    const song = {
+      id: Date.now(),
+      name: name,
+      lrcText: lrcText || document.getElementById('lrcInput').value,
+      offset: offset,
+      baseFontSize: baseFontSize,
+      audioSource: useLocalAudio ? 'local' : 'youtube',
+      youtubeId: useLocalAudio ? null : (currentVideoId || null),
+      audioFileName: useLocalAudio ? (document.getElementById('audioFileName').value || null) : null,
+      createdAt: Date.now(),
+    };
+    await saveSong(song);
+    await refreshSongList();
+    // Select the just-saved song
+    document.getElementById('songSelect').value = song.id;
+    alert(`已儲存「${name}」到歌曲庫。`);
+  }
+
+  async function loadSelectedSong() {
+    const select = document.getElementById('songSelect');
+    const id = Number(select.value);
+    if (!id) { alert('請先選擇一首歌曲。'); return; }
+
+    const songs = await getAllSongs();
+    const song = songs.find(s => s.id === id);
+    if (!song) { alert('找不到歌曲。'); return; }
+
+    // 1. Load lyrics
+    document.getElementById('lrcInput').value = song.lrcText;
+    lyrics = parseLRCText(song.lrcText);
+    renderLyrics();
+
+    // 2. Apply offset
+    offset = song.offset || 0;
+    document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
+
+    // 3. Apply font size
+    baseFontSize = song.baseFontSize || 28;
+    document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
+    if (lyrics.length > 0) updateActiveLine();
+
+    // 4. Switch audio source & load
+    const tabs = document.getElementById('audioSourceTabs').querySelectorAll('.tab');
+    tabs.forEach(t => t.classList.remove('active'));
+
+    if (song.audioSource === 'local') {
+      useLocalAudio = true;
+      useManualMode = false;
+      document.getElementById('audioSourceYoutube').style.display = 'none';
+      document.getElementById('audioSourceLocal').style.display = 'block';
+      if (tabs[1]) tabs[1].classList.add('active');
+
+      if (song.audioFileName) {
+        document.getElementById('audioFileName').value = song.audioFileName;
+        alert(`請選擇音檔「${song.audioFileName}」以播放伴奏。`);
+        document.getElementById('audioFileInput').click();
+      }
+    } else {
+      useLocalAudio = false;
+      document.getElementById('audioSourceYoutube').style.display = 'block';
+      document.getElementById('audioSourceLocal').style.display = 'none';
+      if (tabs[0]) tabs[0].classList.add('active');
+
+      if (song.youtubeId) {
+        document.getElementById('ytUrl').value = 'https://www.youtube.com/watch?v=' + song.youtubeId;
+        loadVideo();
+      }
+    }
+  }
+
+  async function deleteSelectedSong() {
+    const select = document.getElementById('songSelect');
+    const id = Number(select.value);
+    if (!id) { alert('請先選擇一首歌曲。'); return; }
+    const name = select.options[select.selectedIndex].textContent;
+    if (!confirm(`確定要刪除「${name}」？`)) return;
+    await deleteSong(id);
+    await refreshSongList();
+  }
+
+  async function exportSongs() {
+    const songs = await getAllSongs();
+    if (songs.length === 0) { alert('歌曲庫是空的。'); return; }
+    const json = JSON.stringify(songs, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lyrics-flow-songs.json';
+    a.click();
+  }
+
+  async function importSongs(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const songs = JSON.parse(e.target.result);
+        if (!Array.isArray(songs)) throw new Error('格式錯誤');
+        let count = 0;
+        for (const song of songs) {
+          if (song.name && song.lrcText) {
+            // Assign new ID to avoid conflicts
+            song.id = Date.now() + count;
+            await saveSong(song);
+            count++;
+          }
+        }
+        await refreshSongList();
+        alert(`已匯入 ${count} 首歌曲。`);
+      } catch (err) {
+        alert('匯入失敗：檔案格式不正確。');
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+    // Reset file input so same file can be imported again
+    event.target.value = '';
+  }
+
+  // ========== Audio Source Switching ==========
+  function switchAudioSource(source, el) {
+    document.getElementById('audioSourceYoutube').style.display = source === 'youtube' ? 'block' : 'none';
+    document.getElementById('audioSourceLocal').style.display = source === 'local' ? 'block' : 'none';
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+
+    if (source === 'local') {
+      useLocalAudio = true;
+      useManualMode = false;
+      // Pause YouTube if playing
+      if (player && player.pauseVideo) try { player.pauseVideo(); } catch(e) {}
+      stopSync();
+    } else {
+      useLocalAudio = false;
+      // Pause local audio if playing
+      if (audioEl && !audioEl.paused) audioEl.pause();
+      stopSync();
+    }
+  }
+
+  // ========== Local Audio ==========
+  function loadAudioFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById('audioFileName').value = file.name;
+
+    audioEl = document.getElementById('audioPlayer');
+    audioEl.src = URL.createObjectURL(file);
+
+    // Show controls
+    document.getElementById('audioPlaybackInfo').style.display = 'flex';
+    document.getElementById('audioControls').style.display = 'flex';
+
+    // Event bindings
+    audioEl.onplay = function() {
+      document.getElementById('audioStatusDot').className = 'status-dot playing';
+      document.getElementById('statusBadge').className = 'mode-badge active';
+      document.getElementById('statusBadge').textContent = 'PLAYING';
+      document.getElementById('audioPlayBtn').textContent = '⏸ 暫停';
+      startSync();
+    };
+    audioEl.onpause = function() {
+      document.getElementById('audioStatusDot').className = 'status-dot paused';
+      document.getElementById('statusBadge').className = 'mode-badge';
+      document.getElementById('statusBadge').textContent = 'PAUSED';
+      document.getElementById('audioPlayBtn').textContent = '▶ 播放';
+      stopSync();
+    };
+    audioEl.onended = function() {
+      document.getElementById('audioStatusDot').className = 'status-dot';
+      document.getElementById('statusBadge').className = 'mode-badge';
+      document.getElementById('statusBadge').textContent = 'ENDED';
+      document.getElementById('audioPlayBtn').textContent = '▶ 播放';
+      stopSync();
+    };
+    audioEl.ontimeupdate = function() {
+      const cur = audioEl.currentTime;
+      const dur = audioEl.duration || 0;
+      document.getElementById('audioTimeDisplay').textContent =
+        `${formatTime(cur)} / ${formatTime(dur)}`;
+      const pct = dur > 0 ? (cur / dur) * 100 : 0;
+      document.getElementById('audioProgressFill').style.width = pct + '%';
+    };
+  }
+
+  function audioTogglePlay() {
+    if (!audioEl || !audioEl.src) return;
+    if (audioEl.paused) {
+      audioEl.play();
+    } else {
+      audioEl.pause();
+    }
+  }
+
+  function audioSeek(delta) {
+    if (!audioEl) return;
+    audioEl.currentTime = Math.max(0, Math.min(audioEl.duration || 0, audioEl.currentTime + delta));
+    currentLineIndex = -1;
+  }
+
+  function audioSeekFromBar(event) {
+    if (!audioEl || !audioEl.duration) return;
+    const bar = document.getElementById('audioProgressBar');
+    const rect = bar.getBoundingClientRect();
+    const pct = (event.clientX - rect.left) / rect.width;
+    audioEl.currentTime = pct * audioEl.duration;
+    currentLineIndex = -1;
+  }
 
   // ========== PieSocket (OBS Sync) ==========
   const piesocket = new PieSocket.default({
@@ -872,7 +1222,17 @@
     const lines = text.split('\n');
     const result = [];
 
+    // Extract [ti:] for song title
+    currentSongTitle = '';
     for (const line of lines) {
+      const tiMatch = line.match(/^\[ti:\s*(.+?)\s*\]/i);
+      if (tiMatch) { currentSongTitle = tiMatch[1]; break; }
+    }
+
+    for (const line of lines) {
+      // Skip metadata tags like [ti:...], [ar:...], [al:...], etc.
+      if (/^\[(?:ti|ar|al|by|offset|re|ve):/i.test(line)) continue;
+
       // Match multiple time tags on same line: [mm:ss.xx] or [mm:ss:xx] or [mm:ss]
       const timeRegex = /\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g;
       const times = [];
@@ -891,9 +1251,6 @@
 
       // Extract text (everything after the last time tag)
       const textPart = line.replace(/\[\d{1,3}:\d{2}(?:[.:]\d{1,3})?\]/g, '').trim();
-
-      // Skip metadata tags like [ti:...], [ar:...], [al:...], etc.
-      if (/^\[(?:ti|ar|al|by|offset|re|ve):/i.test(line)) continue;
 
       for (const t of times) {
         result.push({ time: t, text: textPart });
@@ -1069,6 +1426,7 @@
 
   // ========== Sync Engine ==========
   function getCurrentTime() {
+    if (useLocalAudio && audioEl) return audioEl.currentTime;
     if (useManualMode) return manualTime;
     if (player && player.getCurrentTime) return player.getCurrentTime();
     return 0;
@@ -1088,7 +1446,7 @@
 
   function syncLyrics() {
     if (lyrics.length === 0) return;
-    if (!useManualMode && (!player || !player.getCurrentTime)) return;
+    if (!useLocalAudio && !useManualMode && (!player || !player.getCurrentTime)) return;
 
     const rawTime = getCurrentTime();
     const currentTime = rawTime + offset;
@@ -1149,7 +1507,10 @@
   // ========== Controls ==========
   function seekToLyric(index) {
     const time = lyrics[index].time - offset;
-    if (useManualMode) {
+    if (useLocalAudio && audioEl) {
+      audioEl.currentTime = Math.max(0, time);
+      currentLineIndex = -1;
+    } else if (useManualMode) {
       manualTime = Math.max(0, time);
       document.getElementById('manualTimerDisplay').textContent = formatTime(manualTime);
       currentLineIndex = -1;
@@ -1237,6 +1598,9 @@
     lyrics = parseLRCText(demo);
     renderLyrics();
   }
+
+  // ========== Init Song Library on Page Load ==========
+  refreshSongList().catch(e => console.error('Failed to load song library:', e));
 </script>
 
 </body>
