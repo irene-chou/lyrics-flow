@@ -1147,6 +1147,14 @@
 
     <!-- Font Size & Line Height -->
     <div class="input-group">
+      <div class="section-label">歌名字體大小</div>
+      <div class="font-size-control">
+        <button class="btn btn-sm" onclick="adjustTitleFontSize(-2)">A-</button>
+        <span id="titleFontSizeDisplay">18px</span>
+        <button class="btn btn-sm" onclick="adjustTitleFontSize(2)">A+</button>
+      </div>
+    </div>
+    <div class="input-group">
       <div class="section-label">歌詞字體大小</div>
       <div class="font-size-control">
         <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
@@ -1291,6 +1299,7 @@
   let currentLineIndex = -1;
   let offset = 0;
   let baseFontSize = 28;
+  let titleFontSize = 18;
   let baseLineHeight = 1.0;
   let syncInterval = null;
   let isOBSMode = false;
@@ -1998,7 +2007,7 @@
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
-        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset, songTitle: currentSongTitle });
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, offset, songTitle: currentSongTitle });
       }
     });
     console.log('PieSocket connected');
@@ -2522,6 +2531,12 @@
     updateSaveBtn();
   }
 
+  function adjustTitleFontSize(delta) {
+    titleFontSize = Math.max(10, Math.min(40, titleFontSize + delta));
+    document.getElementById('titleFontSizeDisplay').textContent = titleFontSize + 'px';
+    broadcast('TITLE_FONT_SIZE', { titleFontSize });
+  }
+
   function adjustFontSize(delta) {
     baseFontSize = Math.max(14, Math.min(60, baseFontSize + delta));
     document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
@@ -2598,7 +2613,7 @@
     if (!document.hidden && lyrics.length > 0) {
       // Re-calculate current line index before broadcasting (it may be stale)
       syncLyrics();
-      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset, songTitle: currentSongTitle });
+      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, offset, songTitle: currentSongTitle });
     }
   });
 

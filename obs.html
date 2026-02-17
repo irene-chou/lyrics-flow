@@ -40,7 +40,7 @@
     flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
-    padding: 30vh 48px 30vh 48px;
+    padding: 16px 48px;
   }
 
   .lyrics-scroll-container::-webkit-scrollbar { width: 0; }
@@ -55,42 +55,34 @@
     line-height: 1.6;
     color: var(--text-dim);
     transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    display: none;
   }
 
-  .lyric-line.passed {
-    color: var(--passed-lyric);
-    font-weight: 400;
+  .lyric-line.visible {
+    display: block;
   }
 
   .lyric-line.active {
     color: var(--active-lyric);
     font-weight: 700;
     font-size: 32px;
-    transform: scale(1.01);
   }
 
-  .lyric-line.upcoming {
+  .lyric-line.next {
     color: var(--upcoming-lyric);
   }
 
   .lyric-line.interlude {
-    font-size: 16px;
     font-style: italic;
     color: var(--text-dim);
     letter-spacing: 0.05em;
-  }
-
-  .lyric-line.interlude::before {
-    content: '\266A';
-    margin-right: 8px;
-    opacity: 0.5;
   }
 
   .now-singing {
     display: none;
     flex-direction: column;
     gap: 4px;
-    padding: 16px 48px;
+    padding: 16px 68px;
     font-family: var(--font-lyrics);
   }
   .now-singing-label {
@@ -135,6 +127,7 @@
   let currentLineIndex = -1;
   let baseFontSize = 28;
   let baseLineHeight = 1.6;
+  let titleFontSize = 18;
   let songTitle = '';
   let syncChannel = null;
   let lastMessageTime = 0;
@@ -142,8 +135,11 @@
   function updateNowSinging() {
     const el = document.getElementById('nowSinging');
     const titleEl = document.getElementById('nowSingingTitle');
+    const labelEl = document.querySelector('.now-singing-label');
     if (songTitle && lyrics.length > 0) {
       titleEl.textContent = songTitle;
+      labelEl.style.fontSize = Math.round(titleFontSize * 0.72) + 'px';
+      titleEl.style.fontSize = titleFontSize + 'px';
       el.style.display = 'flex';
     } else {
       el.style.display = 'none';
@@ -177,6 +173,7 @@
             currentLineIndex = data.currentLineIndex;
             baseFontSize = data.baseFontSize || 28;
             baseLineHeight = data.baseLineHeight || 1.6;
+            titleFontSize = data.titleFontSize || 18;
             songTitle = data.songTitle || '';
             renderLyrics();
             updateActiveLine();
@@ -198,6 +195,10 @@
           case 'FONT_SIZE':
             baseFontSize = data.baseFontSize;
             updateActiveLine();
+            break;
+          case 'TITLE_FONT_SIZE':
+            titleFontSize = data.titleFontSize;
+            updateNowSinging();
             break;
           case 'LINE_HEIGHT':
             baseLineHeight = data.baseLineHeight;
@@ -257,28 +258,17 @@
   function updateActiveLine() {
     const lines = document.querySelectorAll('.lyric-line');
     lines.forEach((line, i) => {
-      line.classList.remove('active', 'passed', 'upcoming');
-      if (i < currentLineIndex) {
-        line.classList.add('passed');
-        line.style.fontSize = baseFontSize + 'px';
-        line.style.lineHeight = baseLineHeight;
-      } else if (i === currentLineIndex) {
-        line.classList.add('active');
+      line.classList.remove('active', 'next', 'visible');
+      if (i === currentLineIndex) {
+        line.classList.add('active', 'visible');
         line.style.fontSize = (baseFontSize + 4) + 'px';
         line.style.lineHeight = baseLineHeight;
-      } else {
-        line.classList.add('upcoming');
+      } else if (i === currentLineIndex + 1) {
+        line.classList.add('next', 'visible');
         line.style.fontSize = baseFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
       }
     });
-
-    if (currentLineIndex >= 0) {
-      const activeLine = document.getElementById(`lyric-${currentLineIndex}`);
-      if (activeLine) {
-        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
   }
 </script>
 
