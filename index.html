@@ -1968,8 +1968,22 @@
   let useManualMode = false;
   let manualTime = 0;        // seconds elapsed
   let manualPlaying = false;
-  let manualTimerInterval = null;
+  let manualTimerActive = false;
   let manualLastTick = null;
+  // Web Worker for manual timer (avoids background tab throttling)
+  const manualWorkerBlob = new Blob([`
+    let id = null;
+    self.onmessage = (e) => {
+      if (e.data === 'start') {
+        if (id) clearInterval(id);
+        id = setInterval(() => self.postMessage('tick'), 50);
+      } else if (e.data === 'stop') {
+        if (id) { clearInterval(id); id = null; }
+      }
+    };
+  `], { type: 'application/javascript' });
+  const manualWorker = new Worker(URL.createObjectURL(manualWorkerBlob));
+  manualWorker.onmessage = () => manualTick();
   let currentVideoId = null;
 
   function switchToManualMode() {
@@ -2005,8 +2019,8 @@
     if (manualPlaying) {
       // Pause
       manualPlaying = false;
-      clearInterval(manualTimerInterval);
-      manualTimerInterval = null;
+      manualWorker.postMessage('stop');
+      manualTimerActive = false;
       btn.textContent = '▶ 繼續';
       dot.className = 'status-dot paused';
       badge.className = 'mode-badge';
@@ -2016,7 +2030,8 @@
       // Play
       manualPlaying = true;
       manualLastTick = performance.now();
-      manualTimerInterval = setInterval(manualTick, 50);
+      manualWorker.postMessage('start');
+      manualTimerActive = true;
       btn.textContent = '⏸ 暫停';
       dot.className = 'status-dot playing';
       badge.className = 'mode-badge active';
@@ -2041,8 +2056,8 @@
   function manualReset() {
     manualTime = 0;
     manualPlaying = false;
-    clearInterval(manualTimerInterval);
-    manualTimerInterval = null;
+    manualWorker.postMessage('stop');
+    manualTimerActive = false;
     manualLastTick = null;
     document.getElementById('manualTimerDisplay').textContent = '00:00';
     document.getElementById('manualPlayBtn').textContent = '▶ 開始';
@@ -2256,9 +2271,11 @@
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveCurrent(); return; }
   });
 
-  // Broadcast full state when tab becomes visible again (ensures OBS sync)
+  // When tab becomes visible, re-sync current line then broadcast to OBS
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && lyrics.length > 0) {
+      // Re-calculate current line index before broadcasting (it may be stale)
+      syncLyrics();
       broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset });
     }
   });

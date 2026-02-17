@@ -102,6 +102,7 @@
   let baseFontSize = 28;
   let baseLineHeight = 1.6;
   let syncChannel = null;
+  let lastMessageTime = 0;
 
   // ========== PieSocket (OBS Sync) ==========
   const piesocket = new PieSocket.default({
@@ -117,51 +118,64 @@
     }
   }
 
-  piesocket.subscribe('lyrics-flow').then(ch => {
-    syncChannel = ch;
+  function connectChannel() {
+    piesocket.subscribe('lyrics-flow').then(ch => {
+      syncChannel = ch;
 
-    ch.listen('sync', (msg) => {
-      const { type, data } = msg;
-      switch (type) {
-        case 'FULL_STATE':
-          lyrics = data.lyrics || [];
-          currentLineIndex = data.currentLineIndex;
-          baseFontSize = data.baseFontSize || 28;
-          baseLineHeight = data.baseLineHeight || 1.6;
-          renderLyrics();
-          updateActiveLine();
-          break;
-        case 'LYRICS_LOADED':
-          lyrics = data.lyrics || [];
-          currentLineIndex = -1;
-          renderLyrics();
-          break;
-        case 'SYNC_UPDATE':
-          if (data.currentLineIndex !== currentLineIndex) {
+      ch.listen('sync', (msg) => {
+        lastMessageTime = Date.now();
+        const { type, data } = msg;
+        switch (type) {
+          case 'FULL_STATE':
+            lyrics = data.lyrics || [];
             currentLineIndex = data.currentLineIndex;
+            baseFontSize = data.baseFontSize || 28;
+            baseLineHeight = data.baseLineHeight || 1.6;
+            renderLyrics();
             updateActiveLine();
-          }
-          break;
-        case 'FONT_SIZE':
-          baseFontSize = data.baseFontSize;
-          updateActiveLine();
-          break;
-        case 'LINE_HEIGHT':
-          baseLineHeight = data.baseLineHeight;
-          updateActiveLine();
-          break;
-      }
-    });
+            break;
+          case 'LYRICS_LOADED':
+            lyrics = data.lyrics || [];
+            currentLineIndex = -1;
+            renderLyrics();
+            break;
+          case 'SYNC_UPDATE':
+            if (data.currentLineIndex !== currentLineIndex) {
+              currentLineIndex = data.currentLineIndex;
+              updateActiveLine();
+            }
+            break;
+          case 'FONT_SIZE':
+            baseFontSize = data.baseFontSize;
+            updateActiveLine();
+            break;
+          case 'LINE_HEIGHT':
+            baseLineHeight = data.baseLineHeight;
+            updateActiveLine();
+            break;
+          case 'OFFSET':
+            // Offset is applied on control page side; OBS just needs fresh sync
+            break;
+        }
+      });
 
-    // Request full state on initial connect
-    requestFullState();
-
-    // Re-request state on WebSocket reconnect
-    ch.on('open', () => {
-      console.log('WebSocket reconnected');
+      // Request full state on connect
       requestFullState();
+    }).catch(err => {
+      console.error('PieSocket subscribe failed:', err);
+      setTimeout(connectChannel, 3000);
     });
-  });
+  }
+
+  connectChannel();
+
+  // Periodically re-request state if no messages received (handles reconnection)
+  setInterval(() => {
+    if (syncChannel && Date.now() - lastMessageTime > 10000) {
+      console.log('No messages for 10s, re-requesting state...');
+      requestFullState();
+    }
+  }, 5000);
 
   function renderLyrics() {
     const container = document.getElementById('lyricsContainer');
