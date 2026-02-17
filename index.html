@@ -128,7 +128,7 @@
     border-color: var(--success);
   }
   .btn-obs-url .obs-url-icon.check { display: none; }
-  .btn-obs-url.copied .obs-url-icon.copy { display: none; }
+  .btn-obs-url.copied .obs-url-icon.link { display: none; }
   .btn-obs-url.copied .obs-url-icon.check { display: block; }
 
   .song-indicator {
@@ -630,6 +630,13 @@
     border-radius: 3px;
     font-size: 10px;
   }
+  .hint a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .hint a:hover {
+    text-decoration: underline;
+  }
 
   /* ========== Manual Timer Mode ========== */
   .manual-controls {
@@ -943,11 +950,9 @@
     <div class="header-actions">
       <span class="mode-badge" id="statusBadge" style="display:none;">IDLE</span>
       <button class="btn-obs-url" id="obsUrlBtn" onclick="copyOBSUrl()" title="複製 OBS 瀏覽器來源 URL">
-        <span>OBS URL</span>
-        <svg class="obs-url-icon copy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        <span>OBS</span>
+        <svg class="obs-url-icon link" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" />
         </svg>
         <svg class="obs-url-icon check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1069,7 +1074,7 @@
       </div>
 
       <div class="hint">
-        提示：可從 <code>lrclib.net</code> 或 <code>megalobiz.com</code> 搜尋下載中文歌的 LRC 檔。
+        提示：可從 <a href="https://lrclib.net" target="_blank">lrclib.net</a> 或 <a href="https://www.megalobiz.com" target="_blank">megalobiz.com</a> 搜尋下載中文歌的 LRC 檔。
       </div>
     </div>
 
@@ -1142,19 +1147,19 @@
   <div class="song-drawer" onclick="event.stopPropagation()">
     <div class="song-drawer-header">
       <h2 class="panel-heading">歌曲庫</h2>
+      <div class="drawer-menu">
+        <button class="btn-icon" onclick="toggleDrawerMenu(event)" title="更多">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" /></svg>
+        </button>
+        <div class="drawer-menu-dropdown" id="drawerMenuDropdown">
+          <button onclick="exportSongs(); closeDrawerMenu()">匯出歌曲庫</button>
+          <button onclick="document.getElementById('importFileInput').click(); closeDrawerMenu()">匯入歌曲庫</button>
+        </div>
+      </div>
     </div>
     <div class="song-drawer-body" onclick="closeDrawerMenu()">
       <div class="input-row" style="align-items:stretch;">
         <input type="text" id="songSearchInput" placeholder="搜尋歌曲..." oninput="filterSongList()" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:var(--font-main); font-size:13px; outline:none;" />
-        <div class="drawer-menu">
-          <button class="btn btn-sm" onclick="toggleDrawerMenu(event)" title="更多" style="height:100%;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" /></svg>
-          </button>
-          <div class="drawer-menu-dropdown" id="drawerMenuDropdown">
-            <button onclick="exportSongs(); closeDrawerMenu()">匯出歌曲庫</button>
-            <button onclick="document.getElementById('importFileInput').click(); closeDrawerMenu()">匯入歌曲庫</button>
-          </div>
-        </div>
         <input type="file" id="importFileInput" accept=".json" onchange="importSongs(event)" style="display:none;" />
       </div>
       <div class="song-list" id="songList">
