@@ -1460,19 +1460,23 @@
       document.getElementById('statusBadge').className = 'mode-badge';
       document.getElementById('statusBadge').textContent = 'IDLE';
 
-      // 1. Load lyrics
+      // 1. Set song title before parsing (so broadcast has correct title)
+      currentSongId = song.id;
+      currentSongTitle = song.name;
+
+      // 2. Load lyrics
       document.getElementById('lrcInput').value = song.lrcText;
       lyrics = parseLRCText(song.lrcText);
       renderLyrics();
 
-      // 2. Apply offset
+      // 3. Apply offset
       offset = song.offset || 0;
       document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
 
-      // 3. Render lyrics with current font size
+      // 4. Render lyrics with current font size
       if (lyrics.length > 0) updateActiveLine();
 
-      // 4. Switch audio source & load
+      // 5. Switch audio source & load
       const tabs = document.getElementById('audioSourceTabs').querySelectorAll('.tab');
       tabs.forEach(t => t.classList.remove('active'));
 
@@ -1500,9 +1504,7 @@
         }
       }
 
-      // 5. Track current song for save/update
-      currentSongId = song.id;
-      currentSongTitle = song.name;
+      // 6. Track current song for save/update
       lastSavedState = captureCurrentState();
       updateSaveBtn();
       updateSongIndicator();
@@ -2152,11 +2154,12 @@
     const lines = text.split('\n');
     const result = [];
 
-    // Extract [ti:] for song title
-    currentSongTitle = '';
-    for (const line of lines) {
-      const tiMatch = line.match(/^\[ti:\s*(.+?)\s*\]/i);
-      if (tiMatch) { currentSongTitle = tiMatch[1]; break; }
+    // Extract [ti:] for song title (only if not already set by loadSongById)
+    if (!currentSongTitle) {
+      for (const line of lines) {
+        const tiMatch = line.match(/^\[ti:\s*(.+?)\s*\]/i);
+        if (tiMatch) { currentSongTitle = tiMatch[1]; break; }
+      }
     }
 
     for (const line of lines) {
@@ -2478,14 +2481,15 @@
     const time = lyrics[index].time - offset;
     if (useLocalAudio && audioEl) {
       audioEl.currentTime = Math.max(0, time);
-      currentLineIndex = -1;
     } else if (useManualMode) {
       manualTime = Math.max(0, time);
       document.getElementById('manualTimerDisplay').textContent = formatTime(manualTime);
-      currentLineIndex = -1;
     } else if (player && player.seekTo) {
       player.seekTo(Math.max(0, time), true);
     }
+    currentLineIndex = index;
+    updateActiveLine();
+    broadcast('SYNC_UPDATE', { currentLineIndex });
   }
 
   function seekFromBar(event) {

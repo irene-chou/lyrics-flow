@@ -88,24 +88,21 @@
 
   .now-singing {
     display: none;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 4px;
     padding: 16px 48px;
     font-family: var(--font-lyrics);
-    font-size: 16px;
   }
   .now-singing-label {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-size: 13px;
-    color: var(--upcoming-lyric);
-  }
-  .now-singing-divider {
-    color: var(--upcoming-lyric);
+    color: #ffffff;
   }
   .now-singing-title {
     font-weight: 500;
+    font-size: 18px;
     color: #ffffff;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -127,7 +124,6 @@
 
 <div class="now-singing" id="nowSinging">
   <span class="now-singing-label">Now singing</span>
-  <span class="now-singing-divider">-</span>
   <span class="now-singing-title" id="nowSingingTitle"></span>
 </div>
 <div class="lyrics-scroll-container" id="lyricsContainer">
