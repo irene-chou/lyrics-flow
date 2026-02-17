@@ -887,66 +887,71 @@
   }
 
   async function loadSelectedSong() {
-    const select = document.getElementById('songSelect');
-    const id = Number(select.value);
-    if (!id) { alert('請先選擇一首歌曲。'); return; }
+    try {
+      const select = document.getElementById('songSelect');
+      const id = Number(select.value);
+      if (!id) { alert('請先選擇一首歌曲。'); return; }
 
-    const songs = await getAllSongs();
-    const song = songs.find(s => s.id === id);
-    if (!song) { alert('找不到歌曲。'); return; }
+      const songs = await getAllSongs();
+      const song = songs.find(s => s.id === id);
+      if (!song) { alert('找不到歌曲。'); return; }
 
-    // 0. Reset previous playback state
-    stopSync();
-    currentLineIndex = -1;
-    if (player && player.stopVideo) try { player.stopVideo(); } catch(e) {}
-    if (audioEl && !audioEl.paused) audioEl.pause();
-    if (manualPlaying) manualReset();
-    document.getElementById('embedMode').style.display = 'block';
-    document.getElementById('manualMode').style.display = 'none';
-    useManualMode = false;
-    document.getElementById('statusBadge').className = 'mode-badge';
-    document.getElementById('statusBadge').textContent = 'IDLE';
-
-    // 1. Load lyrics
-    document.getElementById('lrcInput').value = song.lrcText;
-    lyrics = parseLRCText(song.lrcText);
-    renderLyrics();
-
-    // 2. Apply offset
-    offset = song.offset || 0;
-    document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
-
-    // 3. Apply font size
-    baseFontSize = song.baseFontSize || 28;
-    document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
-    if (lyrics.length > 0) updateActiveLine();
-
-    // 4. Switch audio source & load
-    const tabs = document.getElementById('audioSourceTabs').querySelectorAll('.tab');
-    tabs.forEach(t => t.classList.remove('active'));
-
-    if (song.audioSource === 'local') {
-      useLocalAudio = true;
+      // 0. Reset previous playback state
+      stopSync();
+      currentLineIndex = -1;
+      if (player && player.stopVideo) try { player.stopVideo(); } catch(e) {}
+      if (audioEl && !audioEl.paused) audioEl.pause();
+      if (manualPlaying) manualReset();
+      document.getElementById('embedMode').style.display = 'block';
+      document.getElementById('manualMode').style.display = 'none';
       useManualMode = false;
-      document.getElementById('audioSourceYoutube').style.display = 'none';
-      document.getElementById('audioSourceLocal').style.display = 'block';
-      if (tabs[1]) tabs[1].classList.add('active');
+      document.getElementById('statusBadge').className = 'mode-badge';
+      document.getElementById('statusBadge').textContent = 'IDLE';
 
-      if (song.audioFileName) {
-        document.getElementById('audioFileName').value = song.audioFileName;
-        alert(`請選擇音檔「${song.audioFileName}」以播放伴奏。`);
-        document.getElementById('audioFileInput').click();
-      }
-    } else {
-      useLocalAudio = false;
-      document.getElementById('audioSourceYoutube').style.display = 'block';
-      document.getElementById('audioSourceLocal').style.display = 'none';
-      if (tabs[0]) tabs[0].classList.add('active');
+      // 1. Load lyrics
+      document.getElementById('lrcInput').value = song.lrcText;
+      lyrics = parseLRCText(song.lrcText);
+      renderLyrics();
 
-      if (song.youtubeId) {
-        document.getElementById('ytUrl').value = 'https://www.youtube.com/watch?v=' + song.youtubeId;
-        loadVideo();
+      // 2. Apply offset
+      offset = song.offset || 0;
+      document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
+
+      // 3. Apply font size
+      baseFontSize = song.baseFontSize || 28;
+      document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
+      if (lyrics.length > 0) updateActiveLine();
+
+      // 4. Switch audio source & load
+      const tabs = document.getElementById('audioSourceTabs').querySelectorAll('.tab');
+      tabs.forEach(t => t.classList.remove('active'));
+
+      if (song.audioSource === 'local') {
+        useLocalAudio = true;
+        useManualMode = false;
+        document.getElementById('audioSourceYoutube').style.display = 'none';
+        document.getElementById('audioSourceLocal').style.display = 'block';
+        if (tabs[1]) tabs[1].classList.add('active');
+
+        if (song.audioFileName) {
+          document.getElementById('audioFileName').value = song.audioFileName;
+          alert(`請選擇音檔「${song.audioFileName}」以播放伴奏。`);
+          document.getElementById('audioFileInput').click();
+        }
+      } else {
+        useLocalAudio = false;
+        document.getElementById('audioSourceYoutube').style.display = 'block';
+        document.getElementById('audioSourceLocal').style.display = 'none';
+        if (tabs[0]) tabs[0].classList.add('active');
+
+        if (song.youtubeId) {
+          document.getElementById('ytUrl').value = 'https://www.youtube.com/watch?v=' + song.youtubeId;
+          loadVideo();
+        }
       }
+    } catch (err) {
+      console.error('loadSelectedSong error:', err);
+      alert('載入歌曲時發生錯誤：' + err.message);
     }
   }
 
