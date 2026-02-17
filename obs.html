@@ -105,11 +105,11 @@
   // ========== PieSocket (OBS Sync) ==========
   const piesocket = new PieSocket.default({
     clusterId: 'demo',
-    apiKey: 'VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV',
+    apiKey: 'xlkQUJ7Y5BKQ1m0rNfNx2R1yhLBTu9mrVWOFdrnB',
     notifySelf: 0,
   });
 
-  piesocket.subscribe('lyrics-sync').then(ch => {
+    piesocket.subscribe('lyrics-flow').then(ch => {
     ch.listen('sync', (msg) => {
       const { type, data } = msg;
       switch (type) {
