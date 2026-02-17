@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lyrics Flow - OBS Display</title>
+<script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -101,38 +102,46 @@
   let currentLineIndex = -1;
   let baseFontSize = 36;
 
-  const bc = new BroadcastChannel('lyrics-sync');
+  // ========== PieSocket (OBS Sync) ==========
+  const piesocket = new PieSocket.default({
+    clusterId: 'demo',
+    apiKey: 'VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV',
+    notifySelf: 0,
+  });
 
-  // Request full state on load
-  bc.postMessage({ type: 'REQUEST_STATE', data: null });
-
-  bc.onmessage = (event) => {
-    const { type, data } = event.data;
-    switch (type) {
-      case 'FULL_STATE':
-        lyrics = data.lyrics || [];
-        currentLineIndex = data.currentLineIndex;
-        baseFontSize = data.baseFontSize || 36;
-        renderLyrics();
-        updateActiveLine();
-        break;
-      case 'LYRICS_LOADED':
-        lyrics = data.lyrics || [];
-        currentLineIndex = -1;
-        renderLyrics();
-        break;
-      case 'SYNC_UPDATE':
-        if (data.currentLineIndex !== currentLineIndex) {
+  piesocket.subscribe('lyrics-sync').then(ch => {
+    ch.listen('sync', (msg) => {
+      const { type, data } = msg;
+      switch (type) {
+        case 'FULL_STATE':
+          lyrics = data.lyrics || [];
           currentLineIndex = data.currentLineIndex;
+          baseFontSize = data.baseFontSize || 36;
+          renderLyrics();
           updateActiveLine();
-        }
-        break;
-      case 'FONT_SIZE':
-        baseFontSize = data.baseFontSize;
-        updateActiveLine();
-        break;
-    }
-  };
+          break;
+        case 'LYRICS_LOADED':
+          lyrics = data.lyrics || [];
+          currentLineIndex = -1;
+          renderLyrics();
+          break;
+        case 'SYNC_UPDATE':
+          if (data.currentLineIndex !== currentLineIndex) {
+            currentLineIndex = data.currentLineIndex;
+            updateActiveLine();
+          }
+          break;
+        case 'FONT_SIZE':
+          baseFontSize = data.baseFontSize;
+          updateActiveLine();
+          break;
+      }
+    });
+
+    // Request full state from control page
+    ch.publish('sync', { type: 'REQUEST_STATE', data: null });
+    console.log('PieSocket connected, requesting state...');
+  });
 
   function renderLyrics() {
     const container = document.getElementById('lyricsContainer');

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>歌詞同步器 - Lyrics Sync for OBS</title>
+<script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -726,19 +727,27 @@
   let syncInterval = null;
   let isOBSMode = false;
 
-  // ========== BroadcastChannel (OBS Sync) ==========
-  const bc = new BroadcastChannel('lyrics-sync');
-  bc.onmessage = (event) => {
-    if (event.data.type === 'REQUEST_STATE') {
-      bc.postMessage({
-        type: 'FULL_STATE',
-        data: { lyrics, currentLineIndex, baseFontSize, offset }
-      });
-    }
-  };
+  // ========== PieSocket (OBS Sync) ==========
+  const piesocket = new PieSocket.default({
+    clusterId: 'demo',
+    apiKey: 'VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV',
+    notifySelf: 0,
+  });
+
+  let syncChannel = null;
+  piesocket.subscribe('lyrics-sync').then(ch => {
+    syncChannel = ch;
+    ch.listen('sync', (msg) => {
+      if (msg.type === 'REQUEST_STATE') {
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, offset });
+      }
+    });
+    console.log('PieSocket connected');
+  });
 
   function broadcast(type, data) {
-    try { bc.postMessage({ type, data }); } catch (e) {}
+    if (!syncChannel) return;
+    try { syncChannel.publish('sync', { type, data }); } catch (e) {}
   }
 
   // ========== YouTube API ==========
