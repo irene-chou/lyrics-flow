@@ -37,9 +37,7 @@
 
   .lyrics-scroll-container {
     width: 100vw;
-    flex: 1;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+    margin-top: auto;
     padding: 16px 48px;
   }
 
@@ -128,6 +126,8 @@
   let baseFontSize = 28;
   let baseLineHeight = 1.6;
   let titleFontSize = 18;
+  let visibleBefore = 0;
+  let visibleAfter = 1;
   let songTitle = '';
   let syncChannel = null;
   let lastMessageTime = 0;
@@ -178,6 +178,8 @@
             baseFontSize = data.baseFontSize || 28;
             baseLineHeight = data.baseLineHeight || 1.6;
             titleFontSize = data.titleFontSize || 18;
+            visibleBefore = data.visibleBefore ?? 0;
+            visibleAfter = data.visibleAfter ?? 1;
             songTitle = data.songTitle || '';
             renderLyrics();
             updateActiveLine();
@@ -206,6 +208,11 @@
             break;
           case 'LINE_HEIGHT':
             baseLineHeight = data.baseLineHeight;
+            updateActiveLine();
+            break;
+          case 'VISIBLE_RANGE':
+            visibleBefore = data.visibleBefore ?? 0;
+            visibleAfter = data.visibleAfter ?? 1;
             updateActiveLine();
             break;
           case 'OFFSET':
@@ -261,13 +268,16 @@
 
   function updateActiveLine() {
     const lines = document.querySelectorAll('.lyric-line');
+    const lo = currentLineIndex - visibleBefore;
+    const hi = currentLineIndex + visibleAfter;
     lines.forEach((line, i) => {
       line.classList.remove('active', 'next', 'visible');
+      if (i < lo || i > hi || currentLineIndex < 0) return;
       if (i === currentLineIndex) {
         line.classList.add('active', 'visible');
         line.style.fontSize = (baseFontSize + 4) + 'px';
         line.style.lineHeight = baseLineHeight;
-      } else if (i === currentLineIndex + 1) {
+      } else {
         line.classList.add('next', 'visible');
         line.style.fontSize = baseFontSize + 'px';
         line.style.lineHeight = baseLineHeight;

@@ -25,7 +25,7 @@
     --upcoming-lyric: #9090a8;
     --danger: #ef4444;
     --success: #22c55e;
-    --sidebar-width: 360px;
+    --sidebar-width: 480px;
 
     --radius: 12px;
     --font-main: 'Noto Sans TC', sans-serif;
@@ -1170,6 +1170,19 @@
         <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
       </div>
     </div>
+    <div class="input-group">
+      <div class="section-label">OBS 顯示行數</div>
+      <div class="font-size-control">
+        <span style="font-size:11px;color:var(--text-secondary);">前</span>
+        <button class="btn btn-sm" onclick="adjustVisibleRange('before',-1)">-</button>
+        <span id="visibleBeforeDisplay">0</span>
+        <button class="btn btn-sm" onclick="adjustVisibleRange('before',1)">+</button>
+        <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">後</span>
+        <button class="btn btn-sm" onclick="adjustVisibleRange('after',-1)">-</button>
+        <span id="visibleAfterDisplay">1</span>
+        <button class="btn btn-sm" onclick="adjustVisibleRange('after',1)">+</button>
+      </div>
+    </div>
 
     </div><!-- /sidebar-content -->
     </div><!-- /control-panel -->
@@ -1301,6 +1314,8 @@
   let baseFontSize = 28;
   let titleFontSize = 18;
   let baseLineHeight = 1.0;
+  let visibleBefore = 0;  // OBS: how many lines before current to show
+  let visibleAfter = 1;   // OBS: how many lines after current to show
   let syncInterval = null;
   let isOBSMode = false;
   let useLocalAudio = false;
@@ -1830,6 +1845,8 @@
       nameEl.textContent = currentSongTitle || '未命名歌曲';
       nowSinging.style.display = 'flex';
       nowTitle.textContent = currentSongTitle || '未命名歌曲';
+      nowTitle.style.fontSize = titleFontSize + 'px';
+      document.querySelector('.now-singing-label').style.fontSize = Math.round(titleFontSize * 0.72) + 'px';
     } else {
       nameBlock.style.display = 'none';
       nowSinging.style.display = 'none';
@@ -2011,7 +2028,7 @@
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
-        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, offset, songTitle: currentSongTitle });
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, songTitle: currentSongTitle });
       }
     });
     console.log('PieSocket connected');
@@ -2538,6 +2555,8 @@
   function adjustTitleFontSize(delta) {
     titleFontSize = Math.max(10, Math.min(40, titleFontSize + delta));
     document.getElementById('titleFontSizeDisplay').textContent = titleFontSize + 'px';
+    document.getElementById('nowSingingTitle').style.fontSize = titleFontSize + 'px';
+    document.querySelector('.now-singing-label').style.fontSize = Math.round(titleFontSize * 0.72) + 'px';
     broadcast('TITLE_FONT_SIZE', { titleFontSize });
   }
 
@@ -2546,6 +2565,17 @@
     document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
     broadcast('FONT_SIZE', { baseFontSize });
     if (lyrics.length > 0) updateActiveLine();
+  }
+
+  function adjustVisibleRange(which, delta) {
+    if (which === 'before') {
+      visibleBefore = Math.max(0, Math.min(5, visibleBefore + delta));
+      document.getElementById('visibleBeforeDisplay').textContent = visibleBefore;
+    } else {
+      visibleAfter = Math.max(0, Math.min(5, visibleAfter + delta));
+      document.getElementById('visibleAfterDisplay').textContent = visibleAfter;
+    }
+    broadcast('VISIBLE_RANGE', { visibleBefore, visibleAfter });
   }
 
   function adjustLineHeight(delta) {
@@ -2617,7 +2647,7 @@
     if (!document.hidden && lyrics.length > 0) {
       // Re-calculate current line index before broadcasting (it may be stale)
       syncLyrics();
-      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, offset, songTitle: currentSongTitle });
+      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, songTitle: currentSongTitle });
     }
   });
 
