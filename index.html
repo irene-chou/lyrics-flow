@@ -565,7 +565,8 @@
 
   body.obs-mode .header,
   body.obs-mode .control-panel,
-  body.obs-mode .fab {
+  body.obs-mode .fab,
+  body.obs-mode .lyrics-bottom-bar {
     display: none !important;
   }
 
@@ -689,6 +690,37 @@
   }
 
   .font-size-control span {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .lyrics-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    flex-shrink: 0;
+  }
+
+  .lyrics-bottom-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .lyrics-bottom-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-right: 2px;
+  }
+
+  .lyrics-bottom-control span:not(.lyrics-bottom-label) {
     font-size: 12px;
     color: var(--text-secondary);
     font-family: var(--font-mono);
@@ -1096,24 +1128,6 @@
       <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
     </div>
 
-    <!-- Font Size & Line Height -->
-    <div class="input-group">
-      <div class="section-label">歌詞字體大小</div>
-      <div class="font-size-control">
-        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
-        <span id="fontSizeDisplay">28px</span>
-        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
-      </div>
-    </div>
-    <div class="input-group">
-      <div class="section-label">歌詞行距</div>
-      <div class="font-size-control">
-        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
-        <span id="lineHeightDisplay">1.6</span>
-        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
-      </div>
-    </div>
-
     </div><!-- /sidebar-content -->
     </div><!-- /control-panel -->
 
@@ -1127,6 +1141,20 @@
           2. 貼上或載入 LRC 歌詞<br>
           3. 播放後歌詞會自動同步滾動
         </p>
+      </div>
+    </div>
+    <div class="lyrics-bottom-bar">
+      <div class="lyrics-bottom-control">
+        <span class="lyrics-bottom-label">字體</span>
+        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
+        <span id="fontSizeDisplay">28px</span>
+        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
+      </div>
+      <div class="lyrics-bottom-control">
+        <span class="lyrics-bottom-label">行距</span>
+        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
+        <span id="lineHeightDisplay">1.6</span>
+        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
       </div>
     </div>
   </div>
