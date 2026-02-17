@@ -2062,16 +2062,31 @@
     return 0;
   }
 
+  // Web Worker timer to avoid background tab throttling
+  const syncWorkerBlob = new Blob([`
+    let id = null;
+    self.onmessage = (e) => {
+      if (e.data === 'start') {
+        if (id) clearInterval(id);
+        id = setInterval(() => self.postMessage('tick'), 80);
+      } else if (e.data === 'stop') {
+        if (id) { clearInterval(id); id = null; }
+      }
+    };
+  `], { type: 'application/javascript' });
+  const syncWorker = new Worker(URL.createObjectURL(syncWorkerBlob));
+  syncWorker.onmessage = () => syncLyrics();
+
   function startSync() {
     if (syncInterval) return;
-    syncInterval = setInterval(syncLyrics, 80);
+    syncInterval = true;
+    syncWorker.postMessage('start');
   }
 
   function stopSync() {
-    if (syncInterval) {
-      clearInterval(syncInterval);
-      syncInterval = null;
-    }
+    if (!syncInterval) return;
+    syncInterval = null;
+    syncWorker.postMessage('stop');
   }
 
   function syncLyrics() {
@@ -2239,6 +2254,13 @@
     if (e.key === 'ArrowUp') { e.preventDefault(); adjustFontSize(2); return; }
     if (e.key === 'ArrowDown') { e.preventDefault(); adjustFontSize(-2); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveCurrent(); return; }
+  });
+
+  // Broadcast full state when tab becomes visible again (ensures OBS sync)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && lyrics.length > 0) {
+      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset });
+    }
   });
 
   // ========== Init ==========

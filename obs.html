@@ -101,6 +101,8 @@
   let lyrics = [];
   let currentLineIndex = -1;
   let baseFontSize = 36;
+  let baseLineHeight = 1.6;
+  let syncChannel = null;
 
   // ========== PieSocket (OBS Sync) ==========
   const piesocket = new PieSocket.default({
@@ -109,7 +111,16 @@
     notifySelf: 0,
   });
 
-    piesocket.subscribe('lyrics-flow').then(ch => {
+  function requestFullState() {
+    if (syncChannel) {
+      syncChannel.publish('sync', { type: 'REQUEST_STATE', data: null });
+      console.log('Requesting full state...');
+    }
+  }
+
+  piesocket.subscribe('lyrics-flow').then(ch => {
+    syncChannel = ch;
+
     ch.listen('sync', (msg) => {
       const { type, data } = msg;
       switch (type) {
@@ -117,6 +128,7 @@
           lyrics = data.lyrics || [];
           currentLineIndex = data.currentLineIndex;
           baseFontSize = data.baseFontSize || 36;
+          baseLineHeight = data.baseLineHeight || 1.6;
           renderLyrics();
           updateActiveLine();
           break;
@@ -135,12 +147,21 @@
           baseFontSize = data.baseFontSize;
           updateActiveLine();
           break;
+        case 'LINE_HEIGHT':
+          baseLineHeight = data.baseLineHeight;
+          updateActiveLine();
+          break;
       }
     });
 
-    // Request full state from control page
-    ch.publish('sync', { type: 'REQUEST_STATE', data: null });
-    console.log('PieSocket connected, requesting state...');
+    // Request full state on initial connect
+    requestFullState();
+
+    // Re-request state on WebSocket reconnect
+    ch.on('open', () => {
+      console.log('WebSocket reconnected');
+      requestFullState();
+    });
   });
 
   function renderLyrics() {
@@ -157,6 +178,7 @@
       div.className = 'lyric-line upcoming';
       div.id = `lyric-${index}`;
       div.style.fontSize = baseFontSize + 'px';
+      div.style.lineHeight = baseLineHeight;
 
       if (item.text === '' || item.text === '//') {
         div.classList.add('interlude');
@@ -176,12 +198,15 @@
       if (i < currentLineIndex) {
         line.classList.add('passed');
         line.style.fontSize = baseFontSize + 'px';
+        line.style.lineHeight = baseLineHeight;
       } else if (i === currentLineIndex) {
         line.classList.add('active');
         line.style.fontSize = (baseFontSize + 6) + 'px';
+        line.style.lineHeight = baseLineHeight;
       } else {
         line.classList.add('upcoming');
         line.style.fontSize = baseFontSize + 'px';
+        line.style.lineHeight = baseLineHeight;
       }
     });
 
