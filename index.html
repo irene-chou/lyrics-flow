@@ -765,7 +765,7 @@
     <div class="lyrics-display-header">
       <div class="section-label" style="margin:0;">歌詞預覽</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn btn-sm" onclick="copyOBSUrl()">複製 OBS 瀏覽器來源 URL</button>
+        <button class="btn btn-sm" onclick="copyOBSUrl(this)">複製 OBS 瀏覽器來源 URL</button>
       </div>
     </div>
     <div class="lyrics-scroll-container" id="lyricsContainer">
@@ -1615,13 +1615,17 @@
     document.body.classList.toggle('obs-mode', isOBSMode);
   }
 
-  function copyOBSUrl() {
+  function copyOBSUrl(btn) {
     const base = window.location.href.replace(/[^/]*$/, '');
     const obsUrl = base + 'obs.html';
     navigator.clipboard.writeText(obsUrl).then(() => {
-      alert('已複製 OBS 歌詞顯示頁面 URL。\n\n在 OBS 中新增「瀏覽器來源」並貼上此 URL。\n保持此控制頁面開啟，歌詞會自動同步到 OBS。');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = '已複製 ✓';
+        setTimeout(() => btn.textContent = orig, 1500);
+      }
     }).catch(() => {
-      prompt('請手動複製此 URL 到 OBS 瀏覽器來源：', obsUrl);
+      prompt('請手動複製此 URL：', obsUrl);
     });
   }
 
