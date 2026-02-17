@@ -577,6 +577,90 @@
     color: var(--text-primary);
   }
 
+  /* Song Library Drawer */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .song-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    z-index: 101;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer-backdrop.open .song-drawer {
+    transform: translateX(0);
+  }
+  .song-drawer-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .song-drawer-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .drawer-menu {
+    position: relative;
+  }
+  .drawer-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    min-width: 120px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .drawer-menu-dropdown.open {
+    display: block;
+  }
+  .drawer-menu-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .drawer-menu-dropdown button:hover {
+    background: var(--bg-input);
+  }
+
   /* Responsive: if narrow, stack */
   @media (max-width: 900px) {
     .app {
@@ -588,6 +672,9 @@
       border-bottom: 1px solid var(--border);
       max-height: 50vh;
     }
+    .song-drawer {
+      width: 100%;
+    }
   }
 </style>
 </head>
@@ -597,29 +684,22 @@
   <!-- Header -->
   <header class="header">
     <h1><span class="dot"></span>歌詞同步器 Lyrics Sync</h1>
-    <span class="mode-badge" id="statusBadge">IDLE</span>
+    <span class="mode-badge" id="statusBadge" style="display:none;">IDLE</span>
+    <div class="header-actions">
+      <button class="btn btn-sm" id="saveBtn" onclick="saveCurrent()" title="儲存目前歌曲">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </button>
+      <button class="btn btn-sm" onclick="clearCurrentSong()" title="新增歌曲">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="btn btn-sm" onclick="toggleSongDrawer()" title="歌曲庫">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M20,16H8V4H20M12.5,15A2.5,2.5 0 0,0 15,12.5V7H18V5H14V10.5C13.58,10.19 13.07,10 12.5,10A2.5,2.5 0 0,0 10,12.5A2.5,2.5 0 0,0 12.5,15M4,6H2V20A2,2 0 0,0 4,22H18V20H4"/></svg>
+      </button>
+    </div>
   </header>
 
   <!-- Left: Control Panel -->
   <div class="control-panel">
-    <!-- Song Library -->
-    <div class="input-group">
-      <div class="section-label">歌曲庫</div>
-      <div class="input-row">
-        <select id="songSelect" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:var(--font-main); font-size:13px; outline:none;">
-          <option value="">-- 選擇歌曲 --</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="loadSelectedSong()">載入</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteSelectedSong()">刪除</button>
-      </div>
-      <div class="input-row">
-        <button class="btn btn-sm" onclick="saveCurrent()" style="flex:1;">儲存目前歌曲</button>
-        <button class="btn btn-sm" onclick="exportSongs()">匯出</button>
-        <button class="btn btn-sm" onclick="document.getElementById('importFileInput').click()">匯入</button>
-        <input type="file" id="importFileInput" accept=".json" onchange="importSongs(event)" style="display:none;" />
-      </div>
-    </div>
-
     <!-- Audio Source Tabs -->
     <div class="input-group">
       <div class="section-label">伴奏來源</div>
@@ -778,6 +858,37 @@
   </div>
 </div>
 
+<!-- Song Library Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeSongDrawer()">
+  <div class="song-drawer" onclick="event.stopPropagation()">
+    <div class="song-drawer-header">
+      <span class="section-label" style="margin:0">歌曲庫</span>
+      <button class="btn btn-sm" onclick="closeSongDrawer()">✕</button>
+    </div>
+    <div class="song-drawer-body" onclick="closeDrawerMenu()">
+      <div class="input-row" style="align-items:stretch;">
+        <select id="songSelect" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:var(--font-main); font-size:13px; outline:none;">
+          <option value="">-- 選擇歌曲 --</option>
+        </select>
+        <div class="drawer-menu">
+          <button class="btn btn-sm" onclick="toggleDrawerMenu(event)" title="更多" style="height:100%;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" /></svg>
+          </button>
+          <div class="drawer-menu-dropdown" id="drawerMenuDropdown">
+            <button onclick="exportSongs(); closeDrawerMenu()">匯出歌曲庫</button>
+            <button onclick="document.getElementById('importFileInput').click(); closeDrawerMenu()">匯入歌曲庫</button>
+          </div>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" onchange="importSongs(event)" style="display:none;" />
+      </div>
+      <div class="input-row">
+        <button class="btn btn-primary btn-sm" onclick="loadSelectedSong()" style="flex:1">載入</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSelectedSong()">刪除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- YouTube IFrame API -->
 <script>
   // ========== State ==========
@@ -791,6 +902,7 @@
   let useLocalAudio = false;
   let audioEl = null;
   let currentSongTitle = ''; // from LRC [ti:] or user input
+  let currentSongId = null;  // null = new song, number = update existing
 
   // ========== IndexedDB (Song Library) ==========
   const DB_NAME = 'lyrics-flow-db';
@@ -861,26 +973,46 @@
       alert('請先載入歌詞再儲存。');
       return;
     }
-    const defaultName = currentSongTitle || '未命名歌曲';
-    const name = prompt('輸入歌曲名稱：', defaultName);
-    if (!name) return;
+
+    const btn = document.getElementById('saveBtn');
+    let name;
+
+    if (currentSongId) {
+      // Update mode: use existing name, same id
+      name = currentSongTitle || '未命名歌曲';
+    } else {
+      // New mode: prompt for name
+      const defaultName = currentSongTitle || '未命名歌曲';
+      name = prompt('輸入歌曲名稱：', defaultName);
+      if (!name) return;
+    }
 
     const song = {
-      id: Date.now(),
+      id: currentSongId || Date.now(),
       name: name,
-      lrcText: lrcText || document.getElementById('lrcInput').value,
+      lrcText: lrcText,
       offset: offset,
       baseFontSize: baseFontSize,
       audioSource: useLocalAudio ? 'local' : 'youtube',
       youtubeId: useLocalAudio ? null : (currentVideoId || null),
       audioFileName: useLocalAudio ? (document.getElementById('audioFileName').value || null) : null,
-      createdAt: Date.now(),
+      updatedAt: Date.now(),
     };
+    if (currentSongId) {
+      const songs = await getAllSongs();
+      const existing = songs.find(s => s.id === currentSongId);
+      song.createdAt = existing ? existing.createdAt : Date.now();
+    } else {
+      song.createdAt = Date.now();
+    }
     await saveSong(song);
+    currentSongId = song.id;
+    currentSongTitle = name;
     await refreshSongList();
-    // Select the just-saved song
     document.getElementById('songSelect').value = song.id;
-    alert(`已儲存「${name}」到歌曲庫。`);
+    updateSaveBtn();
+    btn.innerHTML = CHECK_ICON;
+    setTimeout(() => updateSaveBtn(), 1500);
   }
 
   async function loadSelectedSong() {
@@ -946,6 +1078,12 @@
           loadVideo();
         }
       }
+
+      // 5. Track current song for save/update
+      currentSongId = song.id;
+      currentSongTitle = song.name;
+      updateSaveBtn();
+      closeSongDrawer();
     } catch (err) {
       console.error('loadSelectedSong error:', err);
       alert('載入歌曲時發生錯誤：' + err.message);
@@ -959,6 +1097,11 @@
     const name = select.options[select.selectedIndex].textContent;
     if (!confirm(`確定要刪除「${name}」？`)) return;
     await deleteSong(id);
+    if (currentSongId === id) {
+      currentSongId = null;
+      currentSongTitle = '';
+      updateSaveBtn();
+    }
     await refreshSongList();
   }
 
@@ -999,6 +1142,71 @@
     reader.readAsText(file, 'UTF-8');
     // Reset file input so same file can be imported again
     event.target.value = '';
+  }
+
+  // ========== Drawer & Save State ==========
+  function toggleSongDrawer() {
+    document.getElementById('drawerBackdrop').classList.toggle('open');
+  }
+  function closeSongDrawer() {
+    document.getElementById('drawerBackdrop').classList.remove('open');
+    closeDrawerMenu();
+  }
+  function toggleDrawerMenu(e) {
+    e.stopPropagation();
+    document.getElementById('drawerMenuDropdown').classList.toggle('open');
+  }
+  function closeDrawerMenu() {
+    document.getElementById('drawerMenuDropdown').classList.remove('open');
+  }
+  const SAVE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+  const CHECK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  function updateSaveBtn() {
+    const btn = document.getElementById('saveBtn');
+    btn.innerHTML = SAVE_ICON;
+    btn.title = currentSongId ? '更新目前歌曲' : '儲存目前歌曲';
+  }
+  function clearCurrentSong() {
+    currentSongId = null;
+    currentSongTitle = '';
+    document.getElementById('lrcInput').value = '';
+    document.getElementById('ytUrl').value = '';
+    document.getElementById('audioFileName').value = '';
+    document.getElementById('songSelect').value = '';
+    lyrics = [];
+    renderLyrics();
+    offset = 0;
+    document.getElementById('offsetDisplay').textContent = '0.0s';
+    baseFontSize = 28;
+    document.getElementById('fontSizeDisplay').textContent = '28px';
+    stopSync();
+    currentLineIndex = -1;
+    // Destroy YouTube player
+    if (player) {
+      try { player.destroy(); } catch(e) {}
+      player = null;
+      playerReady = false;
+    }
+    // Recreate ytPlayer div for future use
+    const wrapper = document.querySelector('.player-wrapper');
+    if (wrapper && !document.getElementById('ytPlayer')) {
+      const div = document.createElement('div');
+      div.id = 'ytPlayer';
+      wrapper.appendChild(div);
+    }
+    currentVideoId = null;
+    // Reset playback UI
+    document.getElementById('embedMode').style.display = 'block';
+    document.getElementById('manualMode').style.display = 'none';
+    document.getElementById('statusDot').className = 'status-dot';
+    document.getElementById('timeDisplay').textContent = '00:00 / 00:00';
+    document.getElementById('progressFill').style.width = '0%';
+    // Reset local audio
+    if (audioEl && !audioEl.paused) audioEl.pause();
+    document.getElementById('audioPlaybackInfo').style.display = 'none';
+    document.getElementById('audioControls').style.display = 'none';
+    updateSaveBtn();
+    closeSongDrawer();
   }
 
   // ========== Audio Source Switching ==========
@@ -1649,6 +1857,11 @@
     lyrics = parseLRCText(demo);
     renderLyrics();
   }
+
+  // ========== Keyboard Shortcuts ==========
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSongDrawer();
+  });
 
   // ========== Init Song Library on Page Load ==========
   refreshSongList().catch(e => console.error('Failed to load song library:', e));
