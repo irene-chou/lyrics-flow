@@ -6,6 +6,8 @@
 <title>Lyrics Flow - 歌詞播放器</title>
 <script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@0.24.0/dist/coloris.min.css">
+<script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@0.24.0/dist/coloris.min.js"></script>
 <style>@import url("https://font.emtech.cc/css/GenSenRoundedTW");</style>
 <style>
   :root {
@@ -452,28 +454,24 @@
   }
 
   .now-singing {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 68px;
+    font-family: var(--font-lyrics);
     flex-shrink: 0;
   }
   .now-singing-label {
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 11px;
-    color: var(--text-primary);
-  }
-  .now-singing-divider {
-    color: var(--text-dim);
+    font-size: 13px;
+    color: #ffffff;
   }
   .now-singing-title {
     font-weight: 500;
-    color: var(--text-primary);
+    font-size: 18px;
+    color: #ffffff;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -483,7 +481,7 @@
     flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
-    padding: 30vh 48px 30vh 80px;
+    padding: 30vh 48px;
     position: relative;
   }
 
@@ -506,44 +504,10 @@
     line-height: 1.6;
     color: var(--text-dim);
     transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-    cursor: pointer;
-    position: relative;
-  }
-
-  .lyric-line:hover {
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .lyric-line.passed {
-    color: var(--passed-lyric);
-    font-weight: 400;
   }
 
   .lyric-line.active {
-    color: var(--active-lyric);
     font-weight: 700;
-    font-size: 32px;
-    transform: scale(1.01);
-  }
-
-  .lyric-line.upcoming {
-    color: var(--upcoming-lyric);
-  }
-
-  .lyric-line .time-tag {
-    position: absolute;
-    left: -68px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--text-dim);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .lyric-line:hover .time-tag {
-    opacity: 1;
   }
 
   /* Interlude / instrumental indicator */
@@ -882,6 +846,45 @@
     flex-direction: column;
     gap: 20px;
   }
+  .sidebar-section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sidebar-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+  .sidebar-section-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .sidebar-section-actions .btn {
+    flex: 1;
+  }
+  .color-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .color-control input.color-input {
+    width: 100px;
+    padding: 6px 8px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
   .section-label-row {
     display: flex;
     align-items: center;
@@ -1047,151 +1050,189 @@
   <div class="control-panel">
     <div class="sidebar-content">
 
-    <!-- Song Name -->
-    <div class="sidebar-song-name" id="sidebarSongName" style="display:none;">
-      <div class="sidebar-song-name-text" id="songIndicatorName"></div>
-      <button class="btn-sidebar-icon" id="editSongBtn" onclick="openEditSongModal()" title="編輯歌曲">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-        </svg>
-      </button>
-    </div>
+    <!-- ===== 歌曲設定 ===== -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">歌曲設定</div>
 
-    <!-- Hidden inputs for form state (used by saveCurrent and other JS) -->
-    <input type="hidden" id="ytUrl" />
-    <input type="hidden" id="audioFileName" />
-    <textarea id="lrcInput" style="display:none;"></textarea>
-    <input type="file" id="audioFileInput" accept="audio/*" onchange="loadAudioFile(event)" style="display:none;" />
-    <input type="file" id="fileInput" accept=".lrc,.txt" onchange="loadLRCFile(event)" style="display:none;" />
-    <div class="tabs" id="audioSourceTabs" style="display:none;">
-      <button class="tab active">YouTube</button>
-      <button class="tab">本地音檔</button>
-    </div>
+      <!-- Song Name -->
+      <div class="sidebar-song-name" id="sidebarSongName" style="display:none;">
+        <div class="sidebar-song-name-text" id="songIndicatorName"></div>
+        <button class="btn-sidebar-icon" id="editSongBtn" onclick="openEditSongModal()" title="編輯歌曲">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+          </svg>
+        </button>
+      </div>
 
-    <!-- YouTube Player -->
-    <div id="audioSourceYoutube">
-      <div id="embedMode" style="margin-top:4px;">
-        <div class="player-wrapper">
-          <div id="ytPlayer"></div>
+      <!-- Hidden inputs for form state -->
+      <input type="hidden" id="ytUrl" />
+      <input type="hidden" id="audioFileName" />
+      <textarea id="lrcInput" style="display:none;"></textarea>
+      <input type="file" id="audioFileInput" accept="audio/*" onchange="loadAudioFile(event)" style="display:none;" />
+      <input type="file" id="fileInput" accept=".lrc,.txt" onchange="loadLRCFile(event)" style="display:none;" />
+      <div class="tabs" id="audioSourceTabs" style="display:none;">
+        <button class="tab active">YouTube</button>
+        <button class="tab">本地音檔</button>
+      </div>
+
+      <!-- YouTube Player -->
+      <div id="audioSourceYoutube">
+        <div id="embedMode" style="margin-top:4px;">
+          <div class="player-wrapper">
+            <div id="ytPlayer"></div>
+          </div>
+          <div class="playback-info">
+            <div class="status-dot" id="statusDot"></div>
+            <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+            <div class="progress-bar" id="progressBar" onclick="seekFromBar(event)">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
         </div>
-        <div class="playback-info">
-          <div class="status-dot" id="statusDot"></div>
-          <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
-          <div class="progress-bar" id="progressBar" onclick="seekFromBar(event)">
-            <div class="progress-fill" id="progressFill"></div>
+
+        <div id="manualMode" style="display:none;">
+          <div class="embed-error">
+            <div class="error-title">此影片不允許嵌入播放</div>
+            <p>請在其他視窗開啟 YouTube 播放伴奏，<br>然後用下方計時器手動同步歌詞。</p>
+            <button class="btn btn-sm" id="openYtBtn" onclick="openYouTubeExternal()">在新視窗開啟 YouTube</button>
+          </div>
+          <div style="margin-top: 12px;">
+            <div class="section-label">手動計時器</div>
+            <div class="manual-controls">
+              <button class="btn btn-primary" id="manualPlayBtn" onclick="manualTogglePlay()">▶ 開始</button>
+              <span class="timer-display" id="manualTimerDisplay">00:00</span>
+              <button class="btn btn-sm" onclick="manualSeek(-5)">-5s</button>
+              <button class="btn btn-sm" onclick="manualSeek(5)">+5s</button>
+              <button class="btn btn-sm btn-danger" onclick="manualReset()">重置</button>
+            </div>
+            <div class="hint" style="margin-top:6px;">
+              提示：在 YouTube 按播放的同時點「開始」，歌詞就會同步滾動。
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="manualMode" style="display:none;">
-        <div class="embed-error">
-          <div class="error-title">此影片不允許嵌入播放</div>
-          <p>請在其他視窗開啟 YouTube 播放伴奏，<br>然後用下方計時器手動同步歌詞。</p>
-          <button class="btn btn-sm" id="openYtBtn" onclick="openYouTubeExternal()">在新視窗開啟 YouTube</button>
-        </div>
-        <div style="margin-top: 12px;">
-          <div class="section-label">手動計時器</div>
-          <div class="manual-controls">
-            <button class="btn btn-primary" id="manualPlayBtn" onclick="manualTogglePlay()">▶ 開始</button>
-            <span class="timer-display" id="manualTimerDisplay">00:00</span>
-            <button class="btn btn-sm" onclick="manualSeek(-5)">-5s</button>
-            <button class="btn btn-sm" onclick="manualSeek(5)">+5s</button>
-            <button class="btn btn-sm btn-danger" onclick="manualReset()">重置</button>
-          </div>
-          <div class="hint" style="margin-top:6px;">
-            提示：在 YouTube 按播放的同時點「開始」，歌詞就會同步滾動。
+      <!-- Local Audio Player -->
+      <div id="audioSourceLocal" style="display:none;">
+        <audio id="audioPlayer" style="display:none;"></audio>
+        <div class="playback-info" id="audioPlaybackInfo" style="display:none;">
+          <div class="status-dot" id="audioStatusDot"></div>
+          <div class="time-display" id="audioTimeDisplay">00:00 / 00:00</div>
+          <div class="progress-bar" id="audioProgressBar" onclick="audioSeekFromBar(event)">
+            <div class="progress-fill" id="audioProgressFill"></div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Local Audio Player -->
-    <div id="audioSourceLocal" style="display:none;">
-      <audio id="audioPlayer" style="display:none;"></audio>
-      <div class="playback-info" id="audioPlaybackInfo" style="display:none;">
-        <div class="status-dot" id="audioStatusDot"></div>
-        <div class="time-display" id="audioTimeDisplay">00:00 / 00:00</div>
-        <div class="progress-bar" id="audioProgressBar" onclick="audioSeekFromBar(event)">
-          <div class="progress-fill" id="audioProgressFill"></div>
+        <div class="manual-controls" id="audioControls" style="display:none;">
+          <button class="btn btn-primary" id="audioPlayBtn" onclick="audioTogglePlay()">▶ 播放</button>
+          <button class="btn btn-sm" onclick="audioSeek(-5)">-5s</button>
+          <button class="btn btn-sm" onclick="audioSeek(5)">+5s</button>
         </div>
       </div>
-      <div class="manual-controls" id="audioControls" style="display:none;">
-        <button class="btn btn-primary" id="audioPlayBtn" onclick="audioTogglePlay()">▶ 播放</button>
-        <button class="btn btn-sm" onclick="audioSeek(-5)">-5s</button>
-        <button class="btn btn-sm" onclick="audioSeek(5)">+5s</button>
-      </div>
-    </div>
 
-    <!-- Offset -->
-    <div class="input-group">
-      <div class="offset-header">
-        <div class="section-label" style="margin-bottom:0;">歌詞偏移 (Offset)</div>
-        <div class="offset-actions" id="offsetActions">
-          <button class="btn-offset-action" onclick="resetOffset()" title="重置偏移">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          </button>
-          <button class="btn-offset-action btn-offset-save" id="saveBtn" onclick="saveCurrent()" title="儲存偏移">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          </button>
+      <!-- Offset -->
+      <div class="input-group">
+        <div class="offset-header">
+          <div class="section-label" style="margin-bottom:0;">歌詞偏移 (Offset)</div>
+          <div class="offset-actions" id="offsetActions">
+            <button class="btn-offset-action" onclick="resetOffset()" title="重置偏移">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+            <button class="btn-offset-action btn-offset-save" id="saveBtn" onclick="saveCurrent()" title="儲存偏移">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="offset-control">
+          <button class="btn btn-sm" onclick="adjustOffset(-0.5)">-0.5s</button>
+          <button class="btn btn-sm" onclick="adjustOffset(-0.1)">-0.1s</button>
+          <span class="offset-value" id="offsetDisplay">0.0s</span>
+          <button class="btn btn-sm" onclick="adjustOffset(0.1)">+0.1s</button>
+          <button class="btn btn-sm" onclick="adjustOffset(0.5)">+0.5s</button>
+        </div>
+        <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
+      </div>
+    </div><!-- /歌曲設定 -->
+
+    <!-- ===== 顯示設定 ===== -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">顯示設定</div>
+
+      <div class="input-group">
+        <div class="section-label">歌名字體大小</div>
+        <div class="font-size-control">
+          <button class="btn btn-sm" onclick="adjustTitleFontSize(-2)">A-</button>
+          <span id="titleFontSizeDisplay">18px</span>
+          <button class="btn btn-sm" onclick="adjustTitleFontSize(2)">A+</button>
         </div>
       </div>
-      <div class="offset-control">
-        <button class="btn btn-sm" onclick="adjustOffset(-0.5)">-0.5s</button>
-        <button class="btn btn-sm" onclick="adjustOffset(-0.1)">-0.1s</button>
-        <span class="offset-value" id="offsetDisplay">0.0s</span>
-        <button class="btn btn-sm" onclick="adjustOffset(0.1)">+0.1s</button>
-        <button class="btn btn-sm" onclick="adjustOffset(0.5)">+0.5s</button>
+      <div class="input-group">
+        <div class="section-label">當前行字體大小</div>
+        <div class="font-size-control">
+          <button class="btn btn-sm" onclick="adjustActiveFontSize(-2)">A-</button>
+          <span id="activeFontSizeDisplay">32px</span>
+          <button class="btn btn-sm" onclick="adjustActiveFontSize(2)">A+</button>
+        </div>
       </div>
-      <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
-    </div>
-
-    <!-- Font Size & Line Height -->
-    <div class="input-group">
-      <div class="section-label">歌名字體大小</div>
-      <div class="font-size-control">
-        <button class="btn btn-sm" onclick="adjustTitleFontSize(-2)">A-</button>
-        <span id="titleFontSizeDisplay">18px</span>
-        <button class="btn btn-sm" onclick="adjustTitleFontSize(2)">A+</button>
+      <div class="input-group">
+        <div class="section-label">其他行字體大小</div>
+        <div class="font-size-control">
+          <button class="btn btn-sm" onclick="adjustOtherFontSize(-2)">A-</button>
+          <span id="otherFontSizeDisplay">28px</span>
+          <button class="btn btn-sm" onclick="adjustOtherFontSize(2)">A+</button>
+        </div>
       </div>
-    </div>
-    <div class="input-group">
-      <div class="section-label">歌詞字體大小</div>
-      <div class="font-size-control">
-        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
-        <span id="fontSizeDisplay">28px</span>
-        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
+      <div class="input-group">
+        <div class="section-label">歌詞行距</div>
+        <div class="font-size-control">
+          <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
+          <span id="lineHeightDisplay">1.0</span>
+          <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
+        </div>
       </div>
-    </div>
-    <div class="input-group">
-      <div class="section-label">歌詞行距</div>
-      <div class="font-size-control">
-        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
-        <span id="lineHeightDisplay">1.0</span>
-        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
+      <div class="input-group">
+        <div class="section-label">當前行顏色</div>
+        <div class="color-control">
+          <input type="text" class="color-input" id="activeColorPicker" data-coloris value="#ffffff">
+        </div>
       </div>
-    </div>
-    <div class="input-group">
-      <div class="section-label">OBS 顯示行數</div>
-      <div class="font-size-control">
-        <span style="font-size:11px;color:var(--text-secondary);">前</span>
-        <button class="btn btn-sm" onclick="adjustVisibleRange('before',-1)">-</button>
-        <span id="visibleBeforeDisplay">0</span>
-        <button class="btn btn-sm" onclick="adjustVisibleRange('before',1)">+</button>
-        <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">後</span>
-        <button class="btn btn-sm" onclick="adjustVisibleRange('after',-1)">-</button>
-        <span id="visibleAfterDisplay">1</span>
-        <button class="btn btn-sm" onclick="adjustVisibleRange('after',1)">+</button>
+      <div class="input-group">
+        <div class="section-label">其他行顏色</div>
+        <div class="color-control">
+          <input type="text" class="color-input" id="otherColorPicker" data-coloris value="#9090a8">
+        </div>
       </div>
-    </div>
+      <div class="input-group">
+        <div class="section-label">歌詞背景色</div>
+        <div class="color-control">
+          <input type="text" class="color-input" id="bgColorPicker" data-coloris value="transparent">
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="section-label">OBS 顯示行數</div>
+        <div class="font-size-control">
+          <span style="font-size:11px;color:var(--text-secondary);">前</span>
+          <button class="btn btn-sm" onclick="adjustVisibleRange('before',-1)">-</button>
+          <span id="visibleBeforeDisplay">0</span>
+          <button class="btn btn-sm" onclick="adjustVisibleRange('before',1)">+</button>
+          <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">後</span>
+          <button class="btn btn-sm" onclick="adjustVisibleRange('after',-1)">-</button>
+          <span id="visibleAfterDisplay">1</span>
+          <button class="btn btn-sm" onclick="adjustVisibleRange('after',1)">+</button>
+        </div>
+      </div>
+      <div class="sidebar-section-actions">
+        <button class="btn btn-sm" onclick="resetUISettings()">重置</button>
+        <button class="btn btn-sm" style="background:var(--accent);color:#fff;" onclick="saveUISettings()">儲存</button>
+      </div>
+    </div><!-- /顯示設定 -->
 
     </div><!-- /sidebar-content -->
     </div><!-- /control-panel -->
 
   <!-- Right: Lyrics Display -->
   <div class="lyrics-display">
-    <div class="now-singing" id="nowSinging" style="display:none;">
+    <div class="now-singing" id="nowSinging">
       <span class="now-singing-label">Now singing</span>
-      <span class="now-singing-divider">-</span>
       <span class="now-singing-title" id="nowSingingTitle"></span>
     </div>
     <div class="lyrics-scroll-container" id="lyricsContainer">
@@ -1311,11 +1352,124 @@
   let lyrics = []; // [{time: seconds, text: "..."}, ...]
   let currentLineIndex = -1;
   let offset = 0;
-  let baseFontSize = 28;
+  let activeFontSize = 32;
+  let otherFontSize = 28;
   let titleFontSize = 18;
   let baseLineHeight = 1.0;
-  let visibleBefore = 0;  // OBS: how many lines before current to show
-  let visibleAfter = 1;   // OBS: how many lines after current to show
+  let visibleBefore = 0;
+  let visibleAfter = 1;
+  let activeColor = '#ffffff';
+  let otherColor = '#9090a8';
+  let lyricsBgColor = 'transparent';
+  function saveUISettings() {
+    localStorage.setItem('lf-ui-settings', JSON.stringify({
+      activeFontSize, otherFontSize, titleFontSize, baseLineHeight,
+      visibleBefore, visibleAfter, activeColor, otherColor, lyricsBgColor
+    }));
+  }
+  function resetUISettings() {
+    activeFontSize = 32;
+    otherFontSize = 28;
+    titleFontSize = 18;
+    baseLineHeight = 1.0;
+    visibleBefore = 0;
+    visibleAfter = 1;
+    activeColor = '#ffffff';
+    otherColor = '#9090a8';
+    lyricsBgColor = 'transparent';
+    localStorage.removeItem('lf-ui-settings');
+    // Sync UI displays
+    document.getElementById('activeFontSizeDisplay').textContent = activeFontSize + 'px';
+    document.getElementById('otherFontSizeDisplay').textContent = otherFontSize + 'px';
+    document.getElementById('titleFontSizeDisplay').textContent = titleFontSize + 'px';
+    document.getElementById('lineHeightDisplay').textContent = baseLineHeight.toFixed(1);
+    document.getElementById('visibleBeforeDisplay').textContent = visibleBefore;
+    document.getElementById('visibleAfterDisplay').textContent = visibleAfter;
+    document.getElementById('activeColorPicker').value = activeColor;
+    document.getElementById('otherColorPicker').value = otherColor;
+    document.getElementById('bgColorPicker').value = lyricsBgColor;
+    document.getElementById('activeColorPicker').dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById('otherColorPicker').dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById('bgColorPicker').dispatchEvent(new Event('input', { bubbles: true }));
+    // Apply to preview and broadcast
+    applyLyricsPreviewStyles();
+    if (lyrics.length > 0) updateActiveLine();
+    broadcast('FONT_SIZE', { activeFontSize, otherFontSize });
+    broadcast('LYRIC_COLORS', { activeColor, otherColor, lyricsBgColor });
+    broadcast('TITLE_FONT_SIZE', { titleFontSize });
+    broadcast('LINE_HEIGHT', { baseLineHeight });
+    broadcast('VISIBLE_RANGE', { visibleBefore, visibleAfter });
+  }
+  function loadUISettings() {
+    const raw = localStorage.getItem('lf-ui-settings');
+    if (!raw) return;
+    try {
+      const s = JSON.parse(raw);
+      if (s.activeFontSize != null) activeFontSize = s.activeFontSize;
+      if (s.otherFontSize != null) otherFontSize = s.otherFontSize;
+      if (s.titleFontSize != null) titleFontSize = s.titleFontSize;
+      if (s.baseLineHeight != null) baseLineHeight = s.baseLineHeight;
+      if (s.visibleBefore != null) visibleBefore = s.visibleBefore;
+      if (s.visibleAfter != null) visibleAfter = s.visibleAfter;
+      if (s.activeColor != null) activeColor = s.activeColor;
+      if (s.otherColor != null) otherColor = s.otherColor;
+      if (s.lyricsBgColor != null) lyricsBgColor = s.lyricsBgColor;
+    } catch(e) { console.warn('Failed to load UI settings:', e); }
+  }
+  loadUISettings();
+  // Sync UI displays with loaded values
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Coloris first (before setting values, so wrap is done)
+    Coloris({
+      themeMode: 'dark',
+      alpha: true,
+      formatToggle: true,
+      closeButton: true,
+      closeLabel: '確定',
+      swatches: [
+        '#ffffff',
+        '#9090a8',
+        '#5a5a70',
+        '#7c6aef',
+        'rgba(255,255,255,0.8)',
+        'rgba(144,144,168,0.6)',
+        'rgba(0,0,0,0.5)',
+        'transparent'
+      ]
+    });
+
+    document.getElementById('activeFontSizeDisplay').textContent = activeFontSize + 'px';
+    document.getElementById('otherFontSizeDisplay').textContent = otherFontSize + 'px';
+    document.getElementById('titleFontSizeDisplay').textContent = titleFontSize + 'px';
+    document.getElementById('lineHeightDisplay').textContent = baseLineHeight.toFixed(1);
+    document.getElementById('visibleBeforeDisplay').textContent = visibleBefore;
+    document.getElementById('visibleAfterDisplay').textContent = visibleAfter;
+
+    // Set color input values and update Coloris swatches
+    const activeEl = document.getElementById('activeColorPicker');
+    const otherEl = document.getElementById('otherColorPicker');
+    const bgEl = document.getElementById('bgColorPicker');
+    activeEl.value = activeColor;
+    otherEl.value = otherColor;
+    bgEl.value = lyricsBgColor;
+    activeEl.dispatchEvent(new Event('input', { bubbles: true }));
+    otherEl.dispatchEvent(new Event('input', { bubbles: true }));
+    bgEl.dispatchEvent(new Event('input', { bubbles: true }));
+
+    const display = document.querySelector('.lyrics-display');
+    if (display) display.style.background = lyricsBgColor === 'transparent' ? 'transparent' : lyricsBgColor;
+
+    // Listen for Coloris color picks
+    document.addEventListener('coloris:pick', (e) => {
+      const el = e.detail.currentEl;
+      const val = e.detail.color;
+      if (!el) return;
+      if (el.id === 'activeColorPicker') setActiveColor(val);
+      else if (el.id === 'otherColorPicker') setOtherColor(val);
+      else if (el.id === 'bgColorPicker') setBgColor(val);
+    });
+  });
+
   let syncInterval = null;
   let isOBSMode = false;
   let useLocalAudio = false;
@@ -2028,7 +2182,7 @@
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
-        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, songTitle: currentSongTitle });
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, activeFontSize, otherFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, activeColor, otherColor, lyricsBgColor, songTitle: currentSongTitle });
       }
     });
     console.log('PieSocket connected');
@@ -2278,17 +2432,11 @@
       const div = document.createElement('div');
       div.className = 'lyric-line upcoming';
       div.id = `lyric-${index}`;
-      div.style.fontSize = baseFontSize + 'px';
+      div.style.fontSize = otherFontSize + 'px';
       div.style.lineHeight = baseLineHeight;
+      div.style.color = otherColor;
       div.onclick = () => seekToLyric(index);
 
-      // Time tag (hover to see)
-      const timeTag = document.createElement('span');
-      timeTag.className = 'time-tag';
-      timeTag.textContent = formatTime(item.time);
-      div.appendChild(timeTag);
-
-      // Text or interlude
       if (item.text === '' || item.text === '//') {
         div.classList.add('interlude');
         div.appendChild(document.createTextNode('間奏'));
@@ -2484,16 +2632,19 @@
 
       if (i < currentLineIndex) {
         line.classList.add('passed');
-        line.style.fontSize = baseFontSize + 'px';
+        line.style.fontSize = otherFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
+        line.style.color = otherColor;
       } else if (i === currentLineIndex) {
         line.classList.add('active');
-        line.style.fontSize = (baseFontSize + 4) + 'px';
+        line.style.fontSize = activeFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
+        line.style.color = activeColor;
       } else {
         line.classList.add('upcoming');
-        line.style.fontSize = baseFontSize + 'px';
+        line.style.fontSize = otherFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
+        line.style.color = otherColor;
       }
     });
 
@@ -2558,13 +2709,54 @@
     document.getElementById('nowSingingTitle').style.fontSize = titleFontSize + 'px';
     document.querySelector('.now-singing-label').style.fontSize = Math.round(titleFontSize * 0.72) + 'px';
     broadcast('TITLE_FONT_SIZE', { titleFontSize });
+    saveUISettings();
   }
 
-  function adjustFontSize(delta) {
-    baseFontSize = Math.max(14, Math.min(60, baseFontSize + delta));
-    document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
-    broadcast('FONT_SIZE', { baseFontSize });
+  function adjustActiveFontSize(delta) {
+    activeFontSize = Math.max(14, Math.min(60, activeFontSize + delta));
+    document.getElementById('activeFontSizeDisplay').textContent = activeFontSize + 'px';
+    broadcast('FONT_SIZE', { activeFontSize, otherFontSize });
     if (lyrics.length > 0) updateActiveLine();
+    saveUISettings();
+  }
+
+  function adjustOtherFontSize(delta) {
+    otherFontSize = Math.max(14, Math.min(60, otherFontSize + delta));
+    document.getElementById('otherFontSizeDisplay').textContent = otherFontSize + 'px';
+    broadcast('FONT_SIZE', { activeFontSize, otherFontSize });
+    if (lyrics.length > 0) updateActiveLine();
+    saveUISettings();
+  }
+
+  function setActiveColor(val) {
+    activeColor = val;
+    document.getElementById('activeColorPicker').value = val;
+    broadcast('LYRIC_COLORS', { activeColor, otherColor, lyricsBgColor });
+    if (lyrics.length > 0) updateActiveLine();
+    applyLyricsPreviewStyles();
+    saveUISettings();
+  }
+
+  function setOtherColor(val) {
+    otherColor = val;
+    document.getElementById('otherColorPicker').value = val;
+    broadcast('LYRIC_COLORS', { activeColor, otherColor, lyricsBgColor });
+    if (lyrics.length > 0) updateActiveLine();
+    applyLyricsPreviewStyles();
+    saveUISettings();
+  }
+
+  function setBgColor(val) {
+    lyricsBgColor = val;
+    document.getElementById('bgColorPicker').value = val;
+    broadcast('LYRIC_COLORS', { activeColor, otherColor, lyricsBgColor });
+    applyLyricsPreviewStyles();
+    saveUISettings();
+  }
+
+  function applyLyricsPreviewStyles() {
+    const display = document.querySelector('.lyrics-display');
+    if (display) display.style.background = lyricsBgColor === 'transparent' ? 'transparent' : lyricsBgColor;
   }
 
   function adjustVisibleRange(which, delta) {
@@ -2576,6 +2768,7 @@
       document.getElementById('visibleAfterDisplay').textContent = visibleAfter;
     }
     broadcast('VISIBLE_RANGE', { visibleBefore, visibleAfter });
+    saveUISettings();
   }
 
   function adjustLineHeight(delta) {
@@ -2583,6 +2776,7 @@
     document.getElementById('lineHeightDisplay').textContent = baseLineHeight.toFixed(1);
     broadcast('LINE_HEIGHT', { baseLineHeight });
     if (lyrics.length > 0) updateActiveLine();
+    saveUISettings();
   }
 
   function formatTime(seconds) {
@@ -2637,8 +2831,8 @@
     if (e.code === 'Space') { e.preventDefault(); handlePlayPause(); return; }
     if (e.key === 'ArrowLeft') { e.preventDefault(); adjustOffset(e.shiftKey ? -0.5 : -0.1); return; }
     if (e.key === 'ArrowRight') { e.preventDefault(); adjustOffset(e.shiftKey ? 0.5 : 0.1); return; }
-    if (e.key === 'ArrowUp') { e.preventDefault(); adjustFontSize(2); return; }
-    if (e.key === 'ArrowDown') { e.preventDefault(); adjustFontSize(-2); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); adjustActiveFontSize(2); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); adjustActiveFontSize(-2); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveCurrent(); return; }
   });
 
@@ -2647,7 +2841,7 @@
     if (!document.hidden && lyrics.length > 0) {
       // Re-calculate current line index before broadcasting (it may be stale)
       syncLyrics();
-      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, songTitle: currentSongTitle });
+      broadcast('FULL_STATE', { lyrics, currentLineIndex, activeFontSize, otherFontSize, baseLineHeight, titleFontSize, visibleBefore, visibleAfter, offset, activeColor, otherColor, lyricsBgColor, songTitle: currentSongTitle });
     }
   });
 

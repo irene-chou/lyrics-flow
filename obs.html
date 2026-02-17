@@ -61,13 +61,7 @@
   }
 
   .lyric-line.active {
-    color: var(--active-lyric);
     font-weight: 700;
-    font-size: 32px;
-  }
-
-  .lyric-line.next {
-    color: var(--upcoming-lyric);
   }
 
   .lyric-line.interlude {
@@ -123,14 +117,22 @@
 <script>
   let lyrics = [];
   let currentLineIndex = -1;
-  let baseFontSize = 28;
+  let activeFontSize = 32;
+  let otherFontSize = 28;
   let baseLineHeight = 1.6;
   let titleFontSize = 18;
   let visibleBefore = 0;
   let visibleAfter = 1;
+  let activeColor = '#ffffff';
+  let otherColor = '#9090a8';
+  let lyricsBgColor = 'transparent';
   let songTitle = '';
   let syncChannel = null;
   let lastMessageTime = 0;
+
+  function applyColors() {
+    document.body.style.background = lyricsBgColor === 'transparent' ? 'transparent' : lyricsBgColor;
+  }
 
   function updateNowSinging() {
     const el = document.getElementById('nowSinging');
@@ -175,15 +177,20 @@
           case 'FULL_STATE':
             lyrics = data.lyrics || [];
             currentLineIndex = data.currentLineIndex;
-            baseFontSize = data.baseFontSize || 28;
+            activeFontSize = data.activeFontSize || 32;
+            otherFontSize = data.otherFontSize || 28;
             baseLineHeight = data.baseLineHeight || 1.6;
             titleFontSize = data.titleFontSize || 18;
             visibleBefore = data.visibleBefore ?? 0;
             visibleAfter = data.visibleAfter ?? 1;
+            activeColor = data.activeColor || '#ffffff';
+            otherColor = data.otherColor || '#9090a8';
+            lyricsBgColor = data.lyricsBgColor || 'transparent';
             songTitle = data.songTitle || '';
             renderLyrics();
             updateActiveLine();
             updateNowSinging();
+            applyColors();
             break;
           case 'LYRICS_LOADED':
             lyrics = data.lyrics || [];
@@ -199,8 +206,16 @@
             }
             break;
           case 'FONT_SIZE':
-            baseFontSize = data.baseFontSize;
+            activeFontSize = data.activeFontSize;
+            otherFontSize = data.otherFontSize;
             updateActiveLine();
+            break;
+          case 'LYRIC_COLORS':
+            activeColor = data.activeColor || '#ffffff';
+            otherColor = data.otherColor || '#9090a8';
+            lyricsBgColor = data.lyricsBgColor || 'transparent';
+            updateActiveLine();
+            applyColors();
             break;
           case 'TITLE_FONT_SIZE':
             titleFontSize = data.titleFontSize;
@@ -252,8 +267,9 @@
       const div = document.createElement('div');
       div.className = 'lyric-line upcoming';
       div.id = `lyric-${index}`;
-      div.style.fontSize = baseFontSize + 'px';
+      div.style.fontSize = otherFontSize + 'px';
       div.style.lineHeight = baseLineHeight;
+      div.style.color = otherColor;
 
       if (item.text === '' || item.text === '//') {
         div.classList.add('interlude');
@@ -275,12 +291,14 @@
       if (i < lo || i > hi || currentLineIndex < 0) return;
       if (i === currentLineIndex) {
         line.classList.add('active', 'visible');
-        line.style.fontSize = (baseFontSize + 4) + 'px';
+        line.style.fontSize = activeFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
+        line.style.color = activeColor;
       } else {
         line.classList.add('next', 'visible');
-        line.style.fontSize = baseFontSize + 'px';
+        line.style.fontSize = otherFontSize + 'px';
         line.style.lineHeight = baseLineHeight;
+        line.style.color = otherColor;
       }
     });
   }
