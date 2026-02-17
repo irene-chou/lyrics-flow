@@ -32,7 +32,7 @@
     height: 100vh;
     overflow-y: auto;
     scroll-behavior: smooth;
-    padding: 20vh 32px;
+    padding: 30vh 48px 30vh 48px;
   }
 
   .lyrics-scroll-container::-webkit-scrollbar { width: 0; }
@@ -41,26 +41,25 @@
     padding: 12px 20px;
     margin: 4px 0;
     border-radius: 10px;
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 400;
     line-height: 1.6;
     color: var(--text-dim);
     transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
   }
 
   .lyric-line.passed {
     color: var(--passed-lyric);
+    font-weight: 400;
   }
 
   .lyric-line.active {
     color: var(--active-lyric);
     font-weight: 700;
-    font-size: 42px;
+    font-size: 32px;
     background: var(--active-bg);
     transform: scale(1.01);
     padding: 16px 24px;
-    text-shadow: 0 0 20px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.8);
   }
 
   .lyric-line.upcoming {
@@ -100,7 +99,7 @@
 <script>
   let lyrics = [];
   let currentLineIndex = -1;
-  let baseFontSize = 36;
+  let baseFontSize = 28;
   let baseLineHeight = 1.6;
   let syncChannel = null;
 
@@ -127,7 +126,7 @@
         case 'FULL_STATE':
           lyrics = data.lyrics || [];
           currentLineIndex = data.currentLineIndex;
-          baseFontSize = data.baseFontSize || 36;
+          baseFontSize = data.baseFontSize || 28;
           baseLineHeight = data.baseLineHeight || 1.6;
           renderLyrics();
           updateActiveLine();
@@ -201,7 +200,7 @@
         line.style.lineHeight = baseLineHeight;
       } else if (i === currentLineIndex) {
         line.classList.add('active');
-        line.style.fontSize = (baseFontSize + 6) + 'px';
+        line.style.fontSize = (baseFontSize + 4) + 'px';
         line.style.lineHeight = baseLineHeight;
       } else {
         line.classList.add('upcoming');
