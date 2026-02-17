@@ -67,12 +67,6 @@
     flex-shrink: 0;
   }
 
-  .header .song-indicator {
-    flex: 1;
-    min-width: 0;
-    max-width: 320px;
-  }
-
   .header h1 {
     font-size: 18px;
     font-weight: 700;
@@ -131,71 +125,25 @@
   .btn-obs-url.copied .obs-url-icon.link { display: none; }
   .btn-obs-url.copied .obs-url-icon.check { display: block; }
 
-  .song-indicator {
+  .sidebar-song-name {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
-    background: var(--bg-card);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
+    padding: 4px 0;
   }
-  .song-indicator:hover {
-    border-color: var(--accent);
-    background: rgba(124, 106, 239, 0.05);
-  }
-  .song-indicator.editing {
-    border-color: var(--accent);
-    cursor: default;
-  }
-  .song-indicator.editing:hover {
-    background: var(--bg-card);
-  }
-  .song-indicator-icon {
-    color: var(--accent);
-    flex-shrink: 0;
-    display: flex;
-  }
-  .song-indicator-info {
+  .sidebar-song-name-text {
     flex: 1;
     min-width: 0;
-  }
-  .song-indicator-name {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .song-indicator-name.unsaved {
-    color: var(--text-secondary);
-    font-style: italic;
-  }
-  input[type="text"].song-name-input,
-  input[type="text"].song-name-input:focus {
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font-main);
-    color: var(--text-primary);
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    box-shadow: none;
-    width: 100%;
-    height: auto;
-    line-height: inherit;
-    caret-color: var(--accent);
-    -webkit-appearance: none;
-  }
-  .song-indicator-actions {
+  .sidebar-song-name-actions {
     display: flex;
-    gap: 4px;
+    gap: 2px;
     flex-shrink: 0;
   }
   .btn-icon {
@@ -329,6 +277,57 @@
     box-shadow: 0 4px 20px var(--accent-glow);
   }
 
+  .offset-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .offset-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s;
+  }
+  .offset-actions.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .btn-offset-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-offset-action:hover {
+    color: var(--text-primary);
+    border-color: var(--text-dim);
+    background: var(--bg-card);
+  }
+  .btn-offset-action.btn-offset-save:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(124, 106, 239, 0.08);
+  }
+  .btn-offset-action.saved {
+    color: var(--success);
+    border-color: var(--success);
+    background: rgba(34, 197, 94, 0.08);
+    pointer-events: none;
+  }
+
   .btn-sm {
     padding: 6px 12px;
     font-size: 12px;
@@ -424,21 +423,6 @@
   }
 
   /* Lyrics Source Info */
-  .lyrics-info {
-    font-size: 12px;
-    color: var(--text-secondary);
-    padding: 8px 12px;
-    background: var(--bg-input);
-    border-radius: 8px;
-    font-family: var(--font-mono);
-    line-height: 1.6;
-  }
-
-  .lyrics-info .count {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
   /* ========== Lyrics Display (Right) ========== */
   .lyrics-display {
     position: relative;
@@ -566,7 +550,7 @@
   body.obs-mode .header,
   body.obs-mode .control-panel,
   body.obs-mode .fab,
-  body.obs-mode .lyrics-bottom-bar {
+  body.obs-mode .new-song-backdrop {
     display: none !important;
   }
 
@@ -690,37 +674,6 @@
   }
 
   .font-size-control span {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    min-width: 36px;
-    text-align: center;
-  }
-
-  .lyrics-bottom-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    padding: 8px 16px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-card);
-    flex-shrink: 0;
-  }
-
-  .lyrics-bottom-control {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .lyrics-bottom-label {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-right: 2px;
-  }
-
-  .lyrics-bottom-control span:not(.lyrics-bottom-label) {
     font-size: 12px;
     color: var(--text-secondary);
     font-family: var(--font-mono);
@@ -887,7 +840,7 @@
     align-items: center;
     justify-content: space-between;
   }
-  .btn-reset {
+  .btn-sidebar-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -900,11 +853,92 @@
     color: var(--text-secondary);
     cursor: pointer;
     transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
   }
-  .btn-reset:hover {
+  .btn-sidebar-icon:hover {
     color: var(--accent);
     background: rgba(124, 106, 239, 0.08);
   }
+  .btn-new-song {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-new-song:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(124, 106, 239, 0.05);
+  }
+
+  /* New Song Modal */
+  .new-song-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .new-song-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .new-song-modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s;
+  }
+  .new-song-backdrop.open .new-song-modal {
+    transform: scale(1);
+  }
+  .new-song-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .new-song-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .new-song-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+  .new-song-body textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .new-song-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
   /* FAB */
   .fab {
     position: fixed;
@@ -946,9 +980,6 @@
     .song-drawer {
       width: 100%;
     }
-    .header .song-indicator {
-      max-width: 180px;
-    }
   }
 </style>
 </head>
@@ -959,25 +990,6 @@
   <header class="header">
     <div class="header-left">
       <h1><span class="dot"></span>Lyrics Flow</h1>
-    </div>
-    <div class="song-indicator" id="songIndicator" onclick="toggleSongDrawer()" title="開啟歌曲庫">
-      <div class="song-indicator-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12,3V12.26C11.5,12.09 11,12 10.5,12A4.5,4.5 0 0,0 6,16.5A4.5,4.5 0 0,0 10.5,21A4.5,4.5 0 0,0 15,16.5V6H19V3H12Z" />
-        </svg>
-      </div>
-      <div class="song-indicator-info">
-        <div class="song-indicator-name unsaved" id="songIndicatorName">未儲存的歌曲</div>
-      </div>
-      <div class="song-indicator-actions">
-        <button class="btn-icon" onclick="event.stopPropagation(); startEditSongName()" title="編輯歌曲名稱">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-          </svg>
-        </button>
-      </div>
     </div>
     <div class="header-actions">
       <span class="mode-badge" id="statusBadge" style="display:none;">IDLE</span>
@@ -998,34 +1010,31 @@
   <div class="control-panel">
     <div class="sidebar-content">
 
-    <!-- Audio Source Tabs -->
-    <div class="input-group">
-      <div class="section-label-row">
-        <div class="section-label">伴奏來源</div>
-        <button class="btn-reset" onclick="clearCurrentSong()" title="清空內容以新增下一首">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10" />
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-          </svg>
-        </button>
-        </div>
-      <div class="tabs" id="audioSourceTabs">
-        <button class="tab active" onclick="switchAudioSource('youtube', this)">YouTube</button>
-        <button class="tab" onclick="switchAudioSource('local', this)">本地音檔</button>
-      </div>
+    <!-- Song Name -->
+    <div class="sidebar-song-name" id="sidebarSongName" style="display:none;">
+      <div class="sidebar-song-name-text" id="songIndicatorName"></div>
+      <button class="btn-sidebar-icon" id="editSongBtn" onclick="openEditSongModal()" title="編輯歌曲">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+        </svg>
+      </button>
     </div>
 
-    <!-- YouTube Source -->
-    <div id="audioSourceYoutube">
-      <div class="input-group">
-        <div class="input-row">
-          <input type="text" id="ytUrl" placeholder="貼上 YouTube 連結或影片 ID" />
-          <button class="btn btn-primary" onclick="loadVideo()">載入</button>
-        </div>
-      </div>
+    <button class="btn-new-song" onclick="openNewSongModal()">+ 新增歌曲</button>
 
-      <!-- Player (embed mode) -->
+    <!-- Hidden inputs for form state (used by saveCurrent and other JS) -->
+    <input type="hidden" id="ytUrl" />
+    <input type="hidden" id="audioFileName" />
+    <textarea id="lrcInput" style="display:none;"></textarea>
+    <input type="file" id="audioFileInput" accept="audio/*" onchange="loadAudioFile(event)" style="display:none;" />
+    <input type="file" id="fileInput" accept=".lrc,.txt" onchange="loadLRCFile(event)" style="display:none;" />
+    <div class="tabs" id="audioSourceTabs" style="display:none;">
+      <button class="tab active">YouTube</button>
+      <button class="tab">本地音檔</button>
+    </div>
+
+    <!-- YouTube Player -->
+    <div id="audioSourceYoutube">
       <div id="embedMode" style="margin-top:4px;">
         <div class="player-wrapper">
           <div id="ytPlayer"></div>
@@ -1039,7 +1048,6 @@
         </div>
       </div>
 
-      <!-- Manual timer (fallback when embed blocked) -->
       <div id="manualMode" style="display:none;">
         <div class="embed-error">
           <div class="error-title">此影片不允許嵌入播放</div>
@@ -1062,16 +1070,8 @@
       </div>
     </div>
 
-    <!-- Local Audio Source -->
+    <!-- Local Audio Player -->
     <div id="audioSourceLocal" style="display:none;">
-      <div class="input-group">
-        <div class="input-row">
-          <input type="text" id="audioFileName" placeholder="點擊選擇音檔（mp3, m4a, wav, ogg...）" readonly
-                 onclick="document.getElementById('audioFileInput').click()" style="cursor:pointer;" />
-          <button class="btn btn-primary" onclick="document.getElementById('audioFileInput').click()">選擇檔案</button>
-        </div>
-        <input type="file" id="audioFileInput" accept="audio/*" onchange="loadAudioFile(event)" style="display:none;" />
-      </div>
       <audio id="audioPlayer" style="display:none;"></audio>
       <div class="playback-info" id="audioPlaybackInfo" style="display:none;">
         <div class="status-dot" id="audioStatusDot"></div>
@@ -1087,37 +1087,19 @@
       </div>
     </div>
 
-    <!-- LRC Lyrics Input -->
-    <div class="input-group">
-      <div class="section-label">LRC 歌詞</div>
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('paste', this)">貼上歌詞</button>
-        <button class="tab" onclick="switchTab('file', this)">讀取檔案</button>
-      </div>
-
-      <div id="tabPaste">
-        <textarea id="lrcInput" placeholder="在此貼上 LRC 格式歌詞...&#10;&#10;範例：&#10;[00:12.50]第一句歌詞&#10;[00:18.30]第二句歌詞&#10;[00:24.10]第三句歌詞"></textarea>
-        <button class="btn" onclick="parseLRC()" style="margin-top:6px; width:100%;">解析歌詞</button>
-      </div>
-
-      <div id="tabFile" style="display:none;">
-        <input type="text" id="lrcFileInput" placeholder="點擊選擇 .lrc 檔案" readonly onclick="document.getElementById('fileInput').click()" style="cursor:pointer;" />
-        <input type="file" id="fileInput" accept=".lrc,.txt" onchange="loadLRCFile(event)" style="display:none;" />
-      </div>
-
-      <div class="hint">
-        提示：可從 <a href="https://lrclib.net" target="_blank">lrclib.net</a> 或 <a href="https://www.megalobiz.com" target="_blank">megalobiz.com</a> 搜尋下載中文歌的 LRC 檔。
-      </div>
-    </div>
-
-    <!-- Lyrics Info -->
-    <div class="lyrics-info" id="lyricsInfo" style="display:none;">
-      已載入 <span class="count" id="lineCount">0</span> 行歌詞
-    </div>
-
     <!-- Offset -->
     <div class="input-group">
-      <div class="section-label">歌詞偏移 (Offset)</div>
+      <div class="offset-header">
+        <div class="section-label" style="margin-bottom:0;">歌詞偏移 (Offset)</div>
+        <div class="offset-actions" id="offsetActions">
+          <button class="btn-offset-action" onclick="resetOffset()" title="重置偏移">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button class="btn-offset-action btn-offset-save" id="saveBtn" onclick="saveCurrent()" title="儲存偏移">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </button>
+        </div>
+      </div>
       <div class="offset-control">
         <button class="btn btn-sm" onclick="adjustOffset(-0.5)">-0.5s</button>
         <button class="btn btn-sm" onclick="adjustOffset(-0.1)">-0.1s</button>
@@ -1126,6 +1108,24 @@
         <button class="btn btn-sm" onclick="adjustOffset(0.5)">+0.5s</button>
       </div>
       <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
+    </div>
+
+    <!-- Font Size & Line Height -->
+    <div class="input-group">
+      <div class="section-label">歌詞字體大小</div>
+      <div class="font-size-control">
+        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
+        <span id="fontSizeDisplay">28px</span>
+        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <div class="section-label">歌詞行距</div>
+      <div class="font-size-control">
+        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
+        <span id="lineHeightDisplay">1.6</span>
+        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
+      </div>
     </div>
 
     </div><!-- /sidebar-content -->
@@ -1143,30 +1143,13 @@
         </p>
       </div>
     </div>
-    <div class="lyrics-bottom-bar">
-      <div class="lyrics-bottom-control">
-        <span class="lyrics-bottom-label">字體</span>
-        <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
-        <span id="fontSizeDisplay">28px</span>
-        <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
-      </div>
-      <div class="lyrics-bottom-control">
-        <span class="lyrics-bottom-label">行距</span>
-        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
-        <span id="lineHeightDisplay">1.6</span>
-        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
-      </div>
-    </div>
   </div>
 </div>
 
-<!-- Save FAB -->
-<button class="fab" id="saveBtn" onclick="saveCurrent()" title="儲存歌曲 (Ctrl+S)">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-    stroke-linecap="round" stroke-linejoin="round">
-    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-    <polyline points="17 21 17 13 7 13 7 21" />
-    <polyline points="7 3 7 8 15 8" />
+<!-- Song Library FAB -->
+<button class="fab" id="fabLibrary" onclick="toggleSongDrawer()" title="歌曲庫">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z" />
   </svg>
 </button>
 
@@ -1193,6 +1176,67 @@
       <div class="song-list" id="songList">
         <div class="song-list-empty">尚無歌曲</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Song Modal -->
+<div class="new-song-backdrop" id="newSongBackdrop" onclick="closeNewSongModal()">
+  <div class="new-song-modal" onclick="event.stopPropagation()">
+    <div class="new-song-header">
+      <h2 id="nsModalTitle">新增歌曲</h2>
+      <button class="btn-icon" onclick="closeNewSongModal()" title="關閉">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="new-song-body">
+      <div class="input-group">
+        <div class="section-label">歌曲名稱</div>
+        <input type="text" id="nsName" placeholder="輸入歌曲名稱" />
+      </div>
+      <div class="input-group">
+        <div class="section-label">伴奏來源</div>
+        <div class="tabs" id="nsAudioTabs">
+          <button class="tab active" onclick="nsSwitch('youtube', this)">YouTube</button>
+          <button class="tab" onclick="nsSwitch('local', this)">本地音檔</button>
+        </div>
+        <div id="nsYoutube">
+          <input type="text" id="nsYtUrl" placeholder="貼上 YouTube 連結或影片 ID" />
+        </div>
+        <div id="nsLocal" style="display:none;">
+          <div class="input-row">
+            <input type="text" id="nsAudioFileName" placeholder="點擊選擇音檔" readonly
+              onclick="document.getElementById('nsAudioFileInput').click()" style="cursor:pointer;" />
+            <button class="btn btn-sm" onclick="document.getElementById('nsAudioFileInput').click()">選擇</button>
+          </div>
+          <input type="file" id="nsAudioFileInput" accept="audio/*" onchange="nsLoadAudioFile(event)" style="display:none;" />
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="section-label">LRC 歌詞</div>
+        <div class="tabs" id="nsLrcTabs">
+          <button class="tab active" onclick="nsLrcSwitch('paste', this)">貼上歌詞</button>
+          <button class="tab" onclick="nsLrcSwitch('file', this)">讀取檔案</button>
+        </div>
+        <div id="nsLrcPaste">
+          <textarea id="nsLrcInput" placeholder="在此貼上 LRC 格式歌詞...&#10;&#10;範例：&#10;[00:12.50]第一句歌詞&#10;[00:18.30]第二句歌詞"></textarea>
+        </div>
+        <div id="nsLrcFile" style="display:none;">
+          <input type="text" id="nsLrcFileName" placeholder="點擊選擇 .lrc 檔案" readonly
+            onclick="document.getElementById('nsLrcFileInput').click()" style="cursor:pointer;" />
+          <input type="file" id="nsLrcFileInput" accept=".lrc,.txt" onchange="nsLoadLrcFile(event)" style="display:none;" />
+        </div>
+        <div class="hint">
+          提示：可從 <a href="https://lrclib.net" target="_blank">lrclib.net</a> 或 <a href="https://www.megalobiz.com" target="_blank">megalobiz.com</a> 搜尋下載 LRC 檔。
+        </div>
+      </div>
+    </div>
+    <div class="new-song-footer">
+      <button class="btn" onclick="closeNewSongModal()">取消</button>
+      <button class="btn btn-primary" id="nsSubmitBtn" onclick="saveFromModal()">儲存並載入</button>
     </div>
   </div>
 </div>
@@ -1344,9 +1388,10 @@
     currentSongTitle = name;
     lastSavedState = captureCurrentState();
     await refreshSongList();
-    updateSaveBtn();
     updateSongIndicator();
-    btn.innerHTML = CHECK_ICON;
+    btn.innerHTML = CHECK_SVG;
+    btn.classList.add('saved');
+    btn.title = '已儲存';
     setTimeout(() => updateSaveBtn(), 1500);
   }
 
@@ -1495,51 +1540,242 @@
   function closeDrawerMenu() {
     document.getElementById('drawerMenuDropdown').classList.remove('open');
   }
-  const SAVE_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
-  const CHECK_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  function updateSaveBtn() {
-    const btn = document.getElementById('saveBtn');
-    btn.innerHTML = SAVE_ICON;
-    btn.title = currentSongId ? '更新目前歌曲' : '儲存為新歌曲';
+
+  // ========== Song Modal (New / Edit) ==========
+  let nsAudioFile = null; // store selected audio File object
+  let nsIsEditMode = false; // true when editing existing song
+
+  function openNewSongModal() {
+    // Check unsaved changes before opening
+    const hasContent = document.getElementById('lrcInput').value.trim() || lyrics.length > 0;
+    if (hasContent && currentSongId && hasUnsavedChanges()) {
+      const wantSave = confirm('目前有未儲存的變更，是否要先儲存？');
+      if (wantSave) { saveCurrent(); }
+      else if (!confirm('確定不儲存並新增歌曲？')) return;
+    }
+    nsIsEditMode = false;
+    document.getElementById('nsModalTitle').textContent = '新增歌曲';
+    document.getElementById('nsSubmitBtn').textContent = '儲存並載入';
+    // Reset modal fields
+    document.getElementById('nsName').value = '';
+    document.getElementById('nsYtUrl').value = '';
+    document.getElementById('nsLrcInput').value = '';
+    document.getElementById('nsAudioFileName').value = '';
+    document.getElementById('nsLrcFileName').value = '';
+    nsAudioFile = null;
+    nsResetTabs('youtube', 'paste');
+    document.getElementById('newSongBackdrop').classList.add('open');
   }
-  function updateSongIndicator() {
-    const el = document.getElementById('songIndicatorName');
-    if (currentSongId && currentSongTitle) {
-      el.textContent = currentSongTitle;
-      el.classList.remove('unsaved');
+
+  function openEditSongModal() {
+    nsIsEditMode = true;
+    document.getElementById('nsModalTitle').textContent = '編輯歌曲';
+    document.getElementById('nsSubmitBtn').textContent = '儲存變更';
+    // Pre-fill with current data
+    document.getElementById('nsName').value = currentSongTitle || '';
+    document.getElementById('nsLrcInput').value = document.getElementById('lrcInput').value || '';
+    document.getElementById('nsLrcFileName').value = '';
+    nsAudioFile = null;
+
+    if (useLocalAudio) {
+      document.getElementById('nsYtUrl').value = '';
+      document.getElementById('nsAudioFileName').value = document.getElementById('audioFileName').value || '';
+      nsResetTabs('local', 'paste');
     } else {
-      el.textContent = '未儲存的歌曲';
-      el.classList.add('unsaved');
+      document.getElementById('nsYtUrl').value = document.getElementById('ytUrl').value || '';
+      document.getElementById('nsAudioFileName').value = '';
+      nsResetTabs('youtube', 'paste');
+    }
+    document.getElementById('newSongBackdrop').classList.add('open');
+  }
+
+  function nsResetTabs(audioTab, lrcTab) {
+    document.getElementById('nsYoutube').style.display = audioTab === 'youtube' ? 'block' : 'none';
+    document.getElementById('nsLocal').style.display = audioTab === 'local' ? 'block' : 'none';
+    document.getElementById('nsAudioTabs').querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', audioTab === 'youtube' ? i === 0 : i === 1);
+    });
+    document.getElementById('nsLrcPaste').style.display = lrcTab === 'paste' ? 'block' : 'none';
+    document.getElementById('nsLrcFile').style.display = lrcTab === 'file' ? 'block' : 'none';
+    document.getElementById('nsLrcTabs').querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', lrcTab === 'paste' ? i === 0 : i === 1);
+    });
+  }
+
+  function closeNewSongModal() {
+    document.getElementById('newSongBackdrop').classList.remove('open');
+  }
+
+  function nsSwitch(source, el) {
+    document.getElementById('nsYoutube').style.display = source === 'youtube' ? 'block' : 'none';
+    document.getElementById('nsLocal').style.display = source === 'local' ? 'block' : 'none';
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function nsLrcSwitch(tab, el) {
+    document.getElementById('nsLrcPaste').style.display = tab === 'paste' ? 'block' : 'none';
+    document.getElementById('nsLrcFile').style.display = tab === 'file' ? 'block' : 'none';
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function nsLoadAudioFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    nsAudioFile = file;
+    document.getElementById('nsAudioFileName').value = file.name;
+  }
+
+  function nsLoadLrcFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById('nsLrcFileName').value = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('nsLrcInput').value = e.target.result;
+      nsLrcSwitch('paste', document.getElementById('nsLrcTabs').querySelector('.tab'));
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  async function saveFromModal() {
+    const lrcText = document.getElementById('nsLrcInput').value.trim();
+    if (!lrcText) {
+      alert('請填入 LRC 歌詞。');
+      return;
+    }
+
+    const name = document.getElementById('nsName').value.trim() || '未命名歌曲';
+    const isYoutube = document.getElementById('nsYoutube').style.display !== 'none';
+    const ytUrl = document.getElementById('nsYtUrl').value.trim();
+    const audioFileName = document.getElementById('nsAudioFileName').value;
+
+    // Determine if audio source or YT URL changed (need to reload player)
+    const oldYtUrl = document.getElementById('ytUrl').value;
+    const audioSourceChanged = isYoutube !== !useLocalAudio;
+    const ytUrlChanged = isYoutube && ytUrl !== oldYtUrl;
+
+    // Stop current playback if source changed or new mode
+    if (!nsIsEditMode || audioSourceChanged || ytUrlChanged) {
+      stopSync();
+      currentLineIndex = -1;
+      if (player && player.stopVideo) try { player.stopVideo(); } catch(e) {}
+      if (audioEl && !audioEl.paused) audioEl.pause();
+      if (typeof manualPlaying !== 'undefined' && manualPlaying) manualReset();
+    }
+
+    // Update lyrics
+    document.getElementById('lrcInput').value = lrcText;
+    const newLyrics = parseLRCText(lrcText);
+    const lyricsChanged = JSON.stringify(newLyrics) !== JSON.stringify(lyrics);
+    if (lyricsChanged || !nsIsEditMode) {
+      lyrics = newLyrics;
+      renderLyrics();
+      if (!nsIsEditMode) {
+        offset = 0;
+        document.getElementById('offsetDisplay').textContent = '0.0s';
+      }
+    }
+
+    // Switch audio source and load
+    if (isYoutube) {
+      useLocalAudio = false;
+      document.getElementById('audioSourceYoutube').style.display = 'block';
+      document.getElementById('audioSourceLocal').style.display = 'none';
+      document.getElementById('ytUrl').value = ytUrl;
+      if (ytUrlChanged || !nsIsEditMode) {
+        document.getElementById('embedMode').style.display = 'block';
+        document.getElementById('manualMode').style.display = 'none';
+        if (ytUrl) loadVideo();
+      }
+    } else {
+      useLocalAudio = true;
+      document.getElementById('audioSourceYoutube').style.display = 'none';
+      document.getElementById('audioSourceLocal').style.display = 'block';
+      document.getElementById('audioFileName').value = audioFileName;
+      if (nsAudioFile) {
+        const url = URL.createObjectURL(nsAudioFile);
+        audioEl = document.getElementById('audioPlayer');
+        audioEl.src = url;
+        document.getElementById('audioPlaybackInfo').style.display = 'flex';
+        document.getElementById('audioControls').style.display = 'flex';
+      }
+    }
+
+    if (lyrics.length > 0) updateActiveLine();
+
+    // Save to IndexedDB
+    if (nsIsEditMode && currentSongId) {
+      // Update existing song
+      currentSongTitle = name;
+      const song = {
+        id: currentSongId,
+        name: name,
+        lrcText: lrcText,
+        offset: offset,
+        audioSource: isYoutube ? 'youtube' : 'local',
+        youtubeId: isYoutube ? (extractVideoId(ytUrl) || null) : null,
+        audioFileName: isYoutube ? null : (audioFileName || null),
+        updatedAt: Date.now(),
+      };
+      const songs = await getAllSongs();
+      const existing = songs.find(s => s.id === currentSongId);
+      song.createdAt = existing ? existing.createdAt : Date.now();
+      await saveSong(song);
+    } else {
+      // New song
+      currentSongId = Date.now();
+      currentSongTitle = name;
+      const song = {
+        id: currentSongId,
+        name: name,
+        lrcText: lrcText,
+        offset: 0,
+        audioSource: isYoutube ? 'youtube' : 'local',
+        youtubeId: isYoutube ? (extractVideoId(ytUrl) || null) : null,
+        audioFileName: isYoutube ? null : (audioFileName || null),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      await saveSong(song);
+    }
+
+    lastSavedState = captureCurrentState();
+    await refreshSongList();
+    updateSaveBtn();
+    updateSongIndicator();
+
+    closeNewSongModal();
+  }
+
+  const SAVE_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+  const CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  function updateSaveBtn() {
+    const actions = document.getElementById('offsetActions');
+    if (!actions) return;
+    const hasContent = document.getElementById('lrcInput').value.trim() || lyrics.length > 0;
+    if (hasContent && hasUnsavedChanges()) {
+      actions.classList.add('visible');
+      const btn = document.getElementById('saveBtn');
+      btn.innerHTML = SAVE_SVG;
+      btn.classList.remove('saved');
+      btn.title = '儲存偏移';
+    } else {
+      actions.classList.remove('visible');
     }
   }
-  function startEditSongName() {
-    const indicator = document.getElementById('songIndicator');
+  function updateSongIndicator() {
+    const hasSong = lyrics.length > 0 || document.getElementById('lrcInput').value.trim();
+    const nameBlock = document.getElementById('sidebarSongName');
     const nameEl = document.getElementById('songIndicatorName');
-    const current = currentSongTitle || '';
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = current;
-    input.placeholder = '輸入歌曲名稱';
-    input.className = 'song-name-input';
-    indicator.classList.add('editing');
-    nameEl.replaceWith(input);
-    input.focus();
-    input.select();
-    const finish = () => {
-      const val = input.value.trim();
-      if (val) currentSongTitle = val;
-      const div = document.createElement('div');
-      div.className = 'song-indicator-name' + (currentSongId && currentSongTitle ? '' : ' unsaved');
-      div.id = 'songIndicatorName';
-      div.textContent = currentSongTitle || '未儲存的歌曲';
-      input.replaceWith(div);
-      indicator.classList.remove('editing');
-    };
-    input.addEventListener('blur', finish);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-      if (e.key === 'Escape') { input.value = current; input.blur(); }
-    });
+    if (hasSong) {
+      nameBlock.style.display = 'flex';
+      nameEl.textContent = currentSongTitle || '未命名歌曲';
+    } else {
+      nameBlock.style.display = 'none';
+    }
   }
   let lastSavedState = null;
 
@@ -1936,8 +2172,6 @@
   // ========== Lyrics Rendering ==========
   function renderLyrics() {
     const container = document.getElementById('lyricsContainer');
-    const info = document.getElementById('lyricsInfo');
-    const countEl = document.getElementById('lineCount');
 
     // Remove only lyric lines, preserve emptyState
     container.querySelectorAll('.lyric-line').forEach(el => el.remove());
@@ -1955,13 +2189,10 @@
       } else {
         emptyState.style.display = 'flex';
       }
-      info.style.display = 'none';
       return;
     }
 
     if (emptyState) emptyState.style.display = 'none';
-    info.style.display = 'block';
-    countEl.textContent = lyrics.length;
 
     lyrics.forEach((item, index) => {
       const div = document.createElement('div');
@@ -2226,6 +2457,18 @@
     // Re-sync immediately
     currentLineIndex = -1;
     broadcast('OFFSET', { offset });
+    updateSaveBtn();
+  }
+
+  function resetOffset() {
+    if (!lastSavedState) return;
+    const saved = JSON.parse(lastSavedState);
+    offset = saved.offset || 0;
+    offset = Math.round(offset * 10) / 10;
+    document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
+    currentLineIndex = -1;
+    broadcast('OFFSET', { offset });
+    updateSaveBtn();
   }
 
   function adjustFontSize(delta) {
