@@ -1091,13 +1091,21 @@
       <div class="hint">如果歌詞跑太快或太慢，可以微調偏移量。</div>
     </div>
 
-    <!-- Font Size for OBS -->
+    <!-- Font Size & Line Height -->
     <div class="input-group">
       <div class="section-label">歌詞字體大小</div>
       <div class="font-size-control">
         <button class="btn btn-sm" onclick="adjustFontSize(-2)">A-</button>
         <span id="fontSizeDisplay">28px</span>
         <button class="btn btn-sm" onclick="adjustFontSize(2)">A+</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <div class="section-label">歌詞行距</div>
+      <div class="font-size-control">
+        <button class="btn btn-sm" onclick="adjustLineHeight(-0.1)">-</button>
+        <span id="lineHeightDisplay">1.6</span>
+        <button class="btn btn-sm" onclick="adjustLineHeight(0.1)">+</button>
       </div>
     </div>
 
@@ -1164,6 +1172,7 @@
   let currentLineIndex = -1;
   let offset = 0;
   let baseFontSize = 28;
+  let baseLineHeight = 1.6;
   let syncInterval = null;
   let isOBSMode = false;
   let useLocalAudio = false;
@@ -1285,7 +1294,6 @@
       name: name,
       lrcText: lrcText,
       offset: offset,
-      baseFontSize: baseFontSize,
       audioSource: useLocalAudio ? 'local' : 'youtube',
       youtubeId: useLocalAudio ? null : (currentVideoId || null),
       audioFileName: useLocalAudio ? (document.getElementById('audioFileName').value || null) : null,
@@ -1341,9 +1349,7 @@
       offset = song.offset || 0;
       document.getElementById('offsetDisplay').textContent = offset.toFixed(1) + 's';
 
-      // 3. Apply font size
-      baseFontSize = song.baseFontSize || 28;
-      document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
+      // 3. Render lyrics with current font size
       if (lyrics.length > 0) updateActiveLine();
 
       // 4. Switch audio source & load
@@ -1509,7 +1515,6 @@
       title: currentSongTitle,
       lrcText: document.getElementById('lrcInput').value,
       offset: offset,
-      baseFontSize: baseFontSize,
       ytUrl: document.getElementById('ytUrl').value,
       audioFileName: document.getElementById('audioFileName').value,
     });
@@ -1542,8 +1547,6 @@
     renderLyrics();
     offset = 0;
     document.getElementById('offsetDisplay').textContent = '0.0s';
-    baseFontSize = 28;
-    document.getElementById('fontSizeDisplay').textContent = '28px';
     stopSync();
     currentLineIndex = -1;
     // Destroy YouTube player
@@ -1677,7 +1680,7 @@
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
-        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, offset });
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset });
       }
     });
     console.log('PieSocket connected');
@@ -1932,6 +1935,7 @@
       div.className = 'lyric-line upcoming';
       div.id = `lyric-${index}`;
       div.style.fontSize = baseFontSize + 'px';
+      div.style.lineHeight = baseLineHeight;
       div.onclick = () => seekToLyric(index);
 
       // Time tag (hover to see)
@@ -2107,12 +2111,15 @@
       if (i < currentLineIndex) {
         line.classList.add('passed');
         line.style.fontSize = baseFontSize + 'px';
+        line.style.lineHeight = baseLineHeight;
       } else if (i === currentLineIndex) {
         line.classList.add('active');
         line.style.fontSize = (baseFontSize + 4) + 'px';
+        line.style.lineHeight = baseLineHeight;
       } else {
         line.classList.add('upcoming');
         line.style.fontSize = baseFontSize + 'px';
+        line.style.lineHeight = baseLineHeight;
       }
     });
 
@@ -2162,9 +2169,14 @@
     baseFontSize = Math.max(14, Math.min(60, baseFontSize + delta));
     document.getElementById('fontSizeDisplay').textContent = baseFontSize + 'px';
     broadcast('FONT_SIZE', { baseFontSize });
-    if (lyrics.length > 0) {
-      updateActiveLine();
-    }
+    if (lyrics.length > 0) updateActiveLine();
+  }
+
+  function adjustLineHeight(delta) {
+    baseLineHeight = Math.max(1.0, Math.min(3.0, +(baseLineHeight + delta).toFixed(1)));
+    document.getElementById('lineHeightDisplay').textContent = baseLineHeight.toFixed(1);
+    broadcast('LINE_HEIGHT', { baseLineHeight });
+    if (lyrics.length > 0) updateActiveLine();
   }
 
   function formatTime(seconds) {
