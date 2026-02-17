@@ -1301,6 +1301,7 @@
     await saveSong(song);
     currentSongId = song.id;
     currentSongTitle = name;
+    lastSavedState = captureCurrentState();
     await refreshSongList();
     updateSaveBtn();
     updateSongIndicator();
@@ -1309,6 +1310,12 @@
   }
 
   async function loadSongById(id) {
+    if (id === currentSongId) return;
+    if (currentSongId && hasUnsavedChanges()) {
+      const wantSave = confirm('目前有未儲存的變更，是否要先儲存？');
+      if (wantSave) { await saveCurrent(); }
+      else if (!confirm('確定不儲存並切換歌曲？')) return;
+    }
     try {
       const song = cachedSongs.find(s => s.id === id);
       if (!song) { alert('找不到歌曲。'); return; }
@@ -1370,6 +1377,7 @@
       // 5. Track current song for save/update
       currentSongId = song.id;
       currentSongTitle = song.name;
+      lastSavedState = captureCurrentState();
       updateSaveBtn();
       updateSongIndicator();
       renderSongList(cachedSongs);
@@ -1494,9 +1502,36 @@
       if (e.key === 'Escape') { input.value = current; input.blur(); }
     });
   }
+  let lastSavedState = null;
+
+  function captureCurrentState() {
+    return JSON.stringify({
+      title: currentSongTitle,
+      lrcText: document.getElementById('lrcInput').value,
+      offset: offset,
+      baseFontSize: baseFontSize,
+      ytUrl: document.getElementById('ytUrl').value,
+      audioFileName: document.getElementById('audioFileName').value,
+    });
+  }
+
+  function hasUnsavedChanges() {
+    if (!lastSavedState) return false;
+    return captureCurrentState() !== lastSavedState;
+  }
+
   function clearCurrentSong() {
     const hasContent = document.getElementById('lrcInput').value.trim() || lyrics.length > 0;
-    if (hasContent && !confirm('確定要清空目前的歌曲內容？')) return;
+    if (!hasContent) {
+      // Nothing to clear, just reset silently
+    } else if (currentSongId && hasUnsavedChanges()) {
+      // Loaded song with unsaved edits
+      const wantSave = confirm('目前有未儲存的變更，是否要先儲存？');
+      if (wantSave) { saveCurrent(); return; }
+      if (!confirm('確定不儲存並清空目前內容？')) return;
+    } else {
+      if (!confirm('確定要清空目前的歌曲內容？')) return;
+    }
     currentSongId = null;
     currentSongTitle = '';
     document.getElementById('lrcInput').value = '';
@@ -1535,6 +1570,7 @@
     if (audioEl && !audioEl.paused) audioEl.pause();
     document.getElementById('audioPlaybackInfo').style.display = 'none';
     document.getElementById('audioControls').style.display = 'none';
+    lastSavedState = null;
     updateSaveBtn();
     updateSongIndicator();
   }
