@@ -895,6 +895,18 @@
     const song = songs.find(s => s.id === id);
     if (!song) { alert('找不到歌曲。'); return; }
 
+    // 0. Reset previous playback state
+    stopSync();
+    currentLineIndex = -1;
+    if (player && player.stopVideo) try { player.stopVideo(); } catch(e) {}
+    if (audioEl && !audioEl.paused) audioEl.pause();
+    if (manualPlaying) manualReset();
+    document.getElementById('embedMode').style.display = 'block';
+    document.getElementById('manualMode').style.display = 'none';
+    useManualMode = false;
+    document.getElementById('statusBadge').className = 'mode-badge';
+    document.getElementById('statusBadge').textContent = 'IDLE';
+
     // 1. Load lyrics
     document.getElementById('lrcInput').value = song.lrcText;
     lyrics = parseLRCText(song.lrcText);
@@ -1116,9 +1128,26 @@
 
   function createPlayer(videoId) {
     if (player) {
-      // Player already exists, just load the new video
-      player.loadVideoById(videoId);
-      return;
+      try {
+        // Player already exists, just load the new video
+        player.loadVideoById(videoId);
+        return;
+      } catch (e) {
+        // Player object exists but is broken — destroy and recreate
+        console.warn('Player.loadVideoById failed, recreating player:', e);
+        try { player.destroy(); } catch(e2) {}
+        player = null;
+        playerReady = false;
+      }
+    }
+    // Ensure the target div exists
+    if (!document.getElementById('ytPlayer')) {
+      const wrapper = document.querySelector('.player-wrapper');
+      if (wrapper) {
+        const div = document.createElement('div');
+        div.id = 'ytPlayer';
+        wrapper.appendChild(div);
+      }
     }
     player = new YT.Player('ytPlayer', {
       height: '100%',
@@ -1208,6 +1237,12 @@
       alert('YouTube API 尚未載入，請稍候再試。');
       return;
     }
+    // Stop any current playback
+    stopSync();
+    currentLineIndex = -1;
+    if (audioEl && !audioEl.paused) audioEl.pause();
+    useLocalAudio = false;
+
     currentVideoId = videoId;
     // Reset to embed mode first
     useManualMode = false;
@@ -1289,22 +1324,32 @@
   // ========== Lyrics Rendering ==========
   function renderLyrics() {
     const container = document.getElementById('lyricsContainer');
-    const emptyState = document.getElementById('emptyState');
     const info = document.getElementById('lyricsInfo');
     const countEl = document.getElementById('lineCount');
 
+    // Remove only lyric lines, preserve emptyState
+    container.querySelectorAll('.lyric-line').forEach(el => el.remove());
+
+    const emptyState = document.getElementById('emptyState');
+
     if (lyrics.length === 0) {
-      emptyState.style.display = 'flex';
+      // Recreate emptyState if it was lost
+      if (!emptyState) {
+        const es = document.createElement('div');
+        es.className = 'empty-state';
+        es.id = 'emptyState';
+        es.innerHTML = '<div class="icon">♪</div><p>1. 貼上 YouTube 伴奏連結<br>2. 貼上或載入 LRC 歌詞<br>3. 播放後歌詞會自動同步滾動</p>';
+        container.appendChild(es);
+      } else {
+        emptyState.style.display = 'flex';
+      }
       info.style.display = 'none';
       return;
     }
 
-    emptyState.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
     info.style.display = 'block';
     countEl.textContent = lyrics.length;
-
-    // Clear and rebuild
-    container.innerHTML = '';
 
     lyrics.forEach((item, index) => {
       const div = document.createElement('div');
