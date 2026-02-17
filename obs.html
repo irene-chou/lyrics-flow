@@ -147,6 +147,10 @@
   }
 
   // ========== PieSocket (OBS Sync) ==========
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('s') || '';
+  const channelName = sessionId ? `lyrics-flow-${sessionId}` : 'lyrics-flow';
+
   const piesocket = new PieSocket.default({
     clusterId: 'demo',
     apiKey: 'xlkQUJ7Y5BKQ1m0rNfNx2R1yhLBTu9mrVWOFdrnB',
@@ -156,12 +160,12 @@
   function requestFullState() {
     if (syncChannel) {
       syncChannel.publish('sync', { type: 'REQUEST_STATE', data: null });
-      console.log('Requesting full state...');
+      console.log('Requesting full state on channel:', channelName);
     }
   }
 
   function connectChannel() {
-    piesocket.subscribe('lyrics-flow').then(ch => {
+    piesocket.subscribe(channelName).then(ch => {
       syncChannel = ch;
 
       ch.listen('sync', (msg) => {

@@ -1996,6 +1996,10 @@
   }
 
   // ========== PieSocket (OBS Sync) ==========
+  const sessionId = localStorage.getItem('lf-session-id') || (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2, 10));
+  localStorage.setItem('lf-session-id', sessionId);
+  const channelName = `lyrics-flow-${sessionId}`;
+
   const piesocket = new PieSocket.default({
     clusterId: 'demo',
     apiKey: 'xlkQUJ7Y5BKQ1m0rNfNx2R1yhLBTu9mrVWOFdrnB',
@@ -2003,7 +2007,7 @@
   });
 
   let syncChannel = null;
-  piesocket.subscribe('lyrics-flow').then(ch => {
+  piesocket.subscribe(channelName).then(ch => {
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
@@ -2572,7 +2576,7 @@
 
   function copyOBSUrl() {
     const base = window.location.href.replace(/[^/]*$/, '');
-    const obsUrl = base + 'obs.html';
+    const obsUrl = base + 'obs.html?s=' + sessionId;
     const btn = document.getElementById('obsUrlBtn');
     navigator.clipboard.writeText(obsUrl).then(() => {
       btn.classList.add('copied');
