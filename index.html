@@ -6,6 +6,7 @@
 <title>Lyrics Flow - 歌詞播放器</title>
 <script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>@import url("https://font.emtech.cc/css/GenSenRoundedTW");</style>
 <style>
   :root {
     --bg-primary: #0a0a0f;
@@ -28,6 +29,7 @@
 
     --radius: 12px;
     --font-main: 'Noto Sans TC', sans-serif;
+    --font-lyrics: 'GenSenRoundedTW', 'Noto Sans TC', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
@@ -453,6 +455,34 @@
     flex-direction: column;
   }
 
+  .now-singing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .now-singing-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+    color: var(--accent);
+  }
+  .now-singing-divider {
+    color: var(--text-dim);
+  }
+  .now-singing-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .lyrics-scroll-container {
     flex: 1;
     overflow-y: auto;
@@ -474,6 +504,7 @@
     padding: 12px 20px;
     margin: 4px 0;
     border-radius: 10px;
+    font-family: var(--font-lyrics);
     font-size: 28px;
     font-weight: 400;
     line-height: 1.6;
@@ -496,9 +527,7 @@
     color: var(--active-lyric);
     font-weight: 700;
     font-size: 32px;
-    background: var(--active-bg);
     transform: scale(1.01);
-    padding: 16px 24px;
   }
 
   .lyric-line.upcoming {
@@ -1142,6 +1171,11 @@
         <polyline points="20 6 9 17 4 12" />
       </svg>
     </button>
+    <div class="now-singing" id="nowSinging" style="display:none;">
+      <span class="now-singing-label">Now singing</span>
+      <span class="now-singing-divider">-</span>
+      <span class="now-singing-title" id="nowSingingTitle"></span>
+    </div>
     <div class="lyrics-scroll-container" id="lyricsContainer">
       <div class="empty-state" id="emptyState">
         <div class="icon">♪</div>
@@ -1781,11 +1815,16 @@
     const hasSong = lyrics.length > 0 || document.getElementById('lrcInput').value.trim();
     const nameBlock = document.getElementById('sidebarSongName');
     const nameEl = document.getElementById('songIndicatorName');
+    const nowSinging = document.getElementById('nowSinging');
+    const nowTitle = document.getElementById('nowSingingTitle');
     if (hasSong) {
       nameBlock.style.display = 'flex';
       nameEl.textContent = currentSongTitle || '未命名歌曲';
+      nowSinging.style.display = 'flex';
+      nowTitle.textContent = currentSongTitle || '未命名歌曲';
     } else {
       nameBlock.style.display = 'none';
+      nowSinging.style.display = 'none';
     }
   }
   let lastSavedState = null;
@@ -1960,7 +1999,7 @@
     syncChannel = ch;
     ch.listen('sync', (msg) => {
       if (msg.type === 'REQUEST_STATE') {
-        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset });
+        broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset, songTitle: currentSongTitle });
       }
     });
     console.log('PieSocket connected');
@@ -2231,7 +2270,7 @@
     });
 
     currentLineIndex = -1;
-    broadcast('LYRICS_LOADED', { lyrics });
+    broadcast('LYRICS_LOADED', { lyrics, songTitle: currentSongTitle });
   }
 
   // ========== Manual Timer State ==========
@@ -2558,7 +2597,7 @@
     if (!document.hidden && lyrics.length > 0) {
       // Re-calculate current line index before broadcasting (it may be stale)
       syncLyrics();
-      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset });
+      broadcast('FULL_STATE', { lyrics, currentLineIndex, baseFontSize, baseLineHeight, offset, songTitle: currentSongTitle });
     }
   });
 

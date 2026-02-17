@@ -6,16 +6,21 @@
 <title>Lyrics Flow - OBS Display</title>
 <script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>@import url("https://font.emtech.cc/css/GenSenRoundedTW");</style>
 <style>
   :root {
     --accent: #7c6aef;
     --accent-glow: rgba(124, 106, 239, 0.3);
     --active-lyric: #ffffff;
-    --active-bg: rgba(124, 106, 239, 0.15);
+
     --passed-lyric: #5a5a70;
     --upcoming-lyric: #9090a8;
     --text-dim: #55556a;
+    --text-secondary: #8888a0;
+    --text-primary: #e8e8f0;
+    --border: #2a2a3a;
     --font-main: 'Noto Sans TC', sans-serif;
+    --font-lyrics: 'GenSenRoundedTW', 'Noto Sans TC', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
@@ -25,11 +30,14 @@
     font-family: var(--font-main);
     background: transparent;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
 
   .lyrics-scroll-container {
     width: 100vw;
-    height: 100vh;
+    flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
     padding: 30vh 48px 30vh 48px;
@@ -41,6 +49,7 @@
     padding: 12px 20px;
     margin: 4px 0;
     border-radius: 10px;
+    font-family: var(--font-lyrics);
     font-size: 28px;
     font-weight: 400;
     line-height: 1.6;
@@ -57,9 +66,7 @@
     color: var(--active-lyric);
     font-weight: 700;
     font-size: 32px;
-    background: var(--active-bg);
     transform: scale(1.01);
-    padding: 16px 24px;
   }
 
   .lyric-line.upcoming {
@@ -79,6 +86,32 @@
     opacity: 0.5;
   }
 
+  .now-singing {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 48px;
+    font-family: var(--font-lyrics);
+    font-size: 16px;
+  }
+  .now-singing-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 13px;
+    color: var(--upcoming-lyric);
+  }
+  .now-singing-divider {
+    color: var(--upcoming-lyric);
+  }
+  .now-singing-title {
+    font-weight: 500;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .waiting {
     display: flex;
     align-items: center;
@@ -92,6 +125,11 @@
 </head>
 <body>
 
+<div class="now-singing" id="nowSinging">
+  <span class="now-singing-label">Now singing</span>
+  <span class="now-singing-divider">-</span>
+  <span class="now-singing-title" id="nowSingingTitle"></span>
+</div>
 <div class="lyrics-scroll-container" id="lyricsContainer">
   <div class="waiting" id="waitingState">等待控制頁面連線...</div>
 </div>
@@ -101,8 +139,20 @@
   let currentLineIndex = -1;
   let baseFontSize = 28;
   let baseLineHeight = 1.6;
+  let songTitle = '';
   let syncChannel = null;
   let lastMessageTime = 0;
+
+  function updateNowSinging() {
+    const el = document.getElementById('nowSinging');
+    const titleEl = document.getElementById('nowSingingTitle');
+    if (songTitle && lyrics.length > 0) {
+      titleEl.textContent = songTitle;
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+    }
+  }
 
   // ========== PieSocket (OBS Sync) ==========
   const piesocket = new PieSocket.default({
@@ -131,13 +181,17 @@
             currentLineIndex = data.currentLineIndex;
             baseFontSize = data.baseFontSize || 28;
             baseLineHeight = data.baseLineHeight || 1.6;
+            songTitle = data.songTitle || '';
             renderLyrics();
             updateActiveLine();
+            updateNowSinging();
             break;
           case 'LYRICS_LOADED':
             lyrics = data.lyrics || [];
             currentLineIndex = -1;
+            songTitle = data.songTitle || '';
             renderLyrics();
+            updateNowSinging();
             break;
           case 'SYNC_UPDATE':
             if (data.currentLineIndex !== currentLineIndex) {
