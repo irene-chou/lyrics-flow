@@ -25,7 +25,6 @@ export function YouTubePlayer({ engine }: YouTubePlayerProps) {
     <div
       style={{
         position: 'relative',
-        marginTop: '4px',
         paddingBottom: '56.25%', // 16:9
         borderRadius: '8px',
         overflow: 'hidden',

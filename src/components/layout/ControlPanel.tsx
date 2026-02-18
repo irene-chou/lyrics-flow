@@ -99,10 +99,17 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
             </div>
 
             {/* Audio Player */}
-            <YouTubePlayer engine={engine} />
-            <ManualTimerPanel engine={engine} />
-            <LocalAudioPlayer engine={engine} />
-            <PlaybackInfo onSeek={handleSeek} />
+            {audioSource === 'youtube' && (
+              <div
+                className="flex flex-col bg-lf-bg-input rounded-lg"
+                style={{ gap: '6px', padding: '10px 12px' }}
+              >
+                <YouTubePlayer engine={engine} />
+                <ManualTimerPanel engine={engine} />
+                <PlaybackInfo onSeek={handleSeek} />
+              </div>
+            )}
+            <LocalAudioPlayer engine={engine} onSeek={handleSeek} />
             <OffsetControls />
           </>
         ) : (

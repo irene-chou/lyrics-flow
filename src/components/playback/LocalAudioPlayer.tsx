@@ -1,14 +1,17 @@
 import { useEffect, useRef, useCallback } from 'react'
+import { Play, Pause } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { PlaybackInfo } from './PlaybackInfo'
 import { VolumeControl } from './VolumeControl'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 
 interface LocalAudioPlayerProps {
   engine: ReturnType<typeof usePlaybackEngine>
+  onSeek: (time: number) => void
 }
 
-export function LocalAudioPlayer({ engine }: LocalAudioPlayerProps) {
+export function LocalAudioPlayer({ engine, onSeek }: LocalAudioPlayerProps) {
   const audioSource = useSongStore((s) => s.audioSource)
   const audioFileName = useSongStore((s) => s.audioFileName)
   const audioFileObjectUrl = usePlaybackStore((s) => s.audioFileObjectUrl)
@@ -40,7 +43,7 @@ export function LocalAudioPlayer({ engine }: LocalAudioPlayerProps) {
   const isPlaying = status === 'PLAYING'
 
   return (
-    <div style={{ marginTop: '4px' }}>
+    <div>
       <input
         ref={fileInputRef}
         type="file"
@@ -76,47 +79,31 @@ export function LocalAudioPlayer({ engine }: LocalAudioPlayerProps) {
           </button>
         </div>
       ) : (
-        <div className="flex flex-col" style={{ gap: '8px' }}>
-          <div className="flex items-center flex-wrap" style={{ gap: '8px' }}>
+        <div
+          className="flex flex-col bg-lf-bg-input rounded-lg"
+          style={{ gap: '6px', padding: '10px 12px' }}
+        >
+          {/* Progress bar */}
+          <PlaybackInfo onSeek={onSeek} />
+
+          {/* Play button + Volume */}
+          <div className="flex items-center justify-between" style={{ gap: '6px' }}>
             <button
-              className="border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
+              className="flex items-center justify-center border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
               onClick={() => engine.togglePlay()}
               style={{
-                padding: '8px 14px',
-                fontSize: '12px',
-                fontWeight: 600,
-                borderRadius: '6px',
-                fontFamily: 'var(--font-sans)',
+                width: '26px',
+                height: '26px',
+                padding: 0,
+                borderRadius: '50%',
+                flexShrink: 0,
               }}
+              title={isPlaying ? '暫停' : '播放'}
             >
-              {isPlaying ? '⏸ 暫停' : '▶ 播放'}
+              {isPlaying ? <Pause size={12} /> : <Play size={12} style={{ marginLeft: '1px' }} />}
             </button>
-            <button
-              className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
-              onClick={() => engine.seekBy(-5)}
-              style={{
-                padding: '6px 10px',
-                fontSize: '11px',
-                borderRadius: '6px',
-                fontFamily: 'var(--font-sans)',
-              }}
-            >
-              -5s
-            </button>
-            <button
-              className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
-              onClick={() => engine.seekBy(5)}
-              style={{
-                padding: '6px 10px',
-                fontSize: '11px',
-                borderRadius: '6px',
-                fontFamily: 'var(--font-sans)',
-              }}
-            >
-              +5s
-            </button>
+            <VolumeControl />
           </div>
-          <VolumeControl />
         </div>
       )}
     </div>

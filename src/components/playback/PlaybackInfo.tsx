@@ -30,7 +30,7 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
   }
 
   return (
-    <div className="flex items-center" style={{ gap: '8px', marginTop: '8px' }}>
+    <div className="flex items-center" style={{ gap: '8px' }}>
       {/* Status dot */}
       <div
         style={{
@@ -61,7 +61,7 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
         style={{
           flex: 1,
           height: '4px',
-          background: 'var(--lf-bg-input)',
+          background: 'var(--lf-border)',
           borderRadius: '2px',
           cursor: onSeek ? 'pointer' : 'default',
           overflow: 'hidden',

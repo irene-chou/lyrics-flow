@@ -31,7 +31,7 @@ export function VolumeControl() {
   const displayVolume = muted ? 0 : volume
 
   return (
-    <div className="flex items-center" style={{ gap: '8px' }}>
+    <div className="flex items-center" style={{ gap: '4px' }}>
       <button
         className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
         onClick={handleToggleMute}
@@ -40,13 +40,14 @@ export function VolumeControl() {
           border: 'none',
           padding: '2px',
           borderRadius: '4px',
+          flexShrink: 0,
         }}
         title="靜音"
       >
         {muted || volume === 0 ? (
-          <VolumeX size={16} />
+          <VolumeX size={14} />
         ) : (
-          <Volume2 size={16} />
+          <Volume2 size={14} />
         )}
       </button>
       <input
@@ -57,11 +58,11 @@ export function VolumeControl() {
         value={displayVolume}
         onChange={handleVolumeChange}
         style={{
-          flex: 1,
-          height: '4px',
+          width: '60px',
+          height: '3px',
           appearance: 'none',
           WebkitAppearance: 'none',
-          background: `linear-gradient(to right, var(--lf-accent) ${displayVolume}%, var(--lf-bg-input) ${displayVolume}%)`,
+          background: `linear-gradient(to right, var(--lf-accent) ${displayVolume}%, var(--lf-border) ${displayVolume}%)`,
           borderRadius: '2px',
           outline: 'none',
           cursor: 'pointer',
