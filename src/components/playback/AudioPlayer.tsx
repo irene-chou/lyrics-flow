@@ -102,49 +102,42 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
     )
   }
 
+  // YouTube embed mode — iframe only, no extra container
+  if (audioSource === 'youtube') {
+    return <YouTubePlayer engine={engine} />
+  }
+
+  // Local audio — file loaded
   return (
     <div
       className="flex flex-col bg-lf-bg-input rounded-lg"
       style={{ gap: '6px', padding: '10px 12px' }}
     >
-      {/* YouTube embed mode */}
-      {audioSource === 'youtube' && (
-        <>
-          <YouTubePlayer engine={engine} />
-          <PlaybackInfo onSeek={onSeek} />
-        </>
-      )}
-
-      {/* Local audio — file loaded */}
-      {audioSource === 'local' && audioFileObjectUrl && (
-        <>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="audio/*"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-          />
-          <PlaybackInfo onSeek={onSeek} />
-          <div className="flex items-center justify-between" style={{ gap: '6px' }}>
-            <button
-              className="flex items-center justify-center border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
-              onClick={() => engine.togglePlay()}
-              style={{
-                width: '26px',
-                height: '26px',
-                padding: 0,
-                borderRadius: '50%',
-                flexShrink: 0,
-              }}
-              title={isPlaying ? '暫停' : '播放'}
-            >
-              {isPlaying ? <Pause size={12} /> : <Play size={12} style={{ marginLeft: '1px' }} />}
-            </button>
-            <VolumeControl />
-          </div>
-        </>
-      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+      />
+      <PlaybackInfo onSeek={onSeek} />
+      <div className="flex items-center justify-between" style={{ gap: '6px' }}>
+        <button
+          className="flex items-center justify-center border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
+          onClick={() => engine.togglePlay()}
+          style={{
+            width: '26px',
+            height: '26px',
+            padding: 0,
+            borderRadius: '50%',
+            flexShrink: 0,
+          }}
+          title={isPlaying ? '暫停' : '播放'}
+        >
+          {isPlaying ? <Pause size={12} /> : <Play size={12} style={{ marginLeft: '1px' }} />}
+        </button>
+        <VolumeControl />
+      </div>
     </div>
   )
 }
