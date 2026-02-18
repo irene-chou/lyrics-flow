@@ -15,22 +15,22 @@ export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
       }}
     >
       <div
+        className="text-lf-text-dim"
         style={{
           fontSize: '13px',
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
-          color: 'var(--lf-text-dim)',
           marginBottom: '4px',
         }}
       >
         Now Singing
       </div>
       <div
+        className="text-lf-text-primary"
         style={{
           fontSize: `${titleFontSize}px`,
           fontWeight: 600,
-          color: 'var(--lf-text-primary)',
           lineHeight: 1.3,
         }}
       >

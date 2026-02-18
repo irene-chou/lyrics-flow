@@ -57,12 +57,12 @@ export function OffsetControls() {
     <div style={{ marginTop: '4px' }}>
       <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
         <div
+          className="text-lf-text-dim"
           style={{
             fontSize: '11px',
             fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
-            color: 'var(--lf-text-dim)',
           }}
         >
           歌詞偏移 (Offset)

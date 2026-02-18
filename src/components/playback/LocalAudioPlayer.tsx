@@ -28,9 +28,9 @@ export function LocalAudioPlayer({ engine }: LocalAudioPlayerProps) {
     <div style={{ marginTop: '4px' }}>
       {!audioFileObjectUrl ? (
         <p
+          className="text-lf-text-secondary"
           style={{
             fontSize: '12px',
-            color: 'var(--lf-text-secondary)',
             padding: '12px 0',
           }}
         >

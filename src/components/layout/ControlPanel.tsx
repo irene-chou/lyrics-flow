@@ -39,20 +39,17 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
 
   return (
     <aside
-      className="flex flex-col overflow-y-auto"
+      className="flex flex-col overflow-y-auto bg-lf-bg-secondary border-r border-lf-border"
       style={{
         width: 'var(--sidebar-width)',
         padding: '24px',
-        background: 'var(--lf-bg-secondary)',
-        borderRight: '1px solid var(--lf-border)',
         gap: '20px',
       }}
     >
       {/* 歌曲設定 */}
       <section
-        className="flex flex-col"
+        className="flex flex-col border border-lf-border"
         style={{
-          border: '1px solid var(--lf-border)',
           borderRadius: 'var(--lf-radius)',
           padding: '16px',
           gap: '12px',
@@ -60,12 +57,12 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
       >
         <div className="flex items-center justify-between">
           <h2
+            className="text-lf-text-dim"
             style={{
               fontSize: '11px',
               fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: 'var(--lf-text-dim)',
             }}
           >
             歌曲設定
@@ -73,7 +70,7 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
           {currentSongId && (
             <button
               onClick={handleEdit}
-              className="flex items-center justify-center transition-colors cursor-pointer"
+              className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary"
               style={{
                 width: '24px',
                 height: '24px',
@@ -81,7 +78,6 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
                 background: 'transparent',
                 border: 'none',
                 borderRadius: '4px',
-                color: 'var(--lf-text-secondary)',
               }}
               title="編輯歌曲"
             >
@@ -93,11 +89,10 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
           <>
             <div className="flex items-center gap-2">
               <span
-                className="flex-1 min-w-0 truncate"
+                className="flex-1 min-w-0 truncate text-lf-text-primary"
                 style={{
                   fontSize: '14px',
                   fontWeight: 600,
-                  color: 'var(--lf-text-primary)',
                 }}
               >
                 {currentSongTitle}
@@ -113,10 +108,8 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
           </>
         ) : (
           <p
-            style={{
-              fontSize: '13px',
-              color: 'var(--lf-text-secondary)',
-            }}
+            className="text-lf-text-secondary"
+            style={{ fontSize: '13px' }}
           >
             尚未載入歌曲
           </p>

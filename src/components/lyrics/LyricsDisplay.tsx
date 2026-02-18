@@ -11,8 +11,7 @@ export function LyricsDisplay({ onSeekToLyric }: LyricsDisplayProps) {
 
   return (
     <main
-      className="relative flex-1 overflow-hidden flex flex-col"
-      style={{ background: 'var(--lf-bg-primary)' }}
+      className="relative flex-1 overflow-hidden flex flex-col bg-lf-bg-primary"
     >
       {currentSongId ? (
         <LyricsContainer onSeekToLyric={onSeekToLyric} />

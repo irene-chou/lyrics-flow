@@ -44,9 +44,8 @@ export function DisplaySettings() {
 
   return (
     <section
-      className="flex flex-col"
+      className="flex flex-col border border-lf-border"
       style={{
-        border: '1px solid var(--lf-border)',
         borderRadius: 'var(--lf-radius)',
         padding: '16px',
         gap: '10px',
@@ -55,25 +54,23 @@ export function DisplaySettings() {
       {/* Section header */}
       <div className="flex items-center justify-between">
         <h2
+          className="text-lf-text-dim"
           style={{
             fontSize: '11px',
             fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
-            color: 'var(--lf-text-dim)',
           }}
         >
           顯示設定
         </h2>
         <button
           onClick={resetAll}
+          className="border border-lf-border bg-lf-bg-input text-lf-text-secondary"
           style={{
             padding: '4px 10px',
             fontSize: '10px',
             borderRadius: '4px',
-            border: '1px solid var(--lf-border)',
-            background: 'var(--lf-bg-input)',
-            color: 'var(--lf-text-secondary)',
             cursor: 'pointer',
             fontFamily: 'var(--font-sans)',
           }}

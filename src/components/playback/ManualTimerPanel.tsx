@@ -28,28 +28,27 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
     <div style={{ marginTop: '4px' }}>
       {/* Error message */}
       <div
+        className="bg-lf-bg-input border border-lf-border"
         style={{
           padding: '12px',
           borderRadius: '8px',
-          background: 'var(--lf-bg-input)',
-          border: '1px solid var(--lf-border)',
           marginBottom: '12px',
         }}
       >
         <div
+          className="text-lf-text-primary"
           style={{
             fontSize: '13px',
             fontWeight: 600,
-            color: 'var(--lf-text-primary)',
             marginBottom: '4px',
           }}
         >
           此影片不允許嵌入播放
         </div>
         <p
+          className="text-lf-text-secondary"
           style={{
             fontSize: '12px',
-            color: 'var(--lf-text-secondary)',
             lineHeight: 1.5,
             marginBottom: '8px',
           }}
@@ -77,12 +76,12 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
 
       {/* Manual Timer */}
       <div
+        className="text-lf-text-dim"
         style={{
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: 'var(--lf-text-dim)',
           marginBottom: '8px',
         }}
       >
@@ -167,9 +166,9 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
         </button>
       </div>
       <p
+        className="text-lf-text-dim"
         style={{
           fontSize: '11px',
-          color: 'var(--lf-text-dim)',
           marginTop: '6px',
           lineHeight: 1.5,
         }}

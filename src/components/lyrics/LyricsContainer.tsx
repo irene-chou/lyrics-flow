@@ -76,10 +76,10 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
       >
         {lyrics.length === 0 ? (
           <p
+            className="text-lf-text-dim"
             style={{
               textAlign: 'center',
               fontSize: '15px',
-              color: 'var(--lf-text-dim)',
               padding: '32px 0',
             }}
           >

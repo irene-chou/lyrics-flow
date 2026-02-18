@@ -25,9 +25,9 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
   return (
     <div className="flex items-center" style={{ gap: '8px' }}>
       <span
+        className="text-lf-text-secondary"
         style={{
           fontSize: '11px',
-          color: 'var(--lf-text-secondary)',
           flex: 1,
           minWidth: 0,
         }}

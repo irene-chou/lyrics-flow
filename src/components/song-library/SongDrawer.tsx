@@ -47,25 +47,22 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
   return (
     <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
       <DrawerContent
-        className="h-full"
+        className="h-full bg-lf-bg-secondary border-l border-lf-border"
         style={{
-          background: 'var(--lf-bg-secondary)',
-          borderLeft: '1px solid var(--lf-border)',
           width: '380px',
         }}
       >
         {/* Header */}
         <DrawerHeader
-          className="flex-row items-center justify-between shrink-0"
+          className="flex-row items-center justify-between shrink-0 border-b border-lf-border"
           style={{
             padding: '20px 24px',
-            borderBottom: '1px solid var(--lf-border)',
           }}
         >
           <div>
             <DrawerTitle
+              className="text-lf-text-primary"
               style={{
-                color: 'var(--lf-text-primary)',
                 fontSize: '14px',
                 fontWeight: 600,
               }}
@@ -90,8 +87,8 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
           >
             {!songs ? (
               <p
+                className="text-lf-text-secondary"
                 style={{
-                  color: 'var(--lf-text-secondary)',
                   fontSize: '12px',
                   textAlign: 'center',
                   padding: '24px 0',
@@ -101,8 +98,8 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
               </p>
             ) : filteredSongs.length === 0 ? (
               <p
+                className="text-lf-text-secondary"
                 style={{
-                  color: 'var(--lf-text-secondary)',
                   fontSize: '12px',
                   textAlign: 'center',
                   padding: '24px 0',

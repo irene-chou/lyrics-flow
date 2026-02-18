@@ -20,12 +20,12 @@ export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
   return (
     <div className="flex flex-col" style={{ gap: '6px' }}>
       <label
+        className="text-lf-text-dim"
         style={{
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: 'var(--lf-text-dim)',
         }}
       >
         LRC 歌詞
@@ -101,9 +101,9 @@ export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
       </Tabs>
 
       <div
+        className="text-lf-text-dim"
         style={{
           fontSize: '11px',
-          color: 'var(--lf-text-dim)',
           lineHeight: 1.6,
           padding: '8px 0',
         }}
@@ -113,7 +113,8 @@ export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
           href="https://lrclib.net"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--lf-accent)', textDecoration: 'none' }}
+          className="text-lf-accent"
+          style={{ textDecoration: 'none' }}
         >
           lrclib.net
         </a>{' '}

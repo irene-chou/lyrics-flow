@@ -33,8 +33,7 @@ export function SongDrawerMenu() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="p-1.5 rounded-lg transition-colors cursor-pointer"
-            style={{ color: 'var(--lf-text-secondary)' }}
+            className="p-1.5 rounded-lg transition-colors cursor-pointer text-lf-text-secondary"
             title="更多"
           >
             <MoreVertical size={18} />
@@ -42,23 +41,18 @@ export function SongDrawerMenu() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          style={{
-            background: 'var(--lf-bg-card)',
-            border: '1px solid var(--lf-border)',
-          }}
+          className="bg-lf-bg-card border border-lf-border"
         >
           <DropdownMenuItem
             onClick={handleExport}
-            className="cursor-pointer text-sm"
-            style={{ color: 'var(--lf-text-primary)' }}
+            className="cursor-pointer text-sm text-lf-text-primary"
           >
             <Download size={14} className="mr-2" />
             匯出歌曲庫
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => fileInputRef.current?.click()}
-            className="cursor-pointer text-sm"
-            style={{ color: 'var(--lf-text-primary)' }}
+            className="cursor-pointer text-sm text-lf-text-primary"
           >
             <Upload size={14} className="mr-2" />
             匯入歌曲庫

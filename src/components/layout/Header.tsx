@@ -28,25 +28,17 @@ export function Header({ onOpenDrawer }: HeaderProps) {
 
   return (
     <header
-      className="flex items-center justify-between gap-4"
-      style={{
-        padding: '12px 20px',
-        background: 'var(--lf-bg-secondary)',
-        borderBottom: '1px solid var(--lf-border)',
-      }}
+      className="flex items-center justify-between gap-4 bg-lf-bg-secondary border-b border-lf-border"
+      style={{ padding: '12px 20px' }}
     >
       {/* Logo */}
       <div className="flex items-center gap-2 shrink-0">
         <ListMusic
           size={18}
-          style={{ color: 'var(--lf-accent)' }}
+          className="text-lf-accent"
         />
         <h1
-          className="text-lg font-bold"
-          style={{
-            color: 'var(--lf-text-primary)',
-            letterSpacing: '-0.02em',
-          }}
+          className="text-lg font-bold text-lf-text-primary tracking-tight"
         >
           Lyrics Flow
         </h1>
@@ -66,8 +58,7 @@ export function Header({ onOpenDrawer }: HeaderProps) {
         {/* OBS URL */}
         <button
           onClick={copyOBSUrl}
-          className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
-          style={copied ? { color: 'var(--lf-success)' } : undefined}
+          className={`header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${copied ? 'text-lf-success' : ''}`}
           title="複製 OBS 瀏覽器來源 URL"
         >
           {copied ? <Check size={20} /> : <Link size={20} />}

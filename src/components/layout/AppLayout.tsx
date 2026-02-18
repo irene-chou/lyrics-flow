@@ -58,7 +58,7 @@ export function AppLayout() {
       {/* FAB — New Song */}
       <button
         onClick={handleOpenNewSong}
-        className="flex items-center justify-center cursor-pointer"
+        className="flex items-center justify-center cursor-pointer bg-lf-accent"
         style={{
           position: 'fixed',
           bottom: '28px',
@@ -66,7 +66,6 @@ export function AppLayout() {
           width: '52px',
           height: '52px',
           borderRadius: '50%',
-          background: 'var(--lf-accent)',
           color: '#fff',
           border: 'none',
           boxShadow: '0 4px 16px rgba(124, 106, 239, 0.4)',

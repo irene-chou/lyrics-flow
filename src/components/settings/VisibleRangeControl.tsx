@@ -52,9 +52,9 @@ export function VisibleRangeControl({
   return (
     <div>
       <div
+        className="text-lf-text-secondary"
         style={{
           fontSize: '11px',
-          color: 'var(--lf-text-secondary)',
           marginBottom: '6px',
         }}
       >

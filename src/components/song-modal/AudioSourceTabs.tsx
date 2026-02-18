@@ -53,12 +53,12 @@ export function AudioSourceTabs({
   return (
     <div className="flex flex-col" style={{ gap: '6px' }}>
       <label
+        className="text-lf-text-dim"
         style={{
           fontSize: '11px',
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: 'var(--lf-text-dim)',
         }}
       >
         伴奏來源
