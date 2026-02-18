@@ -18,7 +18,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
   const otherFontSize = useUISettingsStore((s) => s.otherFontSize)
   const titleFontSize = useUISettingsStore((s) => s.titleFontSize)
   const showTitle = useUISettingsStore((s) => s.showTitle)
-  const baseLineHeight = useUISettingsStore((s) => s.baseLineHeight)
+  const lyricsGap = useUISettingsStore((s) => s.lyricsGap)
   const activeColor = useUISettingsStore((s) => s.activeColor)
   const otherColor = useUISettingsStore((s) => s.otherColor)
   const lyricsBgColor = useUISettingsStore((s) => s.lyricsBgColor)
@@ -97,7 +97,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
             無歌詞內容
           </p>
         ) : (
-          <div className="flex flex-col">
+          <div className="flex flex-col" style={{ gap: `${lyricsGap}px` }}>
             {lyrics.map((line, i) => (
               <LyricLine
                 key={`${line.time}-${i}`}
@@ -111,7 +111,6 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
                 activeColor={activeColor}
                 otherColor={otherColor}
                 passedColor={otherColor}
-                lineHeight={baseLineHeight}
                 onClick={onSeekToLyric ? () => handleLineClick(i) : undefined}
               />
             ))}

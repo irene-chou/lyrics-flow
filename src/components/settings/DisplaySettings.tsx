@@ -1,6 +1,6 @@
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { FontSizeControl } from './FontSizeControl'
-import { LineHeightControl } from './LineHeightControl'
+import { LyricsGapControl } from './LyricsGapControl'
 import { ColorPicker } from './ColorPicker'
 import { VisibleRangeControl } from './VisibleRangeControl'
 import { RotateCcw, Eye, EyeOff } from 'lucide-react'
@@ -25,7 +25,7 @@ export function DisplaySettings() {
     otherFontSize,
     titleFontSize,
     showTitle,
-    baseLineHeight,
+    lyricsGap,
     visibleBefore,
     visibleAfter,
     activeColor,
@@ -35,7 +35,7 @@ export function DisplaySettings() {
     setOtherFontSize,
     setTitleFontSize,
     setShowTitle,
-    setBaseLineHeight,
+    setLyricsGap,
     setVisibleBefore,
     setVisibleAfter,
     setActiveColor,
@@ -124,7 +124,7 @@ export function DisplaySettings() {
           step={2}
           onChange={setOtherFontSize}
         />
-        <LineHeightControl value={baseLineHeight} onChange={setBaseLineHeight} />
+        <LyricsGapControl value={lyricsGap} onChange={setLyricsGap} />
       </div>
 
       {/* Divider */}

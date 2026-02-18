@@ -8,7 +8,7 @@ interface UISettingsState extends UISettings {
   setOtherFontSize: (size: number) => void
   setTitleFontSize: (size: number) => void
   setShowTitle: (show: boolean) => void
-  setBaseLineHeight: (height: number) => void
+  setLyricsGap: (height: number) => void
   setVisibleBefore: (count: number) => void
   setVisibleAfter: (count: number) => void
   setActiveColor: (color: string) => void
@@ -27,7 +27,7 @@ export const useUISettingsStore = create<UISettingsState>()(
       setOtherFontSize: (size: number) => set({ otherFontSize: size }),
       setTitleFontSize: (size: number) => set({ titleFontSize: size }),
       setShowTitle: (show: boolean) => set({ showTitle: show }),
-      setBaseLineHeight: (height: number) => set({ baseLineHeight: height }),
+      setLyricsGap: (height: number) => set({ lyricsGap: height }),
       setVisibleBefore: (count: number) => set({ visibleBefore: count }),
       setVisibleAfter: (count: number) => set({ visibleAfter: count }),
       setActiveColor: (color: string) => set({ activeColor: color }),

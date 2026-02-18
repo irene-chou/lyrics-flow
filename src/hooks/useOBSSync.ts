@@ -12,7 +12,7 @@ import type { SyncMessage, SyncMessageType } from '@/types'
 
 const VALID_SYNC_TYPES = new Set<string>([
   'FULL_STATE', 'LYRICS_LOADED', 'SYNC_UPDATE', 'FONT_SIZE',
-  'LYRIC_COLORS', 'TITLE_FONT_SIZE', 'LINE_HEIGHT', 'VISIBLE_RANGE',
+  'LYRIC_COLORS', 'TITLE_FONT_SIZE', 'LYRICS_GAP', 'VISIBLE_RANGE',
   'OFFSET', 'REQUEST_STATE',
 ])
 
@@ -99,7 +99,7 @@ export function useOBSSync() {
       currentLineIndex: sync.currentLineIndex,
       activeFontSize: ui.activeFontSize,
       otherFontSize: ui.otherFontSize,
-      baseLineHeight: ui.baseLineHeight,
+      lyricsGap: ui.lyricsGap,
       titleFontSize: ui.titleFontSize,
       showTitle: ui.showTitle,
       visibleBefore: ui.visibleBefore,

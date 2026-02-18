@@ -82,8 +82,8 @@ export function useSyncBroadcast({ broadcast }: UseSyncBroadcastOptions) {
 
   useStoreWatcher(
     useUISettingsStore,
-    (s) => ({ baseLineHeight: s.baseLineHeight }),
-    'LINE_HEIGHT',
+    (s) => ({ lyricsGap: s.lyricsGap }),
+    'LYRICS_GAP',
     broadcastRef,
   )
 

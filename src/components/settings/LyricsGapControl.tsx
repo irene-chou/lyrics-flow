@@ -1,28 +1,27 @@
 import { useState, useEffect } from 'react'
 
-interface LineHeightControlProps {
+interface LyricsGapControlProps {
   value: number
   onChange: (value: number) => void
 }
 
-export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
+export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(value.toFixed(1))
+  const [draft, setDraft] = useState(String(value))
 
   useEffect(() => {
-    if (!editing) setDraft(value.toFixed(1))
+    if (!editing) setDraft(String(value))
   }, [value, editing])
 
   function adjust(delta: number) {
-    const newVal = Math.max(1.0, Math.min(3.0, Math.round((value + delta) * 10) / 10))
+    const newVal = Math.max(0, Math.min(60, value + delta))
     onChange(newVal)
   }
 
   function commit() {
-    const parsed = parseFloat(draft)
+    const parsed = parseInt(draft, 10)
     if (!isNaN(parsed)) {
-      const clamped = Math.max(1.0, Math.min(3.0, Math.round(parsed * 10) / 10))
-      onChange(clamped)
+      onChange(Math.max(0, Math.min(60, parsed)))
     }
     setEditing(false)
   }
@@ -31,7 +30,7 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
 
   const btnStyle: React.CSSProperties = {
     padding: '4px 8px',
-    fontSize: '11px',
+    fontSize: '12px',
     fontWeight: 600,
     borderRadius: '4px',
     fontFamily: 'var(--font-sans)',
@@ -43,21 +42,21 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
       <span
         className="text-lf-text-secondary"
         style={{
-          fontSize: '11px',
+          fontSize: '12px',
           flex: 1,
           minWidth: 0,
         }}
       >
-        歌詞行距
+        歌詞間距
       </span>
-      <button className={btnClass} onClick={() => adjust(-0.1)} style={btnStyle}>
+      <button className={btnClass} onClick={() => adjust(-2)} style={btnStyle}>
         -
       </button>
       {editing ? (
         <input
           autoFocus
           type="text"
-          inputMode="decimal"
+          inputMode="numeric"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commit}
@@ -90,10 +89,10 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
             cursor: 'text',
           }}
         >
-          {value.toFixed(1)}
+          {value}px
         </span>
       )}
-      <button className={btnClass} onClick={() => adjust(0.1)} style={btnStyle}>
+      <button className={btnClass} onClick={() => adjust(2)} style={btnStyle}>
         +
       </button>
     </div>

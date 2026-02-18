@@ -11,7 +11,6 @@ interface LyricLineProps {
   activeColor: string
   otherColor: string
   passedColor: string
-  lineHeight: number
   onClick?: () => void
 }
 
@@ -25,7 +24,6 @@ export const LyricLine = memo(
       activeColor,
       otherColor,
       passedColor,
-      lineHeight,
       onClick,
     },
     ref,
@@ -66,7 +64,7 @@ export const LyricLine = memo(
         style={{
           fontSize: `${fontSize}px`,
           fontWeight,
-          lineHeight: lineHeight > 0 ? lineHeight : 1.6,
+          lineHeight: 1.4,
           color,
           fontStyle: isInterlude ? 'italic' : 'normal',
           letterSpacing: isInterlude ? '0.05em' : 'normal',

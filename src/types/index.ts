@@ -20,7 +20,7 @@ export interface UISettings {
   otherFontSize: number
   titleFontSize: number
   showTitle: boolean
-  baseLineHeight: number
+  lyricsGap: number
   visibleBefore: number
   visibleAfter: number
   activeColor: string
@@ -42,7 +42,7 @@ export type SyncMessageType =
   | 'FONT_SIZE'
   | 'LYRIC_COLORS'
   | 'TITLE_FONT_SIZE'
-  | 'LINE_HEIGHT'
+  | 'LYRICS_GAP'
   | 'VISIBLE_RANGE'
   | 'OFFSET'
   | 'REQUEST_STATE'
