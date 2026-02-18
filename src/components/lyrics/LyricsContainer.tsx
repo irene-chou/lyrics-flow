@@ -23,7 +23,16 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
   } = useUISettingsStore()
   const currentLineIndex = useSyncStore((s) => s.currentLineIndex)
 
+  const scrollRef = useRef<HTMLDivElement>(null)
   const lineRefs = useRef<(HTMLDivElement | null)[]>([])
+  const currentSongId = useSongStore((s) => s.currentSongId)
+
+  // Reset scroll position when song changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0
+    }
+  }, [currentSongId])
 
   // Auto-scroll to active line
   useEffect(() => {
@@ -68,6 +77,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
       <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} />
 
       <div
+        ref={scrollRef}
         className="flex-1 overflow-y-auto"
         style={{
           padding: '30vh 48px',

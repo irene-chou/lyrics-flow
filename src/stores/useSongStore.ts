@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import type { LyricLine, Song, AudioSource } from '@/types'
 import { parseLRC } from '@/lib/lrc-parser'
+import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { useSyncStore } from '@/stores/useSyncStore'
 
 interface SongSavedState {
   name: string
@@ -53,6 +55,10 @@ export const useSongStore = create<SongState>((set, get) => ({
     const { lyrics, title } = parseLRC(song.lrcText)
     const songTitle = song.name || title || '未命名歌曲'
 
+    // Reset playback & sync state before loading new song
+    usePlaybackStore.getState().reset()
+    useSyncStore.getState().reset()
+
     set({
       currentSongId: song.id,
       currentSongTitle: songTitle,
@@ -74,6 +80,8 @@ export const useSongStore = create<SongState>((set, get) => ({
   },
 
   clearSong: () => {
+    usePlaybackStore.getState().reset()
+    useSyncStore.getState().reset()
     set({
       currentSongId: null,
       currentSongTitle: '',
