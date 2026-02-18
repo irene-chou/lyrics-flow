@@ -25,7 +25,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
   const isPlaying = status === 'PLAYING'
 
   return (
-    <div style={{ marginTop: '4px' }}>
+    <div>
       {/* Error message */}
       <div
         className="bg-lf-bg-input border border-lf-border"

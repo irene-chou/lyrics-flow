@@ -2,23 +2,26 @@ import { useEffect, useRef, useCallback } from 'react'
 import { Play, Pause } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { YouTubePlayer } from './YouTubePlayer'
+import { ManualTimerPanel } from './ManualTimerPanel'
 import { PlaybackInfo } from './PlaybackInfo'
 import { VolumeControl } from './VolumeControl'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 
-interface LocalAudioPlayerProps {
+interface AudioPlayerProps {
   engine: ReturnType<typeof usePlaybackEngine>
   onSeek: (time: number) => void
 }
 
-export function LocalAudioPlayer({ engine, onSeek }: LocalAudioPlayerProps) {
+export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   const audioSource = useSongStore((s) => s.audioSource)
   const audioFileName = useSongStore((s) => s.audioFileName)
   const audioFileObjectUrl = usePlaybackStore((s) => s.audioFileObjectUrl)
+  const isManualMode = usePlaybackStore((s) => s.isManualMode)
   const status = usePlaybackStore((s) => s.status)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Load audio file when URL changes
+  // Load local audio file when URL changes
   useEffect(() => {
     if (audioSource === 'local' && audioFileObjectUrl) {
       engine.localAudio.loadFile(audioFileObjectUrl)
@@ -30,34 +33,29 @@ export function LocalAudioPlayer({ engine, onSeek }: LocalAudioPlayerProps) {
     if (!file) return
     const objectUrl = URL.createObjectURL(file)
     usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
-    // Update file name in song store if it differs
     if (file.name !== audioFileName) {
       useSongStore.getState().setAudioFileName(file.name)
     }
-    // Reset input so re-selecting same file triggers change
     e.target.value = ''
   }, [audioFileName])
 
-  if (audioSource !== 'local') return null
-
   const isPlaying = status === 'PLAYING'
 
-  return (
-    <div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="audio/*"
-        onChange={handleFileSelect}
-        style={{ display: 'none' }}
-      />
-      {!audioFileObjectUrl ? (
+  // Local audio — no file loaded yet: show prompt without player container
+  if (audioSource === 'local' && !audioFileObjectUrl) {
+    return (
+      <div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="audio/*"
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+        />
         <div className="flex flex-col" style={{ gap: '8px' }}>
           <p
             className="text-lf-text-secondary"
-            style={{
-              fontSize: '12px',
-            }}
+            style={{ fontSize: '12px' }}
           >
             {audioFileName
               ? `上次使用：${audioFileName}`
@@ -78,15 +76,39 @@ export function LocalAudioPlayer({ engine, onSeek }: LocalAudioPlayerProps) {
             選擇音檔
           </button>
         </div>
-      ) : (
-        <div
-          className="flex flex-col bg-lf-bg-input rounded-lg"
-          style={{ gap: '6px', padding: '10px 12px' }}
-        >
-          {/* Progress bar */}
-          <PlaybackInfo onSeek={onSeek} />
+      </div>
+    )
+  }
 
-          {/* Play button + Volume */}
+  return (
+    <div
+      className="flex flex-col bg-lf-bg-input rounded-lg"
+      style={{ gap: '6px', padding: '10px 12px' }}
+    >
+      {/* YouTube embed mode */}
+      {audioSource === 'youtube' && !isManualMode && (
+        <>
+          <YouTubePlayer engine={engine} />
+          <PlaybackInfo onSeek={onSeek} />
+        </>
+      )}
+
+      {/* YouTube manual timer mode */}
+      {audioSource === 'youtube' && isManualMode && (
+        <ManualTimerPanel engine={engine} />
+      )}
+
+      {/* Local audio — file loaded */}
+      {audioSource === 'local' && audioFileObjectUrl && (
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="audio/*"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+          <PlaybackInfo onSeek={onSeek} />
           <div className="flex items-center justify-between" style={{ gap: '6px' }}>
             <button
               className="flex items-center justify-center border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
@@ -104,7 +126,7 @@ export function LocalAudioPlayer({ engine, onSeek }: LocalAudioPlayerProps) {
             </button>
             <VolumeControl />
           </div>
-        </div>
+        </>
       )}
     </div>
   )
