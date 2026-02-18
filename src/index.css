@@ -1,0 +1,420 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Fonts */
+  --font-sans: 'Noto Sans TC', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-lyrics: 'GenSenRoundedTW', 'Noto Sans TC', sans-serif;
+
+  /* Layout */
+  --sidebar-width: 480px;
+}
+
+/* ===== App custom colors (dark default) ===== */
+:root {
+  --lf-bg-primary: #0a0a0f;
+  --lf-bg-secondary: #12121a;
+  --lf-bg-card: #1a1a26;
+  --lf-bg-input: #22222e;
+  --lf-border: #2a2a3a;
+  --lf-text-primary: #e8e8f0;
+  --lf-text-secondary: #8888a0;
+  --lf-text-dim: #55556a;
+  --lf-accent: #7c6aef;
+  --lf-accent-glow: rgba(124, 106, 239, 0.3);
+  --lf-active-lyric: #ffffff;
+  --lf-active-bg: rgba(124, 106, 239, 0.15);
+  --lf-passed-lyric: #5a5a70;
+  --lf-upcoming-lyric: #9090a8;
+  --lf-danger: #ef4444;
+  --lf-success: #22c55e;
+  --lf-radius: 12px;
+
+  /* shadcn tokens → aligned to our dark theme (default) */
+  --radius: 0.625rem;
+  --background: #0a0a0f;
+  --foreground: #e8e8f0;
+  --card: #1a1a26;
+  --card-foreground: #e8e8f0;
+  --popover: #1a1a26;
+  --popover-foreground: #e8e8f0;
+  --primary: #7c6aef;
+  --primary-foreground: #ffffff;
+  --secondary: #22222e;
+  --secondary-foreground: #e8e8f0;
+  --muted: #22222e;
+  --muted-foreground: #8888a0;
+  --accent: #22222e;
+  --accent-foreground: #e8e8f0;
+  --destructive: #ef4444;
+  --border: #2a2a3a;
+  --input: #2a2a3a;
+  --ring: #7c6aef;
+  --chart-1: #7c6aef;
+  --chart-2: #22c55e;
+  --chart-3: #ef4444;
+  --chart-4: #eab308;
+  --chart-5: #06b6d4;
+  --sidebar: #12121a;
+  --sidebar-foreground: #e8e8f0;
+  --sidebar-primary: #7c6aef;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #22222e;
+  --sidebar-accent-foreground: #e8e8f0;
+  --sidebar-border: #2a2a3a;
+  --sidebar-ring: #7c6aef;
+}
+
+/* ===== App custom colors (light) ===== */
+.light {
+  --lf-bg-primary: #f5f5f8;
+  --lf-bg-secondary: #ffffff;
+  --lf-bg-card: #eeeef2;
+  --lf-bg-input: #e4e4ea;
+  --lf-border: #d0d0da;
+  --lf-text-primary: #1a1a2e;
+  --lf-text-secondary: #5a5a70;
+  --lf-text-dim: #8888a0;
+  --lf-accent: #6b59de;
+  --lf-accent-glow: rgba(107, 89, 222, 0.2);
+  --lf-active-lyric: #1a1a2e;
+  --lf-active-bg: rgba(107, 89, 222, 0.1);
+  --lf-passed-lyric: #a0a0b8;
+  --lf-upcoming-lyric: #6a6a80;
+  --lf-danger: #dc2626;
+  --lf-success: #16a34a;
+
+  /* shadcn tokens → aligned to our light theme */
+  --background: #f5f5f8;
+  --foreground: #1a1a2e;
+  --card: #eeeef2;
+  --card-foreground: #1a1a2e;
+  --popover: #eeeef2;
+  --popover-foreground: #1a1a2e;
+  --primary: #6b59de;
+  --primary-foreground: #ffffff;
+  --secondary: #e4e4ea;
+  --secondary-foreground: #1a1a2e;
+  --muted: #e4e4ea;
+  --muted-foreground: #5a5a70;
+  --accent: #e4e4ea;
+  --accent-foreground: #1a1a2e;
+  --destructive: #dc2626;
+  --border: #d0d0da;
+  --input: #d0d0da;
+  --ring: #6b59de;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a2e;
+  --sidebar-primary: #6b59de;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e4e4ea;
+  --sidebar-accent-foreground: #1a1a2e;
+  --sidebar-border: #d0d0da;
+  --sidebar-ring: #6b59de;
+}
+
+/* ===== Base styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--lf-bg-primary) !important;
+  color: var(--lf-text-primary) !important;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Logo pulse ===== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--lf-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lf-text-dim);
+}
+.light ::-webkit-scrollbar-thumb {
+  background: #c0c0cc;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a0a0b0;
+}
+
+/* ===== shadcn theme inline (radius + color mapping) ===== */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ===== shadcn base layer ===== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ================================================================
+   Override shadcn component styles to match legacy Lyrics Flow theme
+   ================================================================ */
+
+/* --- Inputs & Textarea --- */
+[data-slot="input"],
+[data-slot="textarea"] {
+  background: var(--lf-bg-input) !important;
+  border-color: var(--lf-border) !important;
+  color: var(--lf-text-primary) !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  box-shadow: none !important;
+}
+
+[data-slot="input"]::placeholder,
+[data-slot="textarea"]::placeholder {
+  color: var(--lf-text-dim) !important;
+}
+
+[data-slot="input"]:focus,
+[data-slot="input"]:focus-visible,
+[data-slot="textarea"]:focus,
+[data-slot="textarea"]:focus-visible {
+  border-color: var(--lf-accent) !important;
+  box-shadow: 0 0 0 3px var(--lf-accent-glow) !important;
+  outline: none !important;
+  --tw-ring-shadow: none !important;
+}
+
+[data-slot="textarea"] {
+  font-family: var(--font-sans) !important;
+  line-height: 1.7 !important;
+  min-height: 180px !important;
+}
+
+/* --- Dialog (Modal) --- */
+[data-slot="dialog-overlay"] {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-slot="dialog-content"] {
+  background: var(--lf-bg-secondary) !important;
+  border: 1px solid var(--lf-border) !important;
+  color: var(--lf-text-primary) !important;
+  border-radius: 12px !important;
+  max-width: 480px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+[data-slot="dialog-header"] {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--lf-border) !important;
+}
+
+[data-slot="dialog-title"] {
+  color: var(--lf-text-primary) !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+[data-slot="dialog-close"] {
+  color: var(--lf-text-secondary) !important;
+  top: 16px !important;
+  right: 16px !important;
+}
+
+[data-slot="dialog-close"]:hover {
+  color: var(--lf-text-primary) !important;
+  background: var(--lf-bg-input) !important;
+  opacity: 1 !important;
+}
+
+[data-slot="dialog-footer"] {
+  padding: 16px 20px !important;
+  border-top: 1px solid var(--lf-border) !important;
+}
+
+/* Dialog body — the flex-col gap between header and footer */
+[data-slot="dialog-content"] > .flex.flex-col.gap-5 {
+  padding: 20px;
+}
+
+/* --- Drawer --- */
+[data-slot="drawer-overlay"] {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-slot="drawer-content"] {
+  background: var(--lf-bg-secondary) !important;
+  border-color: var(--lf-border) !important;
+}
+
+[data-slot="drawer-header"] {
+  padding: 20px 24px !important;
+  border-bottom: 1px solid var(--lf-border) !important;
+}
+
+[data-slot="drawer-title"] {
+  color: var(--lf-text-primary) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* --- Tabs --- */
+[data-slot="tabs-list"] {
+  background: var(--lf-bg-input) !important;
+  padding: 3px !important;
+  border-radius: 8px !important;
+  height: auto !important;
+}
+
+[data-slot="tabs-trigger"] {
+  color: var(--lf-text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  padding: 6px 14px !important;
+  box-shadow: none !important;
+}
+
+[data-slot="tabs-trigger"][data-state="active"] {
+  background: var(--lf-bg-card) !important;
+  color: var(--lf-text-primary) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+  border-color: transparent !important;
+}
+
+/* Hide the line-style underline indicator */
+[data-slot="tabs-trigger"]::after {
+  display: none !important;
+}
+
+/* --- Dropdown Menu --- */
+[data-slot="dropdown-menu-content"] {
+  background: var(--lf-bg-card) !important;
+  border: 1px solid var(--lf-border) !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  min-width: 140px !important;
+}
+
+[data-slot="dropdown-menu-item"] {
+  color: var(--lf-text-primary) !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+}
+
+[data-slot="dropdown-menu-item"]:hover,
+[data-slot="dropdown-menu-item"][data-highlighted] {
+  background: var(--lf-bg-input) !important;
+  color: var(--lf-text-primary) !important;
+}
+
+/* --- Buttons --- */
+[data-slot="button"] {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+[data-slot="button"][data-variant="default"] {
+  background: var(--lf-accent) !important;
+  border-color: var(--lf-accent) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+[data-slot="button"][data-variant="default"]:hover {
+  background: #6b59de !important;
+  border-color: #6b59de !important;
+  box-shadow: 0 4px 20px var(--lf-accent-glow) !important;
+}
+
+[data-slot="button"][data-variant="outline"] {
+  background: var(--lf-bg-input) !important;
+  border-color: var(--lf-border) !important;
+  color: var(--lf-text-primary) !important;
+}
+
+[data-slot="button"][data-variant="outline"]:hover {
+  background: var(--lf-bg-card) !important;
+  border-color: var(--lf-text-dim) !important;
+}
+
+[data-slot="button"][data-variant="ghost"] {
+  color: var(--lf-text-secondary) !important;
+}
+
+[data-slot="button"][data-variant="ghost"]:hover {
+  background: var(--lf-bg-input) !important;
+  color: var(--lf-text-primary) !important;
+}

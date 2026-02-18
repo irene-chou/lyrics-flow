@@ -1,0 +1,124 @@
+import { useRef } from 'react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+
+interface LrcInputTabsProps {
+  lrcText: string
+  onLrcTextChange: (text: string) => void
+}
+
+export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const text = await file.text()
+    onLrcTextChange(text)
+    e.target.value = ''
+  }
+
+  return (
+    <div className="flex flex-col" style={{ gap: '6px' }}>
+      <label
+        style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--lf-text-dim)',
+        }}
+      >
+        LRC 歌詞
+      </label>
+      <Tabs defaultValue="paste">
+        <TabsList className="w-full">
+          <TabsTrigger value="paste" className="flex-1">
+            貼上歌詞
+          </TabsTrigger>
+          <TabsTrigger value="file" className="flex-1">
+            讀取檔案
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="paste">
+          <textarea
+            placeholder={`在此貼上 LRC 格式歌詞...\n\n範例：\n[00:12.50]第一句歌詞\n[00:18.30]第二句歌詞`}
+            value={lrcText}
+            onChange={(e) => onLrcTextChange(e.target.value)}
+            style={{
+              background: 'var(--lf-bg-input)',
+              border: '1px solid var(--lf-border)',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              color: 'var(--lf-text-primary)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '13px',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+              width: '100%',
+              minHeight: '180px',
+              resize: 'vertical',
+              lineHeight: 1.7,
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--lf-accent)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px var(--lf-accent-glow)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'var(--lf-border)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="file">
+          <input
+            type="text"
+            placeholder="點擊選擇 .lrc 檔案"
+            readOnly
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              background: 'var(--lf-bg-input)',
+              border: '1px solid var(--lf-border)',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              color: 'var(--lf-text-primary)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '13px',
+              outline: 'none',
+              width: '100%',
+              cursor: 'pointer',
+            }}
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".lrc,.txt"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+        </TabsContent>
+      </Tabs>
+
+      <div
+        style={{
+          fontSize: '11px',
+          color: 'var(--lf-text-dim)',
+          lineHeight: 1.6,
+          padding: '8px 0',
+        }}
+      >
+        提示：可從{' '}
+        <a
+          href="https://lrclib.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--lf-accent)', textDecoration: 'none' }}
+        >
+          lrclib.net
+        </a>{' '}
+        搜尋下載 LRC 檔。
+      </div>
+    </div>
+  )
+}

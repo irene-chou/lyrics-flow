@@ -1,0 +1,101 @@
+import { useEffect, useRef, useCallback } from 'react'
+import { useSongStore } from '@/stores/useSongStore'
+import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { useSyncStore } from '@/stores/useSyncStore'
+
+function createSyncWorker(): Worker {
+  const blob = new Blob(
+    [
+      `
+      let interval = null;
+      self.onmessage = function(e) {
+        if (e.data === 'start') {
+          if (interval) clearInterval(interval);
+          interval = setInterval(function() {
+            self.postMessage('tick');
+          }, 80);
+        } else if (e.data === 'stop') {
+          if (interval) {
+            clearInterval(interval);
+            interval = null;
+          }
+        }
+      };
+    `,
+    ],
+    { type: 'application/javascript' },
+  )
+  return new Worker(URL.createObjectURL(blob))
+}
+
+interface UseSyncEngineOptions {
+  getCurrentTime: () => number
+}
+
+export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
+  const workerRef = useRef<Worker | null>(null)
+
+  // Initialize worker
+  useEffect(() => {
+    const worker = createSyncWorker()
+    workerRef.current = worker
+
+    worker.onmessage = () => {
+      const { lyrics, offset } = useSongStore.getState()
+      if (!lyrics.length) return
+
+      const rawTime = getCurrentTime()
+      const currentTime = rawTime + offset
+
+      // Reverse scan to find active line (same algorithm as legacy)
+      let newIndex = -1
+      for (let i = lyrics.length - 1; i >= 0; i--) {
+        if (currentTime >= lyrics[i].time) {
+          newIndex = i
+          break
+        }
+      }
+
+      const prevIndex = useSyncStore.getState().currentLineIndex
+      if (newIndex !== prevIndex) {
+        useSyncStore.getState().setCurrentLineIndex(newIndex)
+      }
+
+      // Also update current time in playback store for UI display
+      usePlaybackStore.getState().setCurrentTime(rawTime)
+    }
+
+    return () => {
+      worker.postMessage('stop')
+      worker.terminate()
+      workerRef.current = null
+    }
+  }, [getCurrentTime])
+
+  const startSync = useCallback(() => {
+    workerRef.current?.postMessage('start')
+    useSyncStore.getState().setSyncing(true)
+  }, [])
+
+  const stopSync = useCallback(() => {
+    workerRef.current?.postMessage('stop')
+    useSyncStore.getState().setSyncing(false)
+  }, [])
+
+  // Auto-start/stop sync based on playback status
+  useEffect(() => {
+    const unsub = usePlaybackStore.subscribe((state, prevState) => {
+      if (state.status === prevState.status) return
+
+      if (state.status === 'PLAYING') {
+        startSync()
+      } else {
+        stopSync()
+      }
+    })
+
+    return unsub
+  }, [startSync, stopSync])
+
+  return { startSync, stopSync }
+}

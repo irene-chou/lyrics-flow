@@ -1,0 +1,133 @@
+import { useRef } from 'react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import type { AudioSource } from '@/types'
+
+const inputStyle: React.CSSProperties = {
+  background: 'var(--lf-bg-input)',
+  border: '1px solid var(--lf-border)',
+  borderRadius: '8px',
+  padding: '10px 14px',
+  color: 'var(--lf-text-primary)',
+  fontFamily: 'var(--font-mono)',
+  fontSize: '13px',
+  outline: 'none',
+  transition: 'border-color 0.2s',
+  width: '100%',
+}
+
+function focusInput(e: React.FocusEvent<HTMLInputElement>) {
+  e.currentTarget.style.borderColor = 'var(--lf-accent)'
+  e.currentTarget.style.boxShadow = '0 0 0 3px var(--lf-accent-glow)'
+}
+
+function blurInput(e: React.FocusEvent<HTMLInputElement>) {
+  e.currentTarget.style.borderColor = 'var(--lf-border)'
+  e.currentTarget.style.boxShadow = 'none'
+}
+
+interface AudioSourceTabsProps {
+  audioSource: AudioSource
+  onAudioSourceChange: (source: AudioSource) => void
+  youtubeUrl: string
+  onYoutubeUrlChange: (url: string) => void
+  audioFileName: string
+  onAudioFileChange: (file: File, fileName: string) => void
+}
+
+export function AudioSourceTabs({
+  audioSource,
+  onAudioSourceChange,
+  youtubeUrl,
+  onYoutubeUrlChange,
+  audioFileName,
+  onAudioFileChange,
+}: AudioSourceTabsProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    onAudioFileChange(file, file.name)
+  }
+
+  return (
+    <div className="flex flex-col" style={{ gap: '6px' }}>
+      <label
+        style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--lf-text-dim)',
+        }}
+      >
+        伴奏來源
+      </label>
+      <Tabs
+        value={audioSource}
+        onValueChange={(v) => onAudioSourceChange(v as AudioSource)}
+      >
+        <TabsList className="w-full">
+          <TabsTrigger value="youtube" className="flex-1">
+            YouTube
+          </TabsTrigger>
+          <TabsTrigger value="local" className="flex-1">
+            本地音檔
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="youtube">
+          <input
+            type="text"
+            placeholder="貼上 YouTube 連結或影片 ID"
+            value={youtubeUrl}
+            onChange={(e) => onYoutubeUrlChange(e.target.value)}
+            style={inputStyle}
+            onFocus={focusInput}
+            onBlur={blurInput}
+          />
+        </TabsContent>
+
+        <TabsContent value="local">
+          <div className="flex" style={{ gap: '8px' }}>
+            <input
+              type="text"
+              placeholder="點擊選擇音檔"
+              value={audioFileName}
+              readOnly
+              onClick={() => fileInputRef.current?.click()}
+              style={{ ...inputStyle, cursor: 'pointer', flex: 1 }}
+              onFocus={focusInput}
+              onBlur={blurInput}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                padding: '6px 12px',
+                fontSize: '12px',
+                borderRadius: '8px',
+                border: '1px solid var(--lf-border)',
+                background: 'var(--lf-bg-input)',
+                color: 'var(--lf-text-primary)',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              選擇
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="audio/*"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
