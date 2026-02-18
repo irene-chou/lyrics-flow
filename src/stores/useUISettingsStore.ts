@@ -13,6 +13,7 @@ interface UISettingsState extends UISettings {
   setActiveColor: (color: string) => void
   setOtherColor: (color: string) => void
   setLyricsBgColor: (color: string) => void
+  setSidebarWidth: (width: number) => void
   resetAll: () => void
 }
 
@@ -30,6 +31,7 @@ export const useUISettingsStore = create<UISettingsState>()(
       setActiveColor: (color: string) => set({ activeColor: color }),
       setOtherColor: (color: string) => set({ otherColor: color }),
       setLyricsBgColor: (color: string) => set({ lyricsBgColor: color }),
+      setSidebarWidth: (width: number) => set({ sidebarWidth: width }),
       resetAll: () => set({ ...DEFAULT_UI_SETTINGS }),
     }),
     {

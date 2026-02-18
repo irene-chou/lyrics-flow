@@ -10,4 +10,5 @@ export const DEFAULT_UI_SETTINGS: UISettings = {
   activeColor: '#ffffff',
   otherColor: '#9090a8',
   lyricsBgColor: 'rgba(0, 0, 0, 0)',
+  sidebarWidth: 480,
 }

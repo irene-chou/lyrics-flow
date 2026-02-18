@@ -9,9 +9,6 @@
   --font-sans: 'Noto Sans TC', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-lyrics: 'GenSenRoundedTW', 'Noto Sans TC', sans-serif;
-
-  /* Layout */
-  --sidebar-width: 480px;
 }
 
 /* ===== App custom colors (dark default) ===== */
@@ -195,25 +192,13 @@ body {
   50% { opacity: 0.4; }
 }
 
-/* ===== Scrollbar ===== */
+/* ===== Scrollbar (hidden) ===== */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--lf-border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--lf-text-dim);
-}
-.light ::-webkit-scrollbar-thumb {
-  background: #c0c0cc;
-}
-.light ::-webkit-scrollbar-thumb:hover {
-  background: #a0a0b0;
+
+* {
+  scrollbar-width: none;
 }
 
 /* ===== shadcn theme inline (radius + color mapping) ===== */

@@ -1,5 +1,6 @@
 import { Pencil } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
+import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { AudioPlayer } from '../playback/AudioPlayer'
 import { OffsetControls } from '../playback/OffsetControls'
 import { DisplaySettings } from '../settings/DisplaySettings'
@@ -13,6 +14,7 @@ interface ControlPanelProps {
 
 export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
   const { currentSongId, currentSongTitle, lrcText, offset, audioSource, youtubeId, audioFileName } = useSongStore()
+  const sidebarWidth = useUISettingsStore((s) => s.sidebarWidth)
 
   function handleEdit() {
     if (!currentSongId) return
@@ -38,7 +40,8 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
     <aside
       className="flex flex-col overflow-y-auto bg-lf-bg-secondary border-r border-lf-border"
       style={{
-        width: 'var(--sidebar-width)',
+        width: sidebarWidth,
+      flexShrink: 0,
         padding: '24px',
         gap: '20px',
       }}

@@ -25,6 +25,7 @@ export interface UISettings {
   activeColor: string
   otherColor: string
   lyricsBgColor: string
+  sidebarWidth: number
 }
 
 export type Theme = 'light' | 'dark'
