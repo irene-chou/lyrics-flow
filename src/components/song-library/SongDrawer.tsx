@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react'
+import { X } from 'lucide-react'
 import {
   Drawer,
   DrawerContent,
@@ -104,7 +105,21 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
             </DrawerTitle>
             <DrawerDescription className="sr-only">管理你的歌曲</DrawerDescription>
           </div>
-          <SongDrawerMenu />
+          <button
+            onClick={() => onOpenChange(false)}
+            className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
+            style={{
+              width: '28px',
+              height: '28px',
+              padding: 0,
+              border: 'none',
+              borderRadius: '6px',
+              background: 'none',
+            }}
+            title="關閉"
+          >
+            <X size={16} />
+          </button>
         </DrawerHeader>
 
         {/* Body */}
@@ -112,7 +127,12 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
           className="flex flex-col flex-1 overflow-hidden"
           style={{ padding: '16px 24px', gap: '12px' }}
         >
-          <SongSearchInput value={search} onChange={setSearch} />
+          <div className="flex items-center" style={{ gap: '8px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <SongSearchInput value={search} onChange={setSearch} />
+            </div>
+            <SongDrawerMenu />
+          </div>
 
           <div
             className="flex-1 overflow-y-auto flex flex-col"

@@ -397,6 +397,7 @@ body {
   background: transparent !important;
   padding: 6px 14px !important;
   box-shadow: none !important;
+  cursor: pointer !important;
 }
 
 [data-slot="tabs-trigger"][data-state="active"] {
