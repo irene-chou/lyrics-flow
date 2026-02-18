@@ -36,13 +36,10 @@ export function Header({ onOpenDrawer }: HeaderProps) {
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 shrink-0">
-        <div
-          className="w-2 h-2 rounded-full animate-[pulse_2s_ease-in-out_infinite]"
-          style={{
-            background: 'var(--lf-accent)',
-            boxShadow: '0 0 12px var(--lf-accent-glow)',
-          }}
+      <div className="flex items-center gap-2 shrink-0">
+        <ListMusic
+          size={18}
+          style={{ color: 'var(--lf-accent)' }}
         />
         <h1
           className="text-lg font-bold"
