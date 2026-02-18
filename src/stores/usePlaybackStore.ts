@@ -7,7 +7,6 @@ interface PlaybackState {
   duration: number
   volume: number
   muted: boolean
-  isManualMode: boolean
   audioFileObjectUrl: string | null
 
   // Actions
@@ -17,7 +16,6 @@ interface PlaybackState {
   setVolume: (volume: number) => void
   setMuted: (muted: boolean) => void
   toggleMute: () => void
-  setManualMode: (manual: boolean) => void
   setAudioFileObjectUrl: (url: string | null) => void
   reset: () => void
 }
@@ -28,7 +26,6 @@ const initialState = {
   duration: 0,
   volume: 100,
   muted: false,
-  isManualMode: false,
   audioFileObjectUrl: null,
 }
 
@@ -50,7 +47,6 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
     // Volume value is preserved; muted flag controls actual audio output
     void volume
   },
-  setManualMode: (isManualMode) => set({ isManualMode }),
   setAudioFileObjectUrl: (audioFileObjectUrl) => {
     // Revoke previous URL to prevent memory leaks
     const prev = get().audioFileObjectUrl

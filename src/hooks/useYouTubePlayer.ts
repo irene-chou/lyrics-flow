@@ -38,7 +38,7 @@ export function useYouTubePlayer() {
   const isReadyRef = useRef(false)
   const videoIdRef = useRef<string | null>(null)
 
-  const { setStatus, setCurrentTime, setDuration, setManualMode } =
+  const { setStatus, setCurrentTime, setDuration } =
     usePlaybackStore.getState()
 
   // Cleanup on unmount
@@ -120,17 +120,17 @@ export function useYouTubePlayer() {
             const code = event.data
             // Errors 101, 150, 153 = embed not allowed
             if (code === 101 || code === 150 || code === 153) {
-              usePlaybackStore.getState().setManualMode(true)
-              // Destroy the player to free resources
-              if (playerRef.current) {
-                try {
-                  playerRef.current.destroy()
-                } catch {
-                  // ignore
-                }
-                playerRef.current = null
-                isReadyRef.current = false
+              alert('此 YouTube 影片不允許嵌入播放，請更換影片或改用本地音檔。')
+            }
+            // Destroy the player to free resources
+            if (playerRef.current) {
+              try {
+                playerRef.current.destroy()
+              } catch {
+                // ignore
               }
+              playerRef.current = null
+              isReadyRef.current = false
             }
           },
         },
@@ -141,9 +141,6 @@ export function useYouTubePlayer() {
 
   const loadVideo = useCallback(
     async (videoId: string) => {
-      // Reset manual mode when loading a new video
-      usePlaybackStore.getState().setManualMode(false)
-
       await loadYouTubeAPI()
       createPlayer(videoId)
     },
@@ -198,7 +195,6 @@ export function useYouTubePlayer() {
   void setStatus
   void setCurrentTime
   void setDuration
-  void setManualMode
 
   return useMemo(
     () => ({

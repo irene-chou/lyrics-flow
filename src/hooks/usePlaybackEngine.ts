@@ -11,10 +11,14 @@ export function usePlaybackEngine() {
   const manual = useManualTimer()
 
   const getActiveEngine = useCallback(() => {
-    const { audioSource } = useSongStore.getState()
-    const { isManualMode } = usePlaybackStore.getState()
+    const { audioSource, youtubeId, lyrics } = useSongStore.getState()
+    const { audioFileObjectUrl } = usePlaybackStore.getState()
 
-    if (isManualMode) return 'manual'
+    const hasAudio =
+      (audioSource === 'youtube' && !!youtubeId) ||
+      (audioSource === 'local' && !!audioFileObjectUrl)
+
+    if (!hasAudio && lyrics.length > 0) return 'manual'
     if (audioSource === 'local') return 'local'
     return 'youtube'
   }, [])

@@ -16,8 +16,9 @@ interface AudioPlayerProps {
 export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   const audioSource = useSongStore((s) => s.audioSource)
   const audioFileName = useSongStore((s) => s.audioFileName)
+  const youtubeId = useSongStore((s) => s.youtubeId)
+  const lyrics = useSongStore((s) => s.lyrics)
   const audioFileObjectUrl = usePlaybackStore((s) => s.audioFileObjectUrl)
-  const isManualMode = usePlaybackStore((s) => s.isManualMode)
   const status = usePlaybackStore((s) => s.status)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -40,9 +41,18 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   }, [audioFileName])
 
   const isPlaying = status === 'PLAYING'
+  const hasLyrics = lyrics.length > 0
+
+  // Determine if there's an actual audio source available
+  const hasAudio =
+    (audioSource === 'youtube' && !!youtubeId) ||
+    (audioSource === 'local' && !!audioFileObjectUrl)
+
+  // Show manual timer when there are lyrics but no audio
+  const showManualTimer = hasLyrics && !hasAudio
 
   // Local audio — no file loaded yet: show prompt without player container
-  if (audioSource === 'local' && !audioFileObjectUrl) {
+  if (audioSource === 'local' && !audioFileObjectUrl && !showManualTimer) {
     return (
       <div>
         <input
@@ -80,22 +90,29 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
     )
   }
 
+  // Manual timer fallback — lyrics loaded but no audio
+  if (showManualTimer) {
+    return (
+      <div
+        className="flex flex-col bg-lf-bg-input rounded-lg"
+        style={{ gap: '6px', padding: '10px 12px' }}
+      >
+        <ManualTimerPanel engine={engine} />
+      </div>
+    )
+  }
+
   return (
     <div
       className="flex flex-col bg-lf-bg-input rounded-lg"
       style={{ gap: '6px', padding: '10px 12px' }}
     >
       {/* YouTube embed mode */}
-      {audioSource === 'youtube' && !isManualMode && (
+      {audioSource === 'youtube' && (
         <>
           <YouTubePlayer engine={engine} />
           <PlaybackInfo onSeek={onSeek} />
         </>
-      )}
-
-      {/* YouTube manual timer mode */}
-      {audioSource === 'youtube' && isManualMode && (
-        <ManualTimerPanel engine={engine} />
       )}
 
       {/* Local audio — file loaded */}

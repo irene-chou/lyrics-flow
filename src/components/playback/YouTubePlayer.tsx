@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useSongStore } from '@/stores/useSongStore'
-import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 
 interface YouTubePlayerProps {
@@ -10,16 +9,15 @@ interface YouTubePlayerProps {
 export function YouTubePlayer({ engine }: YouTubePlayerProps) {
   const youtubeId = useSongStore((s) => s.youtubeId)
   const audioSource = useSongStore((s) => s.audioSource)
-  const isManualMode = usePlaybackStore((s) => s.isManualMode)
 
   // Load video when youtubeId changes
   useEffect(() => {
-    if (audioSource === 'youtube' && youtubeId && !isManualMode) {
+    if (audioSource === 'youtube' && youtubeId) {
       engine.youtube.loadVideo(youtubeId)
     }
-  }, [youtubeId, audioSource, isManualMode, engine.youtube])
+  }, [youtubeId, audioSource, engine.youtube])
 
-  if (audioSource !== 'youtube' || isManualMode) return null
+  if (audioSource !== 'youtube') return null
 
   return (
     <div
