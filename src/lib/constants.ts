@@ -4,7 +4,7 @@ export const DEFAULT_UI_SETTINGS: UISettings = {
   activeFontSize: 32,
   otherFontSize: 28,
   titleFontSize: 18,
-  baseLineHeight: 1.0,
+  baseLineHeight: 1.6,
   visibleBefore: 3,
   visibleAfter: 3,
   activeColor: '#ffffff',

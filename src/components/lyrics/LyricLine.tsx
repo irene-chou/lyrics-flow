@@ -64,9 +64,6 @@ export const LyricLine = memo(
         onClick={onClick}
         className="font-lyrics"
         style={{
-          padding: '12px 20px',
-          margin: '4px 0',
-          borderRadius: '10px',
           fontSize: `${fontSize}px`,
           fontWeight,
           lineHeight: lineHeight > 0 ? lineHeight : 1.6,
