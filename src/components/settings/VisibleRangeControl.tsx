@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Minus, Plus } from 'lucide-react'
 
 interface VisibleRangeControlProps {
@@ -32,18 +33,6 @@ export function VisibleRangeControl({
     lineHeight: 1,
   }
 
-  const valueStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '22px',
-    fontFamily: 'var(--font-mono)',
-    fontSize: '12px',
-    lineHeight: 1,
-    color: 'var(--lf-text-primary)',
-    minWidth: '20px',
-  }
-
   return (
     <div>
       <div
@@ -64,9 +53,7 @@ export function VisibleRangeControl({
         >
           <Minus size={12} />
         </button>
-        <span style={valueStyle}>
-          {before}
-        </span>
+        <EditableValue value={before} min={0} max={5} onChange={onBeforeChange} />
         <button
           className={btnClass}
           onClick={() => onBeforeChange(Math.min(5, before + 1))}
@@ -82,9 +69,7 @@ export function VisibleRangeControl({
         >
           <Minus size={12} />
         </button>
-        <span style={valueStyle}>
-          {after}
-        </span>
+        <EditableValue value={after} min={0} max={5} onChange={onAfterChange} />
         <button
           className={btnClass}
           onClick={() => onAfterChange(Math.min(5, after + 1))}
@@ -94,5 +79,77 @@ export function VisibleRangeControl({
         </button>
       </div>
     </div>
+  )
+}
+
+function EditableValue({
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  value: number
+  min: number
+  max: number
+  onChange: (v: number) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(String(value))
+
+  useEffect(() => {
+    if (!editing) setDraft(String(value))
+  }, [value, editing])
+
+  function commit() {
+    const parsed = parseInt(draft, 10)
+    if (!isNaN(parsed)) {
+      onChange(Math.max(min, Math.min(max, parsed)))
+    }
+    setEditing(false)
+  }
+
+  const baseStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '22px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    lineHeight: 1,
+    color: 'var(--lf-text-primary)',
+    minWidth: '20px',
+  }
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type="text"
+        inputMode="numeric"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit()
+          if (e.key === 'Escape') setEditing(false)
+        }}
+        style={{
+          ...baseStyle,
+          width: '24px',
+          background: 'var(--lf-bg-input)',
+          border: '1px solid var(--lf-border)',
+          borderRadius: '4px',
+          padding: '1px 2px',
+          outline: 'none',
+          textAlign: 'center',
+        }}
+      />
+    )
+  }
+
+  return (
+    <span onClick={() => setEditing(true)} style={{ ...baseStyle, cursor: 'text' }}>
+      {value}
+    </span>
   )
 }
