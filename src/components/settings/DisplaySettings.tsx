@@ -3,6 +3,21 @@ import { FontSizeControl } from './FontSizeControl'
 import { LineHeightControl } from './LineHeightControl'
 import { ColorPicker } from './ColorPicker'
 import { VisibleRangeControl } from './VisibleRangeControl'
+import { RotateCcw } from 'lucide-react'
+
+const groupLabelStyle: React.CSSProperties = {
+  fontSize: '10px',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  color: 'var(--lf-text-dim)',
+}
+
+const dividerStyle: React.CSSProperties = {
+  height: '1px',
+  background: 'var(--lf-border)',
+  margin: '2px 0',
+}
 
 export function DisplaySettings() {
   const {
@@ -34,9 +49,10 @@ export function DisplaySettings() {
         border: '1px solid var(--lf-border)',
         borderRadius: 'var(--lf-radius)',
         padding: '16px',
-        gap: '12px',
+        gap: '10px',
       }}
     >
+      {/* Section header */}
       <div className="flex items-center justify-between">
         <h2
           style={{
@@ -62,45 +78,56 @@ export function DisplaySettings() {
             fontFamily: 'var(--font-sans)',
           }}
         >
-          重置
+          <RotateCcw size={14} />
         </button>
       </div>
 
-      <FontSizeControl
-        label="歌名字體大小"
-        value={titleFontSize}
-        min={10}
-        max={40}
-        step={2}
-        onChange={setTitleFontSize}
-      />
+      {/* Group: 字體 */}
+      <span style={groupLabelStyle}>字體</span>
+      <div className="flex flex-col" style={{ gap: '6px' }}>
+        <FontSizeControl
+          label="歌名"
+          value={titleFontSize}
+          min={10}
+          max={40}
+          step={2}
+          onChange={setTitleFontSize}
+        />
+        <FontSizeControl
+          label="當前行"
+          value={activeFontSize}
+          min={14}
+          max={60}
+          step={2}
+          onChange={setActiveFontSize}
+        />
+        <FontSizeControl
+          label="其他行"
+          value={otherFontSize}
+          min={14}
+          max={60}
+          step={2}
+          onChange={setOtherFontSize}
+        />
+        <LineHeightControl value={baseLineHeight} onChange={setBaseLineHeight} />
+      </div>
 
-      <FontSizeControl
-        label="當前行字體大小"
-        value={activeFontSize}
-        min={14}
-        max={60}
-        step={2}
-        onChange={setActiveFontSize}
-      />
+      {/* Divider */}
+      <div style={dividerStyle} />
 
-      <FontSizeControl
-        label="其他行字體大小"
-        value={otherFontSize}
-        min={14}
-        max={60}
-        step={2}
-        onChange={setOtherFontSize}
-      />
+      {/* Group: 顏色 */}
+      <span style={groupLabelStyle}>顏色</span>
+      <div className="flex flex-col" style={{ gap: '8px' }}>
+        <ColorPicker label="當前行" value={activeColor} onChange={setActiveColor} />
+        <ColorPicker label="其他行" value={otherColor} onChange={setOtherColor} />
+        <ColorPicker label="背景" value={lyricsBgColor} onChange={setLyricsBgColor} />
+      </div>
 
-      <LineHeightControl value={baseLineHeight} onChange={setBaseLineHeight} />
+      {/* Divider */}
+      <div style={dividerStyle} />
 
-      <ColorPicker label="當前行顏色" value={activeColor} onChange={setActiveColor} />
-
-      <ColorPicker label="其他行顏色" value={otherColor} onChange={setOtherColor} />
-
-      <ColorPicker label="歌詞背景色" value={lyricsBgColor} onChange={setLyricsBgColor} />
-
+      {/* Group: OBS */}
+      <span style={groupLabelStyle}>OBS</span>
       <VisibleRangeControl
         before={visibleBefore}
         after={visibleAfter}

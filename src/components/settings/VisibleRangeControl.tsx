@@ -27,6 +27,7 @@ export function VisibleRangeControl({
   const labelStyle: React.CSSProperties = {
     fontSize: '11px',
     color: 'var(--lf-text-secondary)',
+    lineHeight: 1,
   }
 
   return (
@@ -38,7 +39,7 @@ export function VisibleRangeControl({
           marginBottom: '6px',
         }}
       >
-        OBS 顯示行數
+        顯示行數
       </div>
       <div className="flex items-center" style={{ gap: '6px' }}>
         <span style={labelStyle}>前</span>
@@ -52,6 +53,7 @@ export function VisibleRangeControl({
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
+            lineHeight: 1,
             color: 'var(--lf-text-primary)',
             minWidth: '20px',
             textAlign: 'center',
@@ -76,6 +78,7 @@ export function VisibleRangeControl({
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
+            lineHeight: 1,
             color: 'var(--lf-text-primary)',
             minWidth: '20px',
             textAlign: 'center',

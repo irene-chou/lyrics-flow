@@ -119,14 +119,14 @@ export function ColorPicker({
         {label}
       </div>
 
-      {/* Row 1: swatch + hex input */}
-      <div className="flex items-center" style={{ gap: '8px' }}>
+      {/* Single row: swatch + hex input + opacity slider + % */}
+      <div className="flex items-center" style={{ gap: '6px' }}>
         {/* Color swatch with checkerboard background */}
         <div
           style={{
             position: 'relative',
-            width: '24px',
-            height: '24px',
+            width: '22px',
+            height: '22px',
             borderRadius: '4px',
             border: '1px solid var(--lf-border)',
             background:
@@ -164,35 +164,19 @@ export function ColorPicker({
           value={hexInput}
           onChange={handleTextInput}
           style={{
-            flex: 1,
+            width: '72px',
             background: 'var(--lf-bg-input)',
             border: '1px solid var(--lf-border)',
             borderRadius: '4px',
-            padding: '4px 8px',
+            padding: '3px 6px',
             fontFamily: 'var(--font-mono)',
             fontSize: '11px',
             color: 'var(--lf-text-primary)',
             outline: 'none',
-            minWidth: 0,
+            flexShrink: 0,
           }}
         />
-      </div>
-
-      {/* Row 2: opacity slider */}
-      <div
-        className="flex items-center"
-        style={{ gap: '8px', marginTop: '6px' }}
-      >
-        <span
-          style={{
-            fontSize: '10px',
-            color: 'var(--lf-text-dim)',
-            flexShrink: 0,
-            width: '32px',
-          }}
-        >
-          透明度
-        </span>
+        {/* Opacity slider */}
         <input
           type="range"
           min={0}
@@ -204,6 +188,7 @@ export function ColorPicker({
             height: '4px',
             accentColor: 'var(--lf-accent)',
             cursor: 'pointer',
+            minWidth: '40px',
           }}
         />
         <span
@@ -211,7 +196,7 @@ export function ColorPicker({
             fontSize: '10px',
             fontFamily: 'var(--font-mono)',
             color: 'var(--lf-text-secondary)',
-            width: '30px',
+            width: '28px',
             textAlign: 'right',
             flexShrink: 0,
           }}

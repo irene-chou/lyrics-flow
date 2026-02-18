@@ -23,35 +23,34 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
   }
 
   return (
-    <div>
-      <div
+    <div className="flex items-center" style={{ gap: '8px' }}>
+      <span
         style={{
           fontSize: '11px',
           color: 'var(--lf-text-secondary)',
-          marginBottom: '6px',
+          flex: 1,
+          minWidth: 0,
         }}
       >
         歌詞行距
-      </div>
-      <div className="flex items-center" style={{ gap: '8px' }}>
-        <button onClick={() => adjust(-0.1)} style={btnStyle}>
-          -
-        </button>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-            color: 'var(--lf-text-primary)',
-            minWidth: '32px',
-            textAlign: 'center',
-          }}
-        >
-          {value.toFixed(1)}
-        </span>
-        <button onClick={() => adjust(0.1)} style={btnStyle}>
-          +
-        </button>
-      </div>
+      </span>
+      <button onClick={() => adjust(-0.1)} style={btnStyle}>
+        -
+      </button>
+      <span
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '12px',
+          color: 'var(--lf-text-primary)',
+          minWidth: '32px',
+          textAlign: 'center',
+        }}
+      >
+        {value.toFixed(1)}
+      </span>
+      <button onClick={() => adjust(0.1)} style={btnStyle}>
+        +
+      </button>
     </div>
   )
 }
