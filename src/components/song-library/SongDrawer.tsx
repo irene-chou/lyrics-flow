@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import {
   Drawer,
   DrawerContent,
@@ -11,6 +11,7 @@ import { SongListItem } from './SongListItem'
 import { SongDrawerMenu } from './SongDrawerMenu'
 import { useSongs, deleteSongFromDB } from '@/hooks/useSongLibrary'
 import { useSongStore } from '@/stores/useSongStore'
+import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import type { Song } from '@/types'
 
 interface SongDrawerProps {
@@ -22,6 +23,8 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
   const [search, setSearch] = useState('')
   const songs = useSongs()
   const { currentSongId, loadSong } = useSongStore()
+  const localFileInputRef = useRef<HTMLInputElement>(null)
+  const pendingSongRef = useRef<Song | null>(null)
 
   const filteredSongs = useMemo(() => {
     if (!songs) return []
@@ -32,7 +35,29 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
 
   function handleSelect(song: Song) {
     loadSong(song)
+    // If local audio, trigger file picker in the same user gesture (synchronous)
+    if (song.audioSource === 'local') {
+      pendingSongRef.current = song
+      localFileInputRef.current?.click()
+    }
     onOpenChange(false)
+  }
+
+  function handleLocalFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) {
+      pendingSongRef.current = null
+      return
+    }
+    const objectUrl = URL.createObjectURL(file)
+    usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
+    // Update file name if different
+    if (pendingSongRef.current && file.name !== pendingSongRef.current.audioFileName) {
+      useSongStore.getState().setAudioFileName(file.name)
+    }
+    pendingSongRef.current = null
+    // Reset input so re-selecting same file triggers change
+    e.target.value = ''
   }
 
   async function handleDelete(song: Song) {
@@ -46,6 +71,14 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
 
   return (
     <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+      {/* Hidden file input for local audio re-selection */}
+      <input
+        ref={localFileInputRef}
+        type="file"
+        accept="audio/*"
+        onChange={handleLocalFileSelect}
+        style={{ display: 'none' }}
+      />
       <DrawerContent
         className="h-full bg-lf-bg-secondary border-l border-lf-border"
         style={{
