@@ -1,3 +1,5 @@
+import { Music } from "lucide-react";
+
 export function EmptyState() {
   return (
     <div
@@ -9,7 +11,8 @@ export function EmptyState() {
         gap: '16px',
       }}
     >
-      <div style={{ fontSize: '48px', opacity: 0.3 }}>🎵</div>
+      {/* <div style={{ fontSize: '48px', opacity: 0.3 }}>🎵</div> */}
+      <Music size={48} />
       <p style={{ fontSize: '15px', lineHeight: 1.8 }}>
         載入歌曲開始使用
         <br />
