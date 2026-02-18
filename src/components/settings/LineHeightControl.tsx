@@ -12,7 +12,7 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
   const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
 
   const btnStyle: React.CSSProperties = {
-    padding: '4px 10px',
+    padding: '4px 8px',
     fontSize: '11px',
     fontWeight: 600,
     borderRadius: '4px',
@@ -33,14 +33,14 @@ export function LineHeightControl({ value, onChange }: LineHeightControlProps) {
         歌詞行距
       </span>
       <button className={btnClass} onClick={() => adjust(-0.1)} style={btnStyle}>
-        -
+      -
       </button>
       <span
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '12px',
           color: 'var(--lf-text-primary)',
-          minWidth: '32px',
+          minWidth: '36px',
           textAlign: 'center',
         }}
       >

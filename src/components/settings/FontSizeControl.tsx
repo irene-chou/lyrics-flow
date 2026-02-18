@@ -44,7 +44,7 @@ export function FontSizeControl({
         {label}
       </span>
       <button className={btnClass} onClick={() => adjust(-step)} style={btnStyle}>
-        A-
+        -
       </button>
       <span
         style={{
@@ -58,7 +58,7 @@ export function FontSizeControl({
         {value}px
       </span>
       <button className={btnClass} onClick={() => adjust(step)} style={btnStyle}>
-        A+
+        +
       </button>
     </div>
   )
