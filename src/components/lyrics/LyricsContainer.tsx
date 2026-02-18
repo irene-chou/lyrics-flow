@@ -58,8 +58,6 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
     return 'upcoming'
   }
 
-  const passedColor = 'var(--lf-passed-lyric)'
-
   return (
     <div
       className="flex flex-col h-full"
@@ -101,7 +99,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
                 otherFontSize={otherFontSize}
                 activeColor={activeColor}
                 otherColor={otherColor}
-                passedColor={passedColor}
+                passedColor={otherColor}
                 lineHeight={baseLineHeight}
                 onClick={onSeekToLyric ? () => handleLineClick(i) : undefined}
               />
