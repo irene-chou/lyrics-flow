@@ -35,6 +35,36 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
+  body.light {
+    --bg-primary: #f5f5f8;
+    --bg-secondary: #ffffff;
+    --bg-card: #eeeef2;
+    --bg-input: #e4e4ea;
+    --border: #d0d0da;
+    --text-primary: #1a1a2e;
+    --text-secondary: #5a5a70;
+    --text-dim: #8888a0;
+    --accent: #6b59de;
+    --accent-glow: rgba(107, 89, 222, 0.2);
+    --active-lyric: #1a1a2e;
+    --active-bg: rgba(107, 89, 222, 0.1);
+    --passed-lyric: #a0a0b8;
+    --upcoming-lyric: #6a6a80;
+    --danger: #dc2626;
+    --success: #16a34a;
+  }
+
+  /* Theme toggle icon visibility */
+  .theme-icon-light { display: none; }
+  .theme-icon-dark { display: block; }
+  body.light .theme-icon-light { display: block; }
+  body.light .theme-icon-dark { display: none; }
+
+  /* Light mode patches for hardcoded colors */
+  body.light .btn-primary { color: #fff; }
+  body.light .btn-primary:hover { background: #5a48cc; border-color: #5a48cc; }
+  body.light .btn-header-icon:hover { color: var(--text-primary); }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -466,12 +496,12 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-size: 13px;
-    color: #ffffff;
+    color: var(--text-primary);
   }
   .now-singing-title {
     font-weight: 500;
     font-size: 18px;
-    color: #ffffff;
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1026,6 +1056,14 @@
     </div>
     <div class="header-actions">
       <span class="mode-badge" id="statusBadge" style="display:none;">IDLE</span>
+      <button class="btn-header-icon" onclick="toggleTheme()" title="切換主題">
+        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4L13.5,1L14.56,4L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C19.8,15.87 20.69,17.05 20.16,17.8C19.84,18.25 19.5,18.67 19.08,19.07C15.17,23 8.84,23 4.94,19.07C1.03,15.17 1.03,8.83 4.94,4.93C5.34,4.53 5.76,4.17 6.21,3.85C6.96,3.32 8.14,4.21 8.06,5.04C7.79,7.9 8.75,10.87 10.95,13.06C13.14,15.26 16.1,16.22 18.97,15.95M17.33,17.97C14.5,17.81 11.7,16.64 9.53,14.5C7.36,12.31 6.2,9.5 6.04,6.68C3.23,9.82 3.34,14.64 6.35,17.66C9.37,20.67 14.19,20.78 17.33,17.97Z"/>
+        </svg>
+        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.39,5.42C13.65,5.15 12.84,5 12,5C11.16,5 10.35,5.15 9.61,5.42L12,2M3.34,7L7.5,6.65C6.9,7.16 6.36,7.78 5.93,8.5C5.5,9.22 5.25,9.95 5.07,10.68L3.34,7M3.36,17L5.08,13.32C5.26,14.05 5.53,14.78 5.95,15.5C6.37,16.22 6.91,16.84 7.5,17.35L3.36,17M20.65,7L18.92,10.68C18.74,9.95 18.47,9.22 18.05,8.5C17.63,7.78 17.1,7.16 16.5,6.65L20.65,7M20.64,17L16.5,17.35C17.09,16.84 17.63,16.22 18.05,15.5C18.47,14.78 18.74,14.05 18.92,13.32L20.64,17M12,22L9.59,18.56C10.33,18.83 11.14,19 12,19C12.82,19 13.63,18.83 14.37,18.56L12,22Z"/>
+        </svg>
+      </button>
       <button class="btn-obs-url" id="obsUrlBtn" onclick="copyOBSUrl()" title="複製 OBS 瀏覽器來源 URL">
         <span>OBS</span>
         <svg class="obs-url-icon link" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1418,10 +1456,20 @@
   }
   loadUISettings();
   // Sync UI displays with loaded values
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle('light');
+    localStorage.setItem('lf-theme', isLight ? 'light' : 'dark');
+    Coloris({ themeMode: isLight ? 'light' : 'dark' });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    // Load theme preference
+    const savedTheme = localStorage.getItem('lf-theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+
     // Initialize Coloris first (before setting values, so wrap is done)
     Coloris({
-      themeMode: 'dark',
+      themeMode: savedTheme === 'light' ? 'light' : 'dark',
       alpha: true,
       formatToggle: true,
       closeButton: true,
