@@ -34,7 +34,7 @@ export function Header({ onOpenDrawer }: HeaderProps) {
       {/* Logo */}
       <div className="flex items-center gap-2 shrink-0">
         <ListMusic
-          size={18}
+          size={22}
           className="text-lf-accent"
         />
         <h1
