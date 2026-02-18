@@ -681,6 +681,69 @@
     text-align: center;
   }
 
+  /* 音量控制 */
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .btn-volume-icon {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+  .btn-volume-icon:hover { color: var(--text-primary); }
+  .volume-icon-off { display: none; }
+  .volume-control.muted .volume-icon-on { display: none; }
+  .volume-control.muted .volume-icon-off { display: block; }
+  .volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, var(--accent) 100%, var(--bg-input) 100%);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .volume-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  .volume-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+  }
+  .volume-slider::-moz-range-track {
+    height: 4px;
+    background: var(--bg-input);
+    border-radius: 2px;
+  }
+  .volume-slider::-moz-range-progress {
+    height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
   .embed-error {
     display: flex;
     flex-direction: column;
@@ -1164,6 +1227,19 @@
           <button class="btn btn-primary" id="audioPlayBtn" onclick="audioTogglePlay()">▶ 播放</button>
           <button class="btn btn-sm" onclick="audioSeek(-5)">-5s</button>
           <button class="btn btn-sm" onclick="audioSeek(5)">+5s</button>
+          <div class="volume-control" id="volumeControl">
+            <button class="btn-volume-icon" onclick="toggleMute()" title="靜音">
+              <svg class="volume-icon-on" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"/>
+              </svg>
+              <svg class="volume-icon-off" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.45 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z"/>
+              </svg>
+            </button>
+            <input type="range" class="volume-slider" id="volumeSlider"
+                   min="0" max="100" value="100" step="1"
+                   oninput="setVolume(this.value)">
+          </div>
         </div>
       </div>
 
@@ -2153,6 +2229,7 @@
 
     audioEl = document.getElementById('audioPlayer');
     audioEl.src = URL.createObjectURL(file);
+    audioEl.volume = document.getElementById('volumeSlider').value / 100;
 
     // Show controls
     document.getElementById('audioPlaybackInfo').style.display = 'flex';
@@ -2212,6 +2289,35 @@
     const pct = (event.clientX - rect.left) / rect.width;
     audioEl.currentTime = pct * audioEl.duration;
     currentLineIndex = -1;
+  }
+
+  // ========== 音量控制 ==========
+  let volumeBeforeMute = 100;
+
+  function setVolume(val) {
+    val = Number(val);
+    if (audioEl) audioEl.volume = val / 100;
+    const slider = document.getElementById('volumeSlider');
+    slider.value = val;
+    slider.style.background = `linear-gradient(to right, var(--accent) ${val}%, var(--bg-input) ${val}%)`;
+    const vc = document.getElementById('volumeControl');
+    if (val === 0) {
+      vc.classList.add('muted');
+    } else {
+      vc.classList.remove('muted');
+      volumeBeforeMute = val;
+    }
+  }
+
+  function toggleMute() {
+    if (!audioEl) return;
+    const slider = document.getElementById('volumeSlider');
+    if (audioEl.volume > 0) {
+      volumeBeforeMute = Number(slider.value);
+      setVolume(0);
+    } else {
+      setVolume(volumeBeforeMute || 100);
+    }
   }
 
   // ========== PieSocket (OBS Sync) ==========
