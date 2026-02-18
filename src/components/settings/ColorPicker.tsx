@@ -1,56 +1,63 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { RgbaColorPicker } from 'react-colorful'
 
 // --- Helpers ---
 
-function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  const h = hex.replace('#', '')
-  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
-  return {
-    r: parseInt(full.slice(0, 2), 16),
-    g: parseInt(full.slice(2, 4), 16),
-    b: parseInt(full.slice(4, 6), 16),
-  }
-}
+type RgbaColor = { r: number; g: number; b: number; a: number }
 
-function rgbToHex(r: number, g: number, b: number): string {
-  return (
-    '#' +
-    [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')
-  )
-}
-
-/** Parse any color string into { hex, opacity (0-100) } */
-function parseColor(value: string): { hex: string; opacity: number } {
-  if (value === 'transparent') return { hex: '#000000', opacity: 0 }
+/** Parse any CSS color string into an RGBA object (a: 0-1) */
+function parseColor(value: string): RgbaColor {
+  if (value === 'transparent') return { r: 0, g: 0, b: 0, a: 0 }
 
   // rgba(r, g, b, a)
   const rgbaMatch = value.match(
     /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)$/,
   )
   if (rgbaMatch) {
-    const r = parseInt(rgbaMatch[1])
-    const g = parseInt(rgbaMatch[2])
-    const b = parseInt(rgbaMatch[3])
-    const a = rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1
-    return { hex: rgbToHex(r, g, b), opacity: Math.round(a * 100) }
+    return {
+      r: parseInt(rgbaMatch[1]),
+      g: parseInt(rgbaMatch[2]),
+      b: parseInt(rgbaMatch[3]),
+      a: rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1,
+    }
   }
 
   // #RRGGBB or #RGB
   if (/^#[0-9a-fA-F]{3,6}$/.test(value)) {
     const h = value.replace('#', '')
     const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
-    return { hex: '#' + full.toLowerCase(), opacity: 100 }
+    return {
+      r: parseInt(full.slice(0, 2), 16),
+      g: parseInt(full.slice(2, 4), 16),
+      b: parseInt(full.slice(4, 6), 16),
+      a: 1,
+    }
   }
 
-  return { hex: '#000000', opacity: 100 }
+  return { r: 0, g: 0, b: 0, a: 1 }
 }
 
-/** Format hex + opacity into a CSS color string */
-function formatColor(hex: string, opacity: number): string {
-  if (opacity >= 100) return hex
-  const { r, g, b } = hexToRgb(hex)
-  const a = Math.round(opacity) / 100
-  return `rgba(${r}, ${g}, ${b}, ${a})`
+/** Format RGBA object into a CSS color string */
+function formatColor(c: RgbaColor): string {
+  if (c.a >= 1) {
+    return (
+      '#' +
+      [c.r, c.g, c.b]
+        .map((v) => Math.round(v).toString(16).padStart(2, '0'))
+        .join('')
+    )
+  }
+  return `rgba(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)}, ${c.a})`
+}
+
+/** Format RGBA object into a display hex string */
+function toHex(c: RgbaColor): string {
+  return (
+    '#' +
+    [c.r, c.g, c.b]
+      .map((v) => Math.round(v).toString(16).padStart(2, '0'))
+      .join('')
+  )
 }
 
 // --- Component ---
@@ -61,54 +68,52 @@ interface ColorPickerProps {
   onChange: (color: string) => void
 }
 
-export function ColorPicker({
-  label,
-  value,
-  onChange,
-}: ColorPickerProps) {
-  const parsed = parseColor(value)
-  const [hexInput, setHexInput] = useState(parsed.hex)
-  const [opacity, setOpacity] = useState(parsed.opacity)
+export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
+  const [open, setOpen] = useState(false)
+  const [color, setColor] = useState<RgbaColor>(() => parseColor(value))
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   // Sync from external value changes
   useEffect(() => {
-    const p = parseColor(value)
-    setHexInput(p.hex)
-    setOpacity(p.opacity)
+    setColor(parseColor(value))
   }, [value])
 
-  function emitChange(hex: string, op: number) {
-    onChange(formatColor(hex, op))
+  // Close picker on outside click
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  function handleChange(newColor: RgbaColor) {
+    setColor(newColor)
+    onChange(formatColor(newColor))
   }
 
-  function handleColorInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const color = e.target.value
-    setHexInput(color)
-    emitChange(color, opacity)
-  }
-
-  function handleTextInput(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleHexInput(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value
-    setHexInput(text)
     if (/^#[0-9a-fA-F]{6}$/.test(text) || /^#[0-9a-fA-F]{3}$/.test(text)) {
-      emitChange(text, opacity)
+      const parsed = parseColor(text)
+      const next = { ...parsed, a: color.a }
+      setColor(next)
+      onChange(formatColor(next))
     }
   }
 
-  function handleOpacityChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const op = parseInt(e.target.value)
-    setOpacity(op)
-    emitChange(hexInput, op)
-  }
-
-  // Native color input only accepts #RRGGBB
-  const colorInputValue = parsed.hex
-
-  // Swatch preview with checkerboard behind for transparency
-  const swatchColor = formatColor(parsed.hex, opacity)
+  // Swatch preview color
+  const swatchCss = formatColor(color)
+  const hexDisplay = toHex(color)
 
   return (
-    <div>
+    <div ref={wrapperRef} style={{ position: 'relative' }}>
       <div
         className="text-lf-text-secondary"
         style={{
@@ -119,50 +124,17 @@ export function ColorPicker({
         {label}
       </div>
 
-      {/* Single row: swatch + hex input + opacity slider + % */}
-      <div className="flex items-center" style={{ gap: '6px' }}>
-        {/* Color swatch with checkerboard background */}
-        <div
-          style={{
-            position: 'relative',
-            width: '22px',
-            height: '22px',
-            borderRadius: '4px',
-            border: '1px solid var(--lf-border)',
-            background:
-              'repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% / 8px 8px',
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
-          {/* Color overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: swatchColor,
-            }}
-          />
-          <input
-            type="color"
-            value={colorInputValue}
-            onChange={handleColorInput}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              opacity: 0,
-              cursor: 'pointer',
-            }}
-          />
-        </div>
+      {/* Swatch + hex display */}
+      <div className="flex items-center" style={{ gap: '8px' }}>
         {/* Hex text input */}
         <input
           type="text"
-          value={hexInput}
-          onChange={handleTextInput}
+          defaultValue={hexDisplay}
+          key={hexDisplay}
+          onBlur={handleHexInput}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleHexInput(e as unknown as React.ChangeEvent<HTMLInputElement>)
+          }}
           style={{
             width: '72px',
             background: 'var(--lf-bg-input)',
@@ -176,34 +148,55 @@ export function ColorPicker({
             flexShrink: 0,
           }}
         />
-        {/* Opacity slider */}
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={opacity}
-          onChange={handleOpacityChange}
+        {/* Color swatch — click to toggle picker */}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
           style={{
-            flex: 1,
-            height: '4px',
-            accentColor: 'var(--lf-accent)',
-            cursor: 'pointer',
-            minWidth: '40px',
-          }}
-        />
-        <span
-          style={{
-            fontSize: '10px',
-            fontFamily: 'var(--font-mono)',
-            color: 'var(--lf-text-secondary)',
-            width: '28px',
-            textAlign: 'right',
+            position: 'relative',
+            width: '22px',
+            height: '22px',
+            borderRadius: '4px',
+            border: '1px solid var(--lf-border)',
+            background:
+              'repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% / 8px 8px',
+            overflow: 'hidden',
             flexShrink: 0,
+            cursor: 'pointer',
+            padding: 0,
           }}
         >
-          {`${opacity}%`}
-        </span>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: swatchCss,
+            }}
+          />
+        </button>
       </div>
+
+      {/* Floating picker panel */}
+      {open && (
+        <div
+          className="lf-color-picker"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            marginTop: '6px',
+            zIndex: 50,
+            background: 'var(--lf-bg-card)',
+            border: '1px solid var(--lf-border)',
+            borderRadius: '8px',
+            padding: '10px',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+            width: '220px',
+          }}
+        >
+          <RgbaColorPicker color={color} onChange={handleChange} />
+        </div>
+      )}
     </div>
   )
 }
