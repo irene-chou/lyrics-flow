@@ -40,46 +40,37 @@ export function LocalAudioPlayer({ engine }: LocalAudioPlayerProps) {
         <div className="flex flex-col" style={{ gap: '8px' }}>
           <div className="flex items-center flex-wrap" style={{ gap: '8px' }}>
             <button
+              className="border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
               onClick={() => engine.togglePlay()}
               style={{
                 padding: '8px 14px',
                 fontSize: '12px',
                 fontWeight: 600,
                 borderRadius: '6px',
-                border: '1px solid var(--lf-accent)',
-                background: 'var(--lf-accent)',
-                color: '#fff',
-                cursor: 'pointer',
                 fontFamily: 'var(--font-sans)',
               }}
             >
               {isPlaying ? '⏸ 暫停' : '▶ 播放'}
             </button>
             <button
+              className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
               onClick={() => engine.seekBy(-5)}
               style={{
                 padding: '6px 10px',
                 fontSize: '11px',
                 borderRadius: '6px',
-                border: '1px solid var(--lf-border)',
-                background: 'var(--lf-bg-input)',
-                color: 'var(--lf-text-primary)',
-                cursor: 'pointer',
                 fontFamily: 'var(--font-sans)',
               }}
             >
               -5s
             </button>
             <button
+              className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
               onClick={() => engine.seekBy(5)}
               style={{
                 padding: '6px 10px',
                 fontSize: '11px',
                 borderRadius: '6px',
-                border: '1px solid var(--lf-border)',
-                background: 'var(--lf-bg-input)',
-                color: 'var(--lf-text-primary)',
-                cursor: 'pointer',
                 fontFamily: 'var(--font-sans)',
               }}
             >

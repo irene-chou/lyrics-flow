@@ -66,7 +66,7 @@ export function DisplaySettings() {
         </h2>
         <button
           onClick={resetAll}
-          className="border border-lf-border bg-lf-bg-input text-lf-text-secondary"
+          className="border border-lf-border bg-lf-bg-input text-lf-text-secondary hover:bg-lf-bg-card hover:border-lf-text-dim hover:text-lf-text-primary transition-colors"
           style={{
             padding: '4px 10px',
             fontSize: '10px',

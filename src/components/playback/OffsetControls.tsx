@@ -42,14 +42,12 @@ export function OffsetControls() {
 
   const offsetChanged = lastSavedState ? offset !== lastSavedState.offset : false
 
+  const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+
   const btnStyle: React.CSSProperties = {
     padding: '6px 10px',
     fontSize: '11px',
     borderRadius: '6px',
-    border: '1px solid var(--lf-border)',
-    background: 'var(--lf-bg-input)',
-    color: 'var(--lf-text-primary)',
-    cursor: 'pointer',
     fontFamily: 'var(--font-sans)',
   }
 
@@ -69,31 +67,27 @@ export function OffsetControls() {
         </div>
         <div className="flex items-center" style={{ gap: '4px' }}>
           <button
+            className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
             onClick={resetOffset}
             title="重置偏移"
             style={{
+              padding: '4px',
+              borderRadius: '4px',
               background: 'none',
               border: 'none',
-              padding: '4px',
-              cursor: 'pointer',
-              color: 'var(--lf-text-secondary)',
-              display: 'flex',
-              borderRadius: '4px',
             }}
           >
             <RotateCcw size={14} />
           </button>
           <button
+            className={`flex hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer ${offsetChanged ? 'text-lf-accent' : 'text-lf-text-secondary'}`}
             onClick={saveOffset}
             title="儲存偏移"
             style={{
+              padding: '4px',
+              borderRadius: '4px',
               background: 'none',
               border: 'none',
-              padding: '4px',
-              cursor: 'pointer',
-              color: offsetChanged ? 'var(--lf-accent)' : 'var(--lf-text-secondary)',
-              display: 'flex',
-              borderRadius: '4px',
             }}
           >
             <Save size={14} />
@@ -101,10 +95,10 @@ export function OffsetControls() {
         </div>
       </div>
       <div className="flex items-center justify-center" style={{ gap: '6px' }}>
-        <button onClick={() => adjustOffset(-0.5)} style={btnStyle}>
+        <button className={btnClass} onClick={() => adjustOffset(-0.5)} style={btnStyle}>
           -0.5s
         </button>
-        <button onClick={() => adjustOffset(-0.1)} style={btnStyle}>
+        <button className={btnClass} onClick={() => adjustOffset(-0.1)} style={btnStyle}>
           -0.1s
         </button>
         <span
@@ -120,10 +114,10 @@ export function OffsetControls() {
           {offset >= 0 ? '+' : ''}
           {offset.toFixed(1)}s
         </span>
-        <button onClick={() => adjustOffset(0.1)} style={btnStyle}>
+        <button className={btnClass} onClick={() => adjustOffset(0.1)} style={btnStyle}>
           +0.1s
         </button>
-        <button onClick={() => adjustOffset(0.5)} style={btnStyle}>
+        <button className={btnClass} onClick={() => adjustOffset(0.5)} style={btnStyle}>
           +0.5s
         </button>
       </div>

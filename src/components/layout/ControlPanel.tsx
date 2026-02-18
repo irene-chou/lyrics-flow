@@ -70,12 +70,11 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
           {currentSongId && (
             <button
               onClick={handleEdit}
-              className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary"
+              className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
               style={{
                 width: '24px',
                 height: '24px',
                 padding: 0,
-                background: 'transparent',
                 border: 'none',
                 borderRadius: '4px',
               }}

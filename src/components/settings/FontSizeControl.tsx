@@ -20,15 +20,13 @@ export function FontSizeControl({
     onChange(newVal)
   }
 
+  const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+
   const btnStyle: React.CSSProperties = {
     padding: '4px 8px',
     fontSize: '11px',
     fontWeight: 600,
     borderRadius: '4px',
-    border: '1px solid var(--lf-border)',
-    background: 'var(--lf-bg-input)',
-    color: 'var(--lf-text-primary)',
-    cursor: 'pointer',
     fontFamily: 'var(--font-sans)',
     lineHeight: 1,
   }
@@ -45,7 +43,7 @@ export function FontSizeControl({
       >
         {label}
       </span>
-      <button onClick={() => adjust(-step)} style={btnStyle}>
+      <button className={btnClass} onClick={() => adjust(-step)} style={btnStyle}>
         A-
       </button>
       <span
@@ -59,7 +57,7 @@ export function FontSizeControl({
       >
         {value}px
       </span>
-      <button onClick={() => adjust(step)} style={btnStyle}>
+      <button className={btnClass} onClick={() => adjust(step)} style={btnStyle}>
         A+
       </button>
     </div>

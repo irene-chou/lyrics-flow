@@ -33,14 +33,13 @@ export function VolumeControl() {
   return (
     <div className="flex items-center" style={{ gap: '8px' }}>
       <button
+        className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
         onClick={handleToggleMute}
         style={{
           background: 'none',
           border: 'none',
           padding: '2px',
-          cursor: 'pointer',
-          color: 'var(--lf-text-secondary)',
-          display: 'flex',
+          borderRadius: '4px',
         }}
         title="靜音"
       >

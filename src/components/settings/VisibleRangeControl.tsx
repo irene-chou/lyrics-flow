@@ -13,18 +13,13 @@ export function VisibleRangeControl({
   onBeforeChange,
   onAfterChange,
 }: VisibleRangeControlProps) {
+  const btnClass = 'flex items-center justify-center border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+
   const btnStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     width: '22px',
     height: '22px',
     padding: 0,
     borderRadius: '4px',
-    border: '1px solid var(--lf-border)',
-    background: 'var(--lf-bg-input)',
-    color: 'var(--lf-text-primary)',
-    cursor: 'pointer',
     lineHeight: 1,
   }
 
@@ -63,6 +58,7 @@ export function VisibleRangeControl({
       <div className="flex items-center" style={{ gap: '6px' }}>
         <span style={labelStyle}>前</span>
         <button
+          className={btnClass}
           onClick={() => onBeforeChange(Math.max(0, before - 1))}
           style={btnStyle}
         >
@@ -72,6 +68,7 @@ export function VisibleRangeControl({
           {before}
         </span>
         <button
+          className={btnClass}
           onClick={() => onBeforeChange(Math.min(5, before + 1))}
           style={btnStyle}
         >
@@ -79,6 +76,7 @@ export function VisibleRangeControl({
         </button>
         <span style={{ ...labelStyle, marginLeft: '8px' }}>後</span>
         <button
+          className={btnClass}
           onClick={() => onAfterChange(Math.max(0, after - 1))}
           style={btnStyle}
         >
@@ -88,6 +86,7 @@ export function VisibleRangeControl({
           {after}
         </span>
         <button
+          className={btnClass}
           onClick={() => onAfterChange(Math.min(5, after + 1))}
           style={btnStyle}
         >

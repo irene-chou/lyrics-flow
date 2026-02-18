@@ -164,7 +164,10 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
             flexShrink: 0,
             cursor: 'pointer',
             padding: 0,
+            transition: 'opacity 0.15s',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.75')}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
         >
           <div
             style={{
