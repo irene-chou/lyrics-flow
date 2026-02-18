@@ -19,6 +19,7 @@ export interface UISettings {
   activeFontSize: number
   otherFontSize: number
   titleFontSize: number
+  showTitle: boolean
   baseLineHeight: number
   visibleBefore: number
   visibleAfter: number

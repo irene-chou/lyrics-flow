@@ -3,7 +3,7 @@ import { FontSizeControl } from './FontSizeControl'
 import { LineHeightControl } from './LineHeightControl'
 import { ColorPicker } from './ColorPicker'
 import { VisibleRangeControl } from './VisibleRangeControl'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, Eye, EyeOff } from 'lucide-react'
 
 const groupLabelStyle: React.CSSProperties = {
   fontSize: '10px',
@@ -24,6 +24,7 @@ export function DisplaySettings() {
     activeFontSize,
     otherFontSize,
     titleFontSize,
+    showTitle,
     baseLineHeight,
     visibleBefore,
     visibleAfter,
@@ -33,6 +34,7 @@ export function DisplaySettings() {
     setActiveFontSize,
     setOtherFontSize,
     setTitleFontSize,
+    setShowTitle,
     setBaseLineHeight,
     setVisibleBefore,
     setVisibleAfter,
@@ -82,14 +84,30 @@ export function DisplaySettings() {
       {/* Group: 字體 */}
       <span style={groupLabelStyle}>字體</span>
       <div className="flex flex-col" style={{ gap: '6px' }}>
-        <FontSizeControl
-          label="歌名"
-          value={titleFontSize}
-          min={10}
-          max={40}
-          step={2}
-          onChange={setTitleFontSize}
-        />
+        <div className="flex items-center" style={{ gap: '8px' }}>
+          <button
+            onClick={() => setShowTitle(!showTitle)}
+            className="border border-lf-border bg-lf-bg-input text-lf-text-secondary hover:bg-lf-bg-card hover:border-lf-text-dim hover:text-lf-text-primary transition-colors cursor-pointer"
+            style={{
+              padding: '4px',
+              borderRadius: '4px',
+              lineHeight: 0,
+            }}
+            title={showTitle ? '隱藏標題' : '顯示標題'}
+          >
+            {showTitle ? <Eye size={12} /> : <EyeOff size={12} />}
+          </button>
+          <div className="flex-1" style={{ opacity: showTitle ? 1 : 0.4 }}>
+            <FontSizeControl
+              label="歌名"
+              value={titleFontSize}
+              min={10}
+              max={40}
+              step={2}
+              onChange={setTitleFontSize}
+            />
+          </div>
+        </div>
         <FontSizeControl
           label="當前行"
           value={activeFontSize}

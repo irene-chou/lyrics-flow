@@ -68,7 +68,7 @@ export function useSyncBroadcast({ broadcast }: UseSyncBroadcastOptions) {
 
   useStoreWatcher(
     useUISettingsStore,
-    (s) => ({ titleFontSize: s.titleFontSize }),
+    (s) => ({ titleFontSize: s.titleFontSize, showTitle: s.showTitle }),
     'TITLE_FONT_SIZE',
     broadcastRef,
   )

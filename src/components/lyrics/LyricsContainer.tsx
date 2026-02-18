@@ -17,6 +17,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
   const activeFontSize = useUISettingsStore((s) => s.activeFontSize)
   const otherFontSize = useUISettingsStore((s) => s.otherFontSize)
   const titleFontSize = useUISettingsStore((s) => s.titleFontSize)
+  const showTitle = useUISettingsStore((s) => s.showTitle)
   const baseLineHeight = useUISettingsStore((s) => s.baseLineHeight)
   const activeColor = useUISettingsStore((s) => s.activeColor)
   const otherColor = useUISettingsStore((s) => s.otherColor)
@@ -74,7 +75,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
         background: lyricsBgColor,
       }}
     >
-      <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} />
+      {showTitle && <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} />}
 
       <div
         ref={scrollRef}

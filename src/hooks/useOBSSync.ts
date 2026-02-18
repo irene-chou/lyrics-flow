@@ -101,6 +101,7 @@ export function useOBSSync() {
       otherFontSize: ui.otherFontSize,
       baseLineHeight: ui.baseLineHeight,
       titleFontSize: ui.titleFontSize,
+      showTitle: ui.showTitle,
       visibleBefore: ui.visibleBefore,
       visibleAfter: ui.visibleAfter,
       offset: song.offset,

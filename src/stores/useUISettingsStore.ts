@@ -7,6 +7,7 @@ interface UISettingsState extends UISettings {
   setActiveFontSize: (size: number) => void
   setOtherFontSize: (size: number) => void
   setTitleFontSize: (size: number) => void
+  setShowTitle: (show: boolean) => void
   setBaseLineHeight: (height: number) => void
   setVisibleBefore: (count: number) => void
   setVisibleAfter: (count: number) => void
@@ -25,6 +26,7 @@ export const useUISettingsStore = create<UISettingsState>()(
       setActiveFontSize: (size: number) => set({ activeFontSize: size }),
       setOtherFontSize: (size: number) => set({ otherFontSize: size }),
       setTitleFontSize: (size: number) => set({ titleFontSize: size }),
+      setShowTitle: (show: boolean) => set({ showTitle: show }),
       setBaseLineHeight: (height: number) => set({ baseLineHeight: height }),
       setVisibleBefore: (count: number) => set({ visibleBefore: count }),
       setVisibleAfter: (count: number) => set({ visibleAfter: count }),
