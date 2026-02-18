@@ -1,3 +1,5 @@
+import { Minus, Plus } from 'lucide-react'
+
 interface VisibleRangeControlProps {
   before: number
   after: number
@@ -12,22 +14,39 @@ export function VisibleRangeControl({
   onAfterChange,
 }: VisibleRangeControlProps) {
   const btnStyle: React.CSSProperties = {
-    padding: '4px 8px',
-    fontSize: '11px',
-    fontWeight: 600,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '22px',
+    height: '22px',
+    padding: 0,
     borderRadius: '4px',
     border: '1px solid var(--lf-border)',
     background: 'var(--lf-bg-input)',
     color: 'var(--lf-text-primary)',
     cursor: 'pointer',
-    fontFamily: 'var(--font-sans)',
     lineHeight: 1,
   }
 
   const labelStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    height: '22px',
     fontSize: '11px',
     color: 'var(--lf-text-secondary)',
     lineHeight: 1,
+  }
+
+  const valueStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '22px',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    lineHeight: 1,
+    color: 'var(--lf-text-primary)',
+    minWidth: '20px',
   }
 
   return (
@@ -47,50 +66,32 @@ export function VisibleRangeControl({
           onClick={() => onBeforeChange(Math.max(0, before - 1))}
           style={btnStyle}
         >
-          -
+          <Minus size={12} />
         </button>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-            lineHeight: 1,
-            color: 'var(--lf-text-primary)',
-            minWidth: '20px',
-            textAlign: 'center',
-          }}
-        >
+        <span style={valueStyle}>
           {before}
         </span>
         <button
           onClick={() => onBeforeChange(Math.min(5, before + 1))}
           style={btnStyle}
         >
-          +
+          <Plus size={12} />
         </button>
         <span style={{ ...labelStyle, marginLeft: '8px' }}>後</span>
         <button
           onClick={() => onAfterChange(Math.max(0, after - 1))}
           style={btnStyle}
         >
-          -
+          <Minus size={12} />
         </button>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-            lineHeight: 1,
-            color: 'var(--lf-text-primary)',
-            minWidth: '20px',
-            textAlign: 'center',
-          }}
-        >
+        <span style={valueStyle}>
           {after}
         </span>
         <button
           onClick={() => onAfterChange(Math.min(5, after + 1))}
           style={btnStyle}
         >
-          +
+          <Plus size={12} />
         </button>
       </div>
     </div>

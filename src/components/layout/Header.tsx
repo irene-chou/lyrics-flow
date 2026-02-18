@@ -53,12 +53,11 @@ export function Header({ onOpenDrawer }: HeaderProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4 ml-auto shrink-0">
+      <div className="flex items-center gap-3 ml-auto shrink-0">
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
-          className="flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
-          style={{ color: 'var(--lf-accent)' }}
+          className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="切換主題"
         >
           {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
@@ -67,32 +66,20 @@ export function Header({ onOpenDrawer }: HeaderProps) {
         {/* OBS URL */}
         <button
           onClick={copyOBSUrl}
-          className="flex items-center justify-center gap-1.5 h-8 rounded-md transition-all cursor-pointer"
-          style={{
-            minWidth: '68px',
-            padding: '0 12px',
-            background: 'var(--lf-bg-secondary)',
-            border: `1px solid ${copied ? 'var(--lf-success)' : 'var(--lf-border)'}`,
-            color: copied ? 'var(--lf-success)' : 'var(--lf-text-secondary)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.03em',
-          }}
+          className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
+          style={copied ? { color: 'var(--lf-success)' } : undefined}
           title="複製 OBS 瀏覽器來源 URL"
         >
-          <span>{copied ? 'copied!' : 'OBS'}</span>
-          {copied ? <Check size={14} /> : <Link size={14} />}
+          {copied ? <Check size={20} /> : <Link size={20} />}
         </button>
 
         {/* Song drawer trigger */}
         <button
           onClick={onOpenDrawer}
-          className="flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
-          style={{ color: 'var(--lf-accent)' }}
+          className="header-accent-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="歌曲庫"
         >
-          <ListMusic size={24} />
+          <ListMusic size={20} strokeWidth={2.5} />
         </button>
       </div>
     </header>

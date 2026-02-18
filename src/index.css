@@ -136,6 +136,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ===== Header icon buttons ===== */
+.header-btn {
+  color: var(--lf-text-secondary);
+}
+.header-btn:hover {
+  color: var(--lf-text-primary);
+}
+
+.header-fab {
+  color: #fff;
+  background: var(--lf-accent);
+  border: none;
+  box-shadow: 0 2px 8px var(--lf-accent-glow);
+}
+.header-fab:hover {
+  background: #6b59de;
+  box-shadow: 0 4px 16px var(--lf-accent-glow);
+}
+
+.header-accent-btn {
+  color: var(--lf-accent);
+}
+.header-accent-btn:hover {
+  color: var(--lf-text-primary);
+}
+
 /* ===== Logo pulse ===== */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -165,6 +191,27 @@ body {
 
 /* ===== shadcn theme inline (radius + color mapping) ===== */
 @theme inline {
+  /* Lyrics Flow custom color tokens */
+  --color-lf-bg-primary: var(--lf-bg-primary);
+  --color-lf-bg-secondary: var(--lf-bg-secondary);
+  --color-lf-bg-card: var(--lf-bg-card);
+  --color-lf-bg-input: var(--lf-bg-input);
+  --color-lf-border: var(--lf-border);
+  --color-lf-text-primary: var(--lf-text-primary);
+  --color-lf-text-secondary: var(--lf-text-secondary);
+  --color-lf-text-dim: var(--lf-text-dim);
+  --color-lf-accent: var(--lf-accent);
+  --color-lf-accent-glow: var(--lf-accent-glow);
+  --color-lf-active-lyric: var(--lf-active-lyric);
+  --color-lf-active-bg: var(--lf-active-bg);
+  --color-lf-passed-lyric: var(--lf-passed-lyric);
+  --color-lf-upcoming-lyric: var(--lf-upcoming-lyric);
+  --color-lf-danger: var(--lf-danger);
+  --color-lf-success: var(--lf-success);
+
+  /* Lyrics Flow radius */
+  --radius-lf: var(--lf-radius);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
