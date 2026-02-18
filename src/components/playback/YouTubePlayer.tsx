@@ -24,32 +24,24 @@ export function YouTubePlayer({ engine }: YouTubePlayerProps) {
   return (
     <div
       style={{
+        position: 'relative',
         marginTop: '4px',
+        paddingBottom: '56.25%', // 16:9
         borderRadius: '8px',
         overflow: 'hidden',
+        background: '#000',
       }}
     >
       <div
+        ref={engine.youtube.containerRef}
         style={{
-          position: 'relative',
-          paddingBottom: '56.25%', // 16:9
-          height: 0,
-          overflow: 'hidden',
-          background: '#000',
-          borderRadius: '8px',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
         }}
-      >
-        <div
-          ref={engine.youtube.containerRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      </div>
+      />
     </div>
   )
 }
