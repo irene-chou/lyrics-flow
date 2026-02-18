@@ -18,12 +18,7 @@ export function getChannelName(): string {
 
 export function getOBSUrl(): string {
   const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/')
-  const params = new URLSearchParams({
-    s: getSessionId(),
-    k: PIESOCKET_API_KEY,
-    c: PIESOCKET_CLUSTER_ID,
-  })
-  return `${base}obs.html?${params.toString()}`
+  return `${base}obs.html?s=${getSessionId()}`
 }
 
 export { PIESOCKET_API_KEY, PIESOCKET_CLUSTER_ID }

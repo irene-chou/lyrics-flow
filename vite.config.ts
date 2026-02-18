@@ -2,23 +2,55 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import fs from 'fs'
 
 /**
  * Replace __VITE_*__ placeholders in public HTML files at build time.
- * Vite does not process files in public/ with import.meta.env,
- * so we handle the substitution manually during the build.
+ * Public files are copied after Rollup bundle, so we use writeBundle
+ * to post-process them on disk.
  */
+function replaceEnvPlaceholders(html: string, env: Record<string, string>): string {
+  return html
+    .replace(/__VITE_PIESOCKET_API_KEY__/g, env.VITE_PIESOCKET_API_KEY ?? '')
+    .replace(/__VITE_PIESOCKET_CLUSTER_ID__/g, env.VITE_PIESOCKET_CLUSTER_ID ?? 'demo')
+}
+
 function envReplacementPlugin(env: Record<string, string>): Plugin {
+  let outDir = 'dist'
   return {
     name: 'env-replacement',
     enforce: 'post',
-    generateBundle(_options, bundle) {
-      for (const file of Object.values(bundle)) {
-        if (file.type === 'asset' && typeof file.source === 'string' && file.fileName.endsWith('.html')) {
-          file.source = file.source
-            .replace(/__VITE_PIESOCKET_API_KEY__/g, env.VITE_PIESOCKET_API_KEY ?? '')
-            .replace(/__VITE_PIESOCKET_CLUSTER_ID__/g, env.VITE_PIESOCKET_CLUSTER_ID ?? 'demo')
+    configResolved(config) {
+      outDir = config.build.outDir
+    },
+    // Dev: intercept public HTML files served by Vite dev server
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const urlPath = (req.url || '').split('?')[0]
+        if (urlPath.endsWith('.html') && urlPath !== '/') {
+          // Strip base path (e.g. /lyrics-flow/) to get the filename
+          const base = server.config.base || '/'
+          const relative = urlPath.startsWith(base) ? urlPath.slice(base.length) : urlPath.replace(/^\//, '')
+          const filePath = path.resolve('public', relative)
+          if (fs.existsSync(filePath)) {
+            let html = fs.readFileSync(filePath, 'utf-8')
+            html = replaceEnvPlaceholders(html, env)
+            res.setHeader('Content-Type', 'text/html')
+            res.end(html)
+            return
+          }
         }
+        next()
+      })
+    },
+    // Build: post-process HTML files in dist/
+    writeBundle() {
+      const htmlFiles = fs.readdirSync(outDir).filter((f) => f.endsWith('.html'))
+      for (const file of htmlFiles) {
+        const filePath = path.resolve(outDir, file)
+        let content = fs.readFileSync(filePath, 'utf-8')
+        content = replaceEnvPlaceholders(content, env)
+        fs.writeFileSync(filePath, content, 'utf-8')
       }
     },
   }

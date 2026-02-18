@@ -151,13 +151,11 @@
   // ========== PieSocket (OBS Sync) ==========
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('s') || '';
-  const apiKey = params.get('k') || '';
-  const clusterId = params.get('c') || 'demo';
   const channelName = sessionId ? `lyrics-flow-${sessionId}` : 'lyrics-flow';
 
   const piesocket = new PieSocket.default({
-    clusterId: clusterId,
-    apiKey: apiKey,
+    clusterId: '__VITE_PIESOCKET_CLUSTER_ID__',
+    apiKey: '__VITE_PIESOCKET_API_KEY__',
     notifySelf: 0,
   });
 
