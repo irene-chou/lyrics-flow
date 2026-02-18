@@ -10,7 +10,7 @@ export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
     <div
       className="shrink-0"
       style={{
-        padding: '16px 68px',
+        padding: '16px 48px',
         fontFamily: 'var(--font-lyrics)',
       }}
     >
