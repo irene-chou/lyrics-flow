@@ -1,46 +1,25 @@
-import { RotateCcw, Save } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useSyncStore } from '@/stores/useSyncStore'
-import { saveSongToDB } from '@/hooks/useSongLibrary'
+import { debouncedSaveSong } from '@/hooks/useSongLibrary'
 
 export function OffsetControls() {
-  const { currentSongId, currentSongTitle, offset, lrcText, audioSource, youtubeId, audioFileName, lastSavedState } =
-    useSongStore()
+  const { currentSongId, offset } = useSongStore()
 
   if (!currentSongId) return null
 
   function adjustOffset(delta: number) {
     const newOffset = Math.round((offset + delta) * 10) / 10
     useSongStore.getState().setOffset(newOffset)
-    // Reset sync to force re-evaluation
     useSyncStore.getState().setCurrentLineIndex(-1)
+    debouncedSaveSong()
   }
 
   function resetOffset() {
-    if (lastSavedState) {
-      useSongStore.getState().setOffset(lastSavedState.offset)
-      useSyncStore.getState().setCurrentLineIndex(-1)
-    }
+    useSongStore.getState().setOffset(0)
+    useSyncStore.getState().setCurrentLineIndex(-1)
+    debouncedSaveSong()
   }
-
-  async function saveOffset() {
-    if (!currentSongId) return
-    const song = {
-      id: currentSongId,
-      name: currentSongTitle,
-      lrcText,
-      offset,
-      audioSource,
-      youtubeId,
-      audioFileName,
-      createdAt: 0, // will be preserved by put
-      updatedAt: Date.now(),
-    }
-    await saveSongToDB(song)
-    useSongStore.getState().captureState()
-  }
-
-  const offsetChanged = lastSavedState ? offset !== lastSavedState.offset : false
 
   const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
 
@@ -65,34 +44,19 @@ export function OffsetControls() {
         >
           歌詞偏移 (Offset)
         </div>
-        <div className="flex items-center" style={{ gap: '4px' }}>
-          <button
-            className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
-            onClick={resetOffset}
-            title="重置偏移"
-            style={{
-              padding: '4px',
-              borderRadius: '4px',
-              background: 'none',
-              border: 'none',
-            }}
-          >
-            <RotateCcw size={14} />
-          </button>
-          <button
-            className={`flex hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer ${offsetChanged ? 'text-lf-accent' : 'text-lf-text-secondary'}`}
-            onClick={saveOffset}
-            title="儲存偏移"
-            style={{
-              padding: '4px',
-              borderRadius: '4px',
-              background: 'none',
-              border: 'none',
-            }}
-          >
-            <Save size={14} />
-          </button>
-        </div>
+        <button
+          className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
+          onClick={resetOffset}
+          title="重置偏移"
+          style={{
+            padding: '4px',
+            borderRadius: '4px',
+            background: 'none',
+            border: 'none',
+          }}
+        >
+          <RotateCcw size={14} />
+        </button>
       </div>
       <div className="flex items-center justify-center" style={{ gap: '6px' }}>
         <button className={btnClass} onClick={() => adjustOffset(-0.5)} style={btnStyle}>

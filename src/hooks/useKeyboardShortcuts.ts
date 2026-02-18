@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { useSyncStore } from '@/stores/useSyncStore'
-import { saveSongToDB } from '@/hooks/useSongLibrary'
+import { saveSongToDB, debouncedSaveSong } from '@/hooks/useSongLibrary'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 
 interface UseKeyboardShortcutsOptions {
@@ -42,6 +42,7 @@ export function useKeyboardShortcuts({
             const newOffset = Math.round((current + delta) * 10) / 10
             useSongStore.getState().setOffset(newOffset)
             useSyncStore.getState().setCurrentLineIndex(-1)
+            debouncedSaveSong()
           }
           break
 
@@ -53,6 +54,7 @@ export function useKeyboardShortcuts({
             const newOffset = Math.round((current + delta) * 10) / 10
             useSongStore.getState().setOffset(newOffset)
             useSyncStore.getState().setCurrentLineIndex(-1)
+            debouncedSaveSong()
           }
           break
 

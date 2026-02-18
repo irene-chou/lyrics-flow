@@ -1,11 +1,38 @@
 import { db } from '@/lib/db'
 import type { Song } from '@/types'
+import { useSongStore } from '@/stores/useSongStore'
 
 /**
  * Save (upsert) a song to IndexedDB.
  */
 export async function saveSongToDB(song: Song): Promise<void> {
   await db.songs.put(song)
+}
+
+/**
+ * Debounced auto-save: saves the current song state to DB after a delay.
+ * Repeated calls within the delay window reset the timer.
+ */
+let _autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+
+export function debouncedSaveSong(delay = 600) {
+  if (_autoSaveTimer) clearTimeout(_autoSaveTimer)
+  _autoSaveTimer = setTimeout(async () => {
+    const state = useSongStore.getState()
+    if (!state.currentSongId) return
+    await saveSongToDB({
+      id: state.currentSongId,
+      name: state.currentSongTitle,
+      lrcText: state.lrcText,
+      offset: state.offset,
+      audioSource: state.audioSource,
+      youtubeId: state.youtubeId,
+      audioFileName: state.audioFileName,
+      createdAt: 0,
+      updatedAt: Date.now(),
+    })
+    useSongStore.getState().captureState()
+  }, delay)
 }
 
 /**
