@@ -1,54 +1,111 @@
 import { useState, useEffect } from 'react'
 
+// --- Helpers ---
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
+  return {
+    r: parseInt(full.slice(0, 2), 16),
+    g: parseInt(full.slice(2, 4), 16),
+    b: parseInt(full.slice(4, 6), 16),
+  }
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return (
+    '#' +
+    [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')
+  )
+}
+
+/** Parse any color string into { hex, opacity (0-100) } */
+function parseColor(value: string): { hex: string; opacity: number } {
+  if (value === 'transparent') return { hex: '#000000', opacity: 0 }
+
+  // rgba(r, g, b, a)
+  const rgbaMatch = value.match(
+    /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)$/,
+  )
+  if (rgbaMatch) {
+    const r = parseInt(rgbaMatch[1])
+    const g = parseInt(rgbaMatch[2])
+    const b = parseInt(rgbaMatch[3])
+    const a = rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1
+    return { hex: rgbToHex(r, g, b), opacity: Math.round(a * 100) }
+  }
+
+  // #RRGGBB or #RGB
+  if (/^#[0-9a-fA-F]{3,6}$/.test(value)) {
+    const h = value.replace('#', '')
+    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
+    return { hex: '#' + full.toLowerCase(), opacity: 100 }
+  }
+
+  return { hex: '#000000', opacity: 100 }
+}
+
+/** Format hex + opacity into a CSS color string */
+function formatColor(hex: string, opacity: number): string {
+  if (opacity >= 100) return hex
+  const { r, g, b } = hexToRgb(hex)
+  const a = Math.round(opacity) / 100
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
+// --- Component ---
+
 interface ColorPickerProps {
   label: string
   value: string
   onChange: (color: string) => void
-  supportTransparent?: boolean
 }
 
 export function ColorPicker({
   label,
   value,
   onChange,
-  supportTransparent = false,
 }: ColorPickerProps) {
-  const isTransparent = value === 'transparent'
-  const [hexInput, setHexInput] = useState(isTransparent ? '' : value)
+  const parsed = parseColor(value)
+  const [hexInput, setHexInput] = useState(parsed.hex)
+  const [opacity, setOpacity] = useState(parsed.opacity)
 
+  // Sync from external value changes
   useEffect(() => {
-    if (value !== 'transparent') {
-      setHexInput(value)
-    }
+    const p = parseColor(value)
+    setHexInput(p.hex)
+    setOpacity(p.opacity)
   }, [value])
+
+  function emitChange(hex: string, op: number) {
+    onChange(formatColor(hex, op))
+  }
 
   function handleColorInput(e: React.ChangeEvent<HTMLInputElement>) {
     const color = e.target.value
     setHexInput(color)
-    onChange(color)
+    emitChange(color, opacity)
   }
 
   function handleTextInput(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value
     setHexInput(text)
-    // Only apply if it looks like a valid color
     if (/^#[0-9a-fA-F]{6}$/.test(text) || /^#[0-9a-fA-F]{3}$/.test(text)) {
-      onChange(text)
-    } else if (/^rgba?\(/.test(text)) {
-      onChange(text)
+      emitChange(text, opacity)
     }
   }
 
-  function handleTransparentToggle(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.checked) {
-      onChange('transparent')
-    } else {
-      onChange(hexInput || '#000000')
-    }
+  function handleOpacityChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const op = parseInt(e.target.value)
+    setOpacity(op)
+    emitChange(hexInput, op)
   }
 
-  // Convert to hex for the native color input (it only accepts #RRGGBB)
-  const colorInputValue = isTransparent ? '#000000' : (value.startsWith('#') ? value.slice(0, 7) : '#000000')
+  // Native color input only accepts #RRGGBB
+  const colorInputValue = parsed.hex
+
+  // Swatch preview with checkerboard behind for transparency
+  const swatchColor = formatColor(parsed.hex, opacity)
 
   return (
     <div>
@@ -61,45 +118,51 @@ export function ColorPicker({
       >
         {label}
       </div>
+
+      {/* Row 1: swatch + hex input */}
       <div className="flex items-center" style={{ gap: '8px' }}>
-        {/* Color swatch / native picker */}
-        <div style={{ position: 'relative' }}>
+        {/* Color swatch with checkerboard background */}
+        <div
+          style={{
+            position: 'relative',
+            width: '24px',
+            height: '24px',
+            borderRadius: '4px',
+            border: '1px solid var(--lf-border)',
+            background:
+              'repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% / 8px 8px',
+            overflow: 'hidden',
+            flexShrink: 0,
+          }}
+        >
+          {/* Color overlay */}
           <div
             style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '4px',
-              border: '1px solid var(--lf-border)',
-              background: isTransparent
-                ? 'repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% / 8px 8px'
-                : value,
-              cursor: 'pointer',
-              overflow: 'hidden',
+              position: 'absolute',
+              inset: 0,
+              background: swatchColor,
             }}
-          >
-            <input
-              type="color"
-              value={colorInputValue}
-              onChange={handleColorInput}
-              disabled={isTransparent}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                opacity: 0,
-                cursor: 'pointer',
-              }}
-            />
-          </div>
+          />
+          <input
+            type="color"
+            value={colorInputValue}
+            onChange={handleColorInput}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0,
+              cursor: 'pointer',
+            }}
+          />
         </div>
         {/* Hex text input */}
         <input
           type="text"
-          value={isTransparent ? 'transparent' : hexInput}
+          value={hexInput}
           onChange={handleTextInput}
-          disabled={isTransparent}
           style={{
             flex: 1,
             background: 'var(--lf-bg-input)',
@@ -108,32 +171,54 @@ export function ColorPicker({
             padding: '4px 8px',
             fontFamily: 'var(--font-mono)',
             fontSize: '11px',
-            color: isTransparent ? 'var(--lf-text-dim)' : 'var(--lf-text-primary)',
+            color: 'var(--lf-text-primary)',
             outline: 'none',
             minWidth: 0,
           }}
         />
       </div>
-      {supportTransparent && (
-        <label
-          className="flex items-center"
+
+      {/* Row 2: opacity slider */}
+      <div
+        className="flex items-center"
+        style={{ gap: '8px', marginTop: '6px' }}
+      >
+        <span
           style={{
-            gap: '6px',
-            marginTop: '4px',
-            fontSize: '11px',
-            color: 'var(--lf-text-secondary)',
-            cursor: 'pointer',
+            fontSize: '10px',
+            color: 'var(--lf-text-dim)',
+            flexShrink: 0,
+            width: '32px',
           }}
         >
-          <input
-            type="checkbox"
-            checked={isTransparent}
-            onChange={handleTransparentToggle}
-            style={{ accentColor: 'var(--lf-accent)' }}
-          />
-          透明
-        </label>
-      )}
+          透明度
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={opacity}
+          onChange={handleOpacityChange}
+          style={{
+            flex: 1,
+            height: '4px',
+            accentColor: 'var(--lf-accent)',
+            cursor: 'pointer',
+          }}
+        />
+        <span
+          style={{
+            fontSize: '10px',
+            fontFamily: 'var(--font-mono)',
+            color: 'var(--lf-text-secondary)',
+            width: '30px',
+            textAlign: 'right',
+            flexShrink: 0,
+          }}
+        >
+          {`${opacity}%`}
+        </span>
+      </div>
     </div>
   )
 }

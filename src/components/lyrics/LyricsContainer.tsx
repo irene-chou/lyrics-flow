@@ -64,7 +64,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
     <div
       className="flex flex-col h-full"
       style={{
-        background: lyricsBgColor !== 'transparent' ? lyricsBgColor : undefined,
+        background: lyricsBgColor,
       }}
     >
       <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} />

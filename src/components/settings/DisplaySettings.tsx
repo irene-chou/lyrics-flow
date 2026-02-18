@@ -99,12 +99,7 @@ export function DisplaySettings() {
 
       <ColorPicker label="其他行顏色" value={otherColor} onChange={setOtherColor} />
 
-      <ColorPicker
-        label="歌詞背景色"
-        value={lyricsBgColor}
-        onChange={setLyricsBgColor}
-        supportTransparent
-      />
+      <ColorPicker label="歌詞背景色" value={lyricsBgColor} onChange={setLyricsBgColor} />
 
       <VisibleRangeControl
         before={visibleBefore}

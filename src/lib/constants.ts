@@ -9,5 +9,5 @@ export const DEFAULT_UI_SETTINGS: UISettings = {
   visibleAfter: 1,
   activeColor: '#ffffff',
   otherColor: '#9090a8',
-  lyricsBgColor: 'transparent',
+  lyricsBgColor: 'rgba(0, 0, 0, 0)',
 }
