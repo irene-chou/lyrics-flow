@@ -1,5 +1,5 @@
-const PIESOCKET_API_KEY = 'xlkQUJ7Y5BKQ1m0rNfNx2R1yhLBTu9mrVWOFdrnB'
-const PIESOCKET_CLUSTER_ID = 'demo'
+const PIESOCKET_API_KEY = import.meta.env.VITE_PIESOCKET_API_KEY ?? ''
+const PIESOCKET_CLUSTER_ID = import.meta.env.VITE_PIESOCKET_CLUSTER_ID ?? 'demo'
 
 export function getSessionId(): string {
   let id = localStorage.getItem('lf-session-id')

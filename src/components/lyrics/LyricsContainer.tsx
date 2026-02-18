@@ -11,16 +11,16 @@ interface LyricsContainerProps {
 }
 
 export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
-  const { currentSongTitle, lyrics, offset } = useSongStore()
-  const {
-    activeFontSize,
-    otherFontSize,
-    titleFontSize,
-    baseLineHeight,
-    activeColor,
-    otherColor,
-    lyricsBgColor,
-  } = useUISettingsStore()
+  const currentSongTitle = useSongStore((s) => s.currentSongTitle)
+  const lyrics = useSongStore((s) => s.lyrics)
+  const offset = useSongStore((s) => s.offset)
+  const activeFontSize = useUISettingsStore((s) => s.activeFontSize)
+  const otherFontSize = useUISettingsStore((s) => s.otherFontSize)
+  const titleFontSize = useUISettingsStore((s) => s.titleFontSize)
+  const baseLineHeight = useUISettingsStore((s) => s.baseLineHeight)
+  const activeColor = useUISettingsStore((s) => s.activeColor)
+  const otherColor = useUISettingsStore((s) => s.otherColor)
+  const lyricsBgColor = useUISettingsStore((s) => s.lyricsBgColor)
   const currentLineIndex = useSyncStore((s) => s.currentLineIndex)
 
   const scrollRef = useRef<HTMLDivElement>(null)

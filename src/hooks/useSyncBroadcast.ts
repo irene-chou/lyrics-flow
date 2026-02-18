@@ -8,128 +8,89 @@ interface UseSyncBroadcastOptions {
   broadcast: (type: SyncMessageType, data: Record<string, unknown>) => void
 }
 
+/**
+ * Generic store watcher: subscribes to a Zustand store and broadcasts
+ * when selected fields change.
+ */
+function useStoreWatcher<T>(
+  store: { getState: () => T; subscribe: (cb: (state: T) => void) => () => void },
+  selector: (state: T) => Record<string, unknown>,
+  messageType: SyncMessageType,
+  broadcastRef: React.RefObject<(type: SyncMessageType, data: Record<string, unknown>) => void>,
+) {
+  useEffect(() => {
+    let prev = selector(store.getState())
+    const unsub = store.subscribe((state) => {
+      const next = selector(state)
+      const changed = Object.keys(next).some(
+        (k) => next[k] !== prev[k],
+      )
+      if (changed) {
+        prev = next
+        broadcastRef.current(messageType, next)
+      }
+    })
+    return unsub
+  }, [store, selector, messageType, broadcastRef])
+}
+
 export function useSyncBroadcast({ broadcast }: UseSyncBroadcastOptions) {
   const broadcastRef = useRef(broadcast)
   broadcastRef.current = broadcast
 
-  // Watch currentLineIndex
-  useEffect(() => {
-    let prev = useSyncStore.getState().currentLineIndex
-    const unsub = useSyncStore.subscribe((state) => {
-      if (state.currentLineIndex !== prev) {
-        prev = state.currentLineIndex
-        broadcastRef.current('SYNC_UPDATE', { currentLineIndex: state.currentLineIndex })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useSyncStore,
+    (s) => ({ currentLineIndex: s.currentLineIndex }),
+    'SYNC_UPDATE',
+    broadcastRef,
+  )
 
-  // Watch lyrics changes (song loaded)
-  useEffect(() => {
-    let prev = useSongStore.getState().lyrics
-    const unsub = useSongStore.subscribe((state) => {
-      if (state.lyrics !== prev) {
-        prev = state.lyrics
-        broadcastRef.current('LYRICS_LOADED', {
-          lyrics: state.lyrics,
-          songTitle: state.currentSongTitle,
-        })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useSongStore,
+    (s) => ({ lyrics: s.lyrics, songTitle: s.currentSongTitle }),
+    'LYRICS_LOADED',
+    broadcastRef,
+  )
 
-  // Watch offset changes
-  useEffect(() => {
-    let prev = useSongStore.getState().offset
-    const unsub = useSongStore.subscribe((state) => {
-      if (state.offset !== prev) {
-        prev = state.offset
-        broadcastRef.current('OFFSET', { offset: state.offset })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useSongStore,
+    (s) => ({ offset: s.offset }),
+    'OFFSET',
+    broadcastRef,
+  )
 
-  // Watch UI settings changes — font sizes
-  useEffect(() => {
-    let prevActive = useUISettingsStore.getState().activeFontSize
-    let prevOther = useUISettingsStore.getState().otherFontSize
-    const unsub = useUISettingsStore.subscribe((state) => {
-      if (state.activeFontSize !== prevActive || state.otherFontSize !== prevOther) {
-        prevActive = state.activeFontSize
-        prevOther = state.otherFontSize
-        broadcastRef.current('FONT_SIZE', {
-          activeFontSize: state.activeFontSize,
-          otherFontSize: state.otherFontSize,
-        })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useUISettingsStore,
+    (s) => ({ activeFontSize: s.activeFontSize, otherFontSize: s.otherFontSize }),
+    'FONT_SIZE',
+    broadcastRef,
+  )
 
-  // Watch titleFontSize
-  useEffect(() => {
-    let prev = useUISettingsStore.getState().titleFontSize
-    const unsub = useUISettingsStore.subscribe((state) => {
-      if (state.titleFontSize !== prev) {
-        prev = state.titleFontSize
-        broadcastRef.current('TITLE_FONT_SIZE', { titleFontSize: state.titleFontSize })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useUISettingsStore,
+    (s) => ({ titleFontSize: s.titleFontSize }),
+    'TITLE_FONT_SIZE',
+    broadcastRef,
+  )
 
-  // Watch colors
-  useEffect(() => {
-    let prevActive = useUISettingsStore.getState().activeColor
-    let prevOther = useUISettingsStore.getState().otherColor
-    let prevBg = useUISettingsStore.getState().lyricsBgColor
-    const unsub = useUISettingsStore.subscribe((state) => {
-      if (
-        state.activeColor !== prevActive ||
-        state.otherColor !== prevOther ||
-        state.lyricsBgColor !== prevBg
-      ) {
-        prevActive = state.activeColor
-        prevOther = state.otherColor
-        prevBg = state.lyricsBgColor
-        broadcastRef.current('LYRIC_COLORS', {
-          activeColor: state.activeColor,
-          otherColor: state.otherColor,
-          lyricsBgColor: state.lyricsBgColor,
-        })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useUISettingsStore,
+    (s) => ({ activeColor: s.activeColor, otherColor: s.otherColor, lyricsBgColor: s.lyricsBgColor }),
+    'LYRIC_COLORS',
+    broadcastRef,
+  )
 
-  // Watch baseLineHeight
-  useEffect(() => {
-    let prev = useUISettingsStore.getState().baseLineHeight
-    const unsub = useUISettingsStore.subscribe((state) => {
-      if (state.baseLineHeight !== prev) {
-        prev = state.baseLineHeight
-        broadcastRef.current('LINE_HEIGHT', { baseLineHeight: state.baseLineHeight })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useUISettingsStore,
+    (s) => ({ baseLineHeight: s.baseLineHeight }),
+    'LINE_HEIGHT',
+    broadcastRef,
+  )
 
-  // Watch visible range
-  useEffect(() => {
-    let prevBefore = useUISettingsStore.getState().visibleBefore
-    let prevAfter = useUISettingsStore.getState().visibleAfter
-    const unsub = useUISettingsStore.subscribe((state) => {
-      if (state.visibleBefore !== prevBefore || state.visibleAfter !== prevAfter) {
-        prevBefore = state.visibleBefore
-        prevAfter = state.visibleAfter
-        broadcastRef.current('VISIBLE_RANGE', {
-          visibleBefore: state.visibleBefore,
-          visibleAfter: state.visibleAfter,
-        })
-      }
-    })
-    return unsub
-  }, [])
+  useStoreWatcher(
+    useUISettingsStore,
+    (s) => ({ visibleBefore: s.visibleBefore, visibleAfter: s.visibleAfter }),
+    'VISIBLE_RANGE',
+    broadcastRef,
+  )
 }

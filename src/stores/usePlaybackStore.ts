@@ -38,14 +38,8 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
   setVolume: (volume) => set({ volume }),
   setMuted: (muted) => set({ muted }),
   toggleMute: () => {
-    const { muted, volume } = get()
-    if (muted) {
-      set({ muted: false })
-    } else {
-      set({ muted: true })
-    }
-    // Volume value is preserved; muted flag controls actual audio output
-    void volume
+    const { muted } = get()
+    set({ muted: !muted })
   },
   setAudioFileObjectUrl: (audioFileObjectUrl) => {
     // Revoke previous URL to prevent memory leaks

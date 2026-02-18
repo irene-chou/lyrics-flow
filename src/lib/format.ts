@@ -9,15 +9,6 @@ export function formatTime(seconds: number): string {
 }
 
 /**
- * Escape HTML special characters to prevent XSS.
- */
-export function escapeHtml(str: string): string {
-  const div = document.createElement('div')
-  div.appendChild(document.createTextNode(str))
-  return div.innerHTML
-}
-
-/**
  * Extract YouTube video ID from various URL formats or a direct 11-char ID.
  */
 export function extractVideoId(input: string): string | null {

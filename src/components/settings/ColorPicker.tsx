@@ -98,8 +98,8 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
     onChange(formatColor(newColor))
   }
 
-  function handleHexInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const text = e.target.value
+  function commitHex(input: HTMLInputElement) {
+    const text = input.value
     if (/^#[0-9a-fA-F]{6}$/.test(text) || /^#[0-9a-fA-F]{3}$/.test(text)) {
       const parsed = parseColor(text)
       const next = { ...parsed, a: color.a }
@@ -131,9 +131,9 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           type="text"
           defaultValue={hexDisplay}
           key={hexDisplay}
-          onBlur={handleHexInput}
+          onBlur={(e) => commitHex(e.currentTarget)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleHexInput(e as unknown as React.ChangeEvent<HTMLInputElement>)
+            if (e.key === 'Enter') commitHex(e.currentTarget)
           }}
           style={{
             width: '72px',

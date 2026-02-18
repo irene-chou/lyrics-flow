@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect, useMemo } from 'react'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 
-function createTimerWorker(): Worker {
+function createTimerWorker(): { worker: Worker; blobUrl: string } {
   const blob = new Blob(
     [
       `
@@ -23,7 +23,8 @@ function createTimerWorker(): Worker {
     ],
     { type: 'application/javascript' },
   )
-  return new Worker(URL.createObjectURL(blob))
+  const blobUrl = URL.createObjectURL(blob)
+  return { worker: new Worker(blobUrl), blobUrl }
 }
 
 export function useManualTimer() {
@@ -33,7 +34,7 @@ export function useManualTimer() {
   const isPlayingRef = useRef(false)
 
   useEffect(() => {
-    const worker = createTimerWorker()
+    const { worker, blobUrl } = createTimerWorker()
     workerRef.current = worker
 
     worker.onmessage = () => {
@@ -50,6 +51,7 @@ export function useManualTimer() {
     return () => {
       worker.postMessage('stop')
       worker.terminate()
+      URL.revokeObjectURL(blobUrl)
       workerRef.current = null
     }
   }, [])

@@ -38,17 +38,14 @@ export function useYouTubePlayer() {
   const isReadyRef = useRef(false)
   const videoIdRef = useRef<string | null>(null)
 
-  const { setStatus, setCurrentTime, setDuration } =
-    usePlaybackStore.getState()
-
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (playerRef.current) {
         try {
           playerRef.current.destroy()
-        } catch {
-          // ignore
+        } catch (e) {
+          console.debug('YT player destroy:', e)
         }
         playerRef.current = null
         isReadyRef.current = false
@@ -64,8 +61,8 @@ export function useYouTubePlayer() {
       if (playerRef.current) {
         try {
           playerRef.current.destroy()
-        } catch {
-          // ignore
+        } catch (e) {
+          console.debug('YT player destroy:', e)
         }
         playerRef.current = null
         isReadyRef.current = false
@@ -190,11 +187,6 @@ export function useYouTubePlayer() {
       isReadyRef.current = false
     }
   }, [])
-
-  // Suppress TS unused warnings for store methods retrieved at module level
-  void setStatus
-  void setCurrentTime
-  void setDuration
 
   return useMemo(
     () => ({

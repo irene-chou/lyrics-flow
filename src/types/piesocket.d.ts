@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 interface PieSocketChannel {
-  listen(event: string, callback: (data: any) => void): void
-  publish(event: string, data: any): void
+  listen(event: string, callback: (data: unknown) => void): void
+  publish(event: string, data: unknown): void
 }
 
 interface PieSocketOptions {
@@ -13,6 +12,7 @@ interface PieSocketOptions {
 declare class PieSocketClass {
   constructor(options: PieSocketOptions)
   subscribe(channel: string): Promise<PieSocketChannel>
+  unsubscribe(channel: string): void
 }
 
 interface PieSocketModule {

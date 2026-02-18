@@ -3,7 +3,7 @@ import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import { useSyncStore } from '@/stores/useSyncStore'
 
-function createSyncWorker(): Worker {
+function createSyncWorker(): { worker: Worker; blobUrl: string } {
   const blob = new Blob(
     [
       `
@@ -25,7 +25,8 @@ function createSyncWorker(): Worker {
     ],
     { type: 'application/javascript' },
   )
-  return new Worker(URL.createObjectURL(blob))
+  const blobUrl = URL.createObjectURL(blob)
+  return { worker: new Worker(blobUrl), blobUrl }
 }
 
 interface UseSyncEngineOptions {
@@ -37,7 +38,7 @@ export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
 
   // Initialize worker
   useEffect(() => {
-    const worker = createSyncWorker()
+    const { worker, blobUrl } = createSyncWorker()
     workerRef.current = worker
 
     worker.onmessage = () => {
@@ -68,6 +69,7 @@ export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
     return () => {
       worker.postMessage('stop')
       worker.terminate()
+      URL.revokeObjectURL(blobUrl)
       workerRef.current = null
     }
   }, [getCurrentTime])

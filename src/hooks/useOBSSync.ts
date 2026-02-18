@@ -8,10 +8,27 @@ import {
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { useSyncStore } from '@/stores/useSyncStore'
-import type { SyncMessageType } from '@/types'
+import type { SyncMessage, SyncMessageType } from '@/types'
+
+const VALID_SYNC_TYPES = new Set<string>([
+  'FULL_STATE', 'LYRICS_LOADED', 'SYNC_UPDATE', 'FONT_SIZE',
+  'LYRIC_COLORS', 'TITLE_FONT_SIZE', 'LINE_HEIGHT', 'VISIBLE_RANGE',
+  'OFFSET', 'REQUEST_STATE',
+])
+
+function isValidSyncMessage(msg: unknown): msg is SyncMessage {
+  if (typeof msg !== 'object' || msg === null) return false
+  const m = msg as Record<string, unknown>
+  return (
+    typeof m.type === 'string' &&
+    VALID_SYNC_TYPES.has(m.type) &&
+    (m.data === null || m.data === undefined || typeof m.data === 'object')
+  )
+}
 
 export function useOBSSync() {
   const channelRef = useRef<{ publish: (event: string, data: unknown) => void } | null>(null)
+  const psRef = useRef<PieSocketClass | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const sessionId = getSessionId()
 
@@ -29,13 +46,18 @@ export function useOBSSync() {
       apiKey: PIESOCKET_API_KEY,
       notifySelf: 0,
     })
+    psRef.current = ps
 
     ps.subscribe(channelName).then((ch) => {
       channelRef.current = ch
       setIsConnected(true)
 
-      ch.listen('sync', (msg: { type: string }) => {
-        if (msg.type === 'REQUEST_STATE') {
+      ch.listen('sync', (raw: unknown) => {
+        if (!isValidSyncMessage(raw)) {
+          console.warn('Invalid sync message received:', raw)
+          return
+        }
+        if (raw.type === 'REQUEST_STATE') {
           broadcastFullState()
         }
       })
@@ -44,7 +66,13 @@ export function useOBSSync() {
     })
 
     return () => {
+      try {
+        ps.unsubscribe(channelName)
+      } catch {
+        // PieSocket may throw if already disconnected
+      }
       channelRef.current = null
+      psRef.current = null
       setIsConnected(false)
     }
   }, [])
@@ -54,8 +82,8 @@ export function useOBSSync() {
       if (!channelRef.current) return
       try {
         channelRef.current.publish('sync', { type, data })
-      } catch {
-        // ignore broadcast errors
+      } catch (e) {
+        console.debug('PieSocket broadcast error:', e)
       }
     },
     [],

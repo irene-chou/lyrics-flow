@@ -21,8 +21,9 @@ export function SongDrawerMenu() {
     try {
       const count = await importSongs(file)
       alert(`成功匯入 ${count} 首歌曲`)
-    } catch {
-      alert('匯入失敗：檔案格式無效')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '檔案格式無效'
+      alert(`匯入失敗：${msg}`)
     }
     // Reset input
     e.target.value = ''
