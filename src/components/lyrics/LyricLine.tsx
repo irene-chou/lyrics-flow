@@ -74,7 +74,6 @@ export const LyricLine = memo(
           fontStyle: isInterlude ? 'italic' : 'normal',
           letterSpacing: isInterlude ? '0.05em' : 'normal',
           transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-          background: isActive ? 'var(--lf-active-bg)' : 'transparent',
           cursor: onClick ? 'pointer' : 'default',
         }}
       >
