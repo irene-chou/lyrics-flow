@@ -70,7 +70,7 @@ export function Header({ onOpenDrawer }: HeaderProps) {
           className="header-accent-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="歌曲庫"
         >
-          <ListMusic size={20} strokeWidth={2.5} />
+          <ListMusic size={22} strokeWidth={2.6} />
         </button>
       </div>
     </header>
