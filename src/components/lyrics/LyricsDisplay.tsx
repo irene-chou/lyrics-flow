@@ -4,9 +4,10 @@ import { LyricsContainer } from './LyricsContainer'
 
 interface LyricsDisplayProps {
   onSeekToLyric?: (time: number) => void
+  isMobile?: boolean
 }
 
-export function LyricsDisplay({ onSeekToLyric }: LyricsDisplayProps) {
+export function LyricsDisplay({ onSeekToLyric, isMobile }: LyricsDisplayProps) {
   const currentSongId = useSongStore((s) => s.currentSongId)
 
   return (
@@ -14,9 +15,9 @@ export function LyricsDisplay({ onSeekToLyric }: LyricsDisplayProps) {
       className="relative flex-1 overflow-hidden flex flex-col bg-lf-bg-primary"
     >
       {currentSongId ? (
-        <LyricsContainer onSeekToLyric={onSeekToLyric} />
+        <LyricsContainer onSeekToLyric={onSeekToLyric} isMobile={isMobile} />
       ) : (
-        <EmptyState />
+        <EmptyState isMobile={isMobile} />
       )}
     </main>
   )

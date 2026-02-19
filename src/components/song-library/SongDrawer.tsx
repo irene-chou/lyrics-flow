@@ -18,9 +18,10 @@ import type { Song } from '@/types'
 interface SongDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  isMobile?: boolean
 }
 
-export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
+export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
   const [search, setSearch] = useState('')
   const songs = useSongs()
   const { currentSongId, loadSong } = useSongStore()
@@ -83,14 +84,14 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
       <DrawerContent
         className="h-full bg-lf-bg-secondary border-l border-lf-border"
         style={{
-          width: '380px',
+          width: isMobile ? '100vw' : '380px',
         }}
       >
         {/* Header */}
         <DrawerHeader
           className="flex-row items-center justify-between shrink-0 border-b border-lf-border"
           style={{
-            padding: '20px 24px',
+            padding: isMobile ? '16px' : '20px 24px',
           }}
         >
           <div>
@@ -125,7 +126,7 @@ export function SongDrawer({ open, onOpenChange }: SongDrawerProps) {
         {/* Body */}
         <div
           className="flex flex-col flex-1 overflow-hidden"
-          style={{ padding: '16px 24px', gap: '12px' }}
+          style={{ padding: isMobile ? '12px 16px' : '16px 24px', gap: '12px' }}
         >
           <div className="flex items-center" style={{ gap: '8px' }}>
             <div style={{ flex: 1, minWidth: 0 }}>

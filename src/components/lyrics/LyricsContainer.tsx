@@ -8,9 +8,10 @@ import type { LyricStatus } from './LyricLine'
 
 interface LyricsContainerProps {
   onSeekToLyric?: (time: number) => void
+  isMobile?: boolean
 }
 
-export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
+export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProps) {
   const currentSongTitle = useSongStore((s) => s.currentSongTitle)
   const lyrics = useSongStore((s) => s.lyrics)
   const offset = useSongStore((s) => s.offset)
@@ -81,7 +82,7 @@ export function LyricsContainer({ onSeekToLyric }: LyricsContainerProps) {
         ref={scrollRef}
         className="flex-1 overflow-y-auto"
         style={{
-          padding: '30vh 48px',
+          padding: isMobile ? '20vh 16px' : '30vh 48px',
           scrollBehavior: 'smooth',
         }}
       >
