@@ -478,3 +478,37 @@ body {
   background: var(--lf-bg-input) !important;
   color: var(--lf-text-primary) !important;
 }
+
+/* ===== Mobile responsive overrides ===== */
+@media (max-width: 767px) {
+  [data-slot="dialog-content"] {
+    max-width: calc(100vw - 32px) !important;
+    max-height: 85vh !important;
+    border-radius: 10px !important;
+  }
+
+  [data-slot="dialog-header"] {
+    padding: 12px 16px !important;
+  }
+
+  [data-slot="dialog-footer"] {
+    padding: 12px 16px !important;
+  }
+
+  [data-slot="dialog-content"] > .flex.flex-col {
+    padding: 16px !important;
+  }
+
+  [data-slot="textarea"] {
+    min-height: 120px !important;
+  }
+
+  [data-slot="input"],
+  [data-slot="textarea"] {
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+
+  [data-slot="drawer-header"] {
+    padding: 16px !important;
+  }
+}

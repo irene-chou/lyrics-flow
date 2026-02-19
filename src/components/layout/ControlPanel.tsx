@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react'
+import { Pencil, X } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { AudioPlayer } from '../playback/AudioPlayer'
@@ -10,9 +10,11 @@ import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 interface ControlPanelProps {
   onEditSong: (song: Song) => void
   engine: ReturnType<typeof usePlaybackEngine>
+  isMobile?: boolean
+  onClose?: () => void
 }
 
-export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
+export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlPanelProps) {
   const { currentSongId, currentSongTitle, lrcText, offset, audioSource, youtubeId, audioFileName } = useSongStore()
   const sidebarWidth = useUISettingsStore((s) => s.sidebarWidth)
 
@@ -40,18 +42,46 @@ export function ControlPanel({ onEditSong, engine }: ControlPanelProps) {
     <aside
       className="flex flex-col overflow-y-auto bg-lf-bg-secondary border-r border-lf-border"
       style={{
-        width: sidebarWidth,
-      flexShrink: 0,
-        padding: '24px',
-        gap: '20px',
+        width: isMobile ? '100%' : sidebarWidth,
+        height: isMobile ? '100%' : undefined,
+        flexShrink: 0,
+        padding: isMobile ? '16px' : '24px',
+        gap: isMobile ? '16px' : '20px',
       }}
     >
+      {/* Mobile header with close button */}
+      {isMobile && onClose && (
+        <div className="flex items-center justify-between">
+          <h2
+            className="text-lf-text-primary"
+            style={{ fontSize: '14px', fontWeight: 600 }}
+          >
+            控制面板
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
+            style={{
+              width: '28px',
+              height: '28px',
+              padding: 0,
+              border: 'none',
+              borderRadius: '6px',
+              background: 'none',
+            }}
+            title="關閉"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* 歌曲設定 */}
       <section
         className="flex flex-col border border-lf-border"
         style={{
           borderRadius: 'var(--lf-radius)',
-          padding: '16px',
+          padding: isMobile ? '12px' : '16px',
           gap: '12px',
         }}
       >

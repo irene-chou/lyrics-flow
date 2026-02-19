@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { Moon, Sun, Link, Check, ListMusic } from 'lucide-react'
+import { Moon, Sun, Link, Check, ListMusic, Menu } from 'lucide-react'
 import { getOBSUrl } from '@/lib/piesocket'
 
 interface HeaderProps {
   onOpenDrawer: () => void
+  isMobile?: boolean
+  onToggleMobilePanel?: () => void
 }
 
-export function Header({ onOpenDrawer }: HeaderProps) {
+export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const [copied, setCopied] = useState(false)
 
@@ -29,40 +31,52 @@ export function Header({ onOpenDrawer }: HeaderProps) {
   return (
     <header
       className="flex items-center justify-between gap-4 bg-lf-bg-secondary border-b border-lf-border"
-      style={{ padding: '12px 20px' }}
+      style={{ padding: isMobile ? '10px 12px' : '12px 20px' }}
     >
-      {/* Logo */}
+      {/* Left: mobile menu + Logo */}
       <div className="flex items-center gap-2 shrink-0">
+        {isMobile && onToggleMobilePanel && (
+          <button
+            onClick={onToggleMobilePanel}
+            className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
+            title="控制面板"
+          >
+            <Menu size={20} />
+          </button>
+        )}
         <ListMusic
-          size={22}
+          size={isMobile ? 18 : 22}
           className="text-lf-accent"
         />
         <h1
-          className="text-lg font-bold text-lf-text-primary tracking-tight"
+          className="font-bold text-lf-text-primary tracking-tight"
+          style={{ fontSize: isMobile ? '14px' : '18px' }}
         >
           Lyrics Flow
         </h1>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3 ml-auto shrink-0">
+      <div className="flex items-center gap-2 ml-auto shrink-0">
         {/* Theme toggle */}
         <button
           onClick={toggleTheme}
           className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="切換主題"
         >
-          {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+          {theme === 'dark' ? <Moon size={isMobile ? 18 : 20} /> : <Sun size={isMobile ? 18 : 20} />}
         </button>
 
-        {/* OBS URL */}
-        <button
-          onClick={copyOBSUrl}
-          className={`header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${copied ? 'text-lf-success' : ''}`}
-          title="複製 OBS 瀏覽器來源 URL"
-        >
-          {copied ? <Check size={20} /> : <Link size={20} />}
-        </button>
+        {/* OBS URL — hide on mobile to save space */}
+        {!isMobile && (
+          <button
+            onClick={copyOBSUrl}
+            className={`header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${copied ? 'text-lf-success' : ''}`}
+            title="複製 OBS 瀏覽器來源 URL"
+          >
+            {copied ? <Check size={20} /> : <Link size={20} />}
+          </button>
+        )}
 
         {/* Song drawer trigger */}
         <button
@@ -70,7 +84,7 @@ export function Header({ onOpenDrawer }: HeaderProps) {
           className="header-accent-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="歌曲庫"
         >
-          <ListMusic size={22} strokeWidth={2.6} />
+          <ListMusic size={isMobile ? 20 : 22} strokeWidth={2.6} />
         </button>
       </div>
     </header>

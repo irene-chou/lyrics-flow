@@ -1,18 +1,21 @@
 import { Music } from "lucide-react";
 
-export function EmptyState() {
+interface EmptyStateProps {
+  isMobile?: boolean
+}
+
+export function EmptyState({ isMobile }: EmptyStateProps) {
   return (
     <div
       className="flex flex-col items-center justify-center text-center text-lf-text-dim"
       style={{
         height: '100%',
-        padding: '48px',
+        padding: isMobile ? '24px 16px' : '48px',
         gap: '16px',
       }}
     >
-      {/* <div style={{ fontSize: '48px', opacity: 0.3 }}>🎵</div> */}
-      <Music size={48} />
-      <p style={{ fontSize: '15px', lineHeight: 1.8 }}>
+      <Music size={isMobile ? 36 : 48} />
+      <p style={{ fontSize: isMobile ? '14px' : '15px', lineHeight: 1.8 }}>
         載入歌曲開始使用
         <br />
         點擊右上角{' '}
