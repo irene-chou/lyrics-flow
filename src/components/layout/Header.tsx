@@ -33,24 +33,25 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
       className="flex items-center justify-between gap-4 bg-lf-bg-secondary border-b border-lf-border"
       style={{ padding: isMobile ? '10px 12px' : '12px 20px' }}
     >
-      {/* Left: mobile menu + Logo */}
+      {/* Left: Logo (desktop) / Menu+Logo (mobile) */}
       <div className="flex items-center gap-2 shrink-0">
-        {isMobile && onToggleMobilePanel && (
+        {isMobile && onToggleMobilePanel ? (
           <button
             onClick={onToggleMobilePanel}
-            className="header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
+            className="flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer text-lf-accent"
             title="控制面板"
           >
             <Menu size={20} />
           </button>
+        ) : (
+          <ListMusic
+            size={22}
+            className="text-lf-accent"
+          />
         )}
-        <ListMusic
-          size={isMobile ? 18 : 22}
-          className="text-lf-accent"
-        />
         <h1
           className="font-bold text-lf-text-primary tracking-tight"
-          style={{ fontSize: isMobile ? '14px' : '18px' }}
+          style={{ fontSize: isMobile ? '15px' : '18px' }}
         >
           Lyrics Flow
         </h1>
