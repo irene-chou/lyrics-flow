@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { Moon, Sun, Link, Check, ListMusic, Menu } from 'lucide-react'
+import { Moon, Sun, Link, Check, ListMusic, Menu, FileMusic } from 'lucide-react'
 import { getOBSUrl } from '@/lib/piesocket'
 
 interface HeaderProps {
@@ -85,7 +85,7 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
           className="header-accent-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer"
           title="歌曲庫"
         >
-          <ListMusic size={isMobile ? 20 : 22} strokeWidth={2.6} />
+          <FileMusic size={isMobile ? 20 : 22} />
         </button>
       </div>
     </header>
