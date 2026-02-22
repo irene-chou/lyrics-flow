@@ -15,7 +15,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import type { Song } from '@/types'
 
 const MIN_SIDEBAR = 320
-const MAX_SIDEBAR = 720
+const MAX_SIDEBAR = 1280
 
 export function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
