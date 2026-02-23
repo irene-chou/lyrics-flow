@@ -1,12 +1,22 @@
 import { useRef } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { LyricsSearchTab } from './LyricsSearchTab'
 
 interface LrcInputTabsProps {
   lrcText: string
   onLrcTextChange: (text: string) => void
+  activeTab?: string
+  onTabChange?: (tab: string) => void
+  onSearchSelect?: (lrcText: string, trackName: string) => void
 }
 
-export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
+export function LrcInputTabs({
+  lrcText,
+  onLrcTextChange,
+  activeTab,
+  onTabChange,
+  onSearchSelect,
+}: LrcInputTabsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -30,13 +40,16 @@ export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
       >
         LRC 歌詞
       </label>
-      <Tabs defaultValue="paste">
+      <Tabs value={activeTab} defaultValue="paste" onValueChange={onTabChange}>
         <TabsList className="w-full">
           <TabsTrigger value="paste" className="flex-1">
             貼上歌詞
           </TabsTrigger>
           <TabsTrigger value="file" className="flex-1">
             讀取檔案
+          </TabsTrigger>
+          <TabsTrigger value="search" className="flex-1">
+            線上搜尋
           </TabsTrigger>
         </TabsList>
 
@@ -98,28 +111,11 @@ export function LrcInputTabs({ lrcText, onLrcTextChange }: LrcInputTabsProps) {
             style={{ display: 'none' }}
           />
         </TabsContent>
-      </Tabs>
 
-      <div
-        className="text-lb-text-dim"
-        style={{
-          fontSize: '11px',
-          lineHeight: 1.6,
-          padding: '8px 0',
-        }}
-      >
-        提示：可從{' '}
-        <a
-          href="https://lrclib.net"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-lb-accent"
-          style={{ textDecoration: 'none' }}
-        >
-          lrclib.net
-        </a>{' '}
-        搜尋下載 LRC 檔。
-      </div>
+        <TabsContent value="search">
+          {onSearchSelect && <LyricsSearchTab onSelect={onSearchSelect} />}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

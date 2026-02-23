@@ -27,6 +27,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [audioFileName, setAudioFileName] = useState('')
   const [lrcText, setLrcText] = useState('')
+  const [lrcTab, setLrcTab] = useState('paste')
   const [audioFile, setAudioFile] = useState<File | null>(null)
 
   const isEditMode = !!editSong
@@ -46,6 +47,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       setYoutubeUrl('')
       setAudioFileName('')
       setLrcText('')
+      setLrcTab('paste')
       setAudioFile(null)
     }
   }, [open, editSong])
@@ -87,6 +89,14 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
   function handleAudioFileChange(file: File, fileName: string) {
     setAudioFile(file)
     setAudioFileName(fileName)
+  }
+
+  function handleSearchSelect(text: string, trackName: string) {
+    setLrcText(text)
+    if (!name.trim()) {
+      setName(trackName)
+    }
+    setLrcTab('paste')
   }
 
   return (
@@ -158,7 +168,13 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
           />
 
           {/* LRC input */}
-          <LrcInputTabs lrcText={lrcText} onLrcTextChange={setLrcText} />
+          <LrcInputTabs
+            lrcText={lrcText}
+            onLrcTextChange={setLrcText}
+            activeTab={lrcTab}
+            onTabChange={setLrcTab}
+            onSearchSelect={handleSearchSelect}
+          />
         </div>
 
         <DialogFooter>
