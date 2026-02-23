@@ -115,7 +115,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
   return (
     <div ref={wrapperRef} style={{ position: 'relative' }}>
       <div
-        className="text-lf-text-secondary"
+        className="text-lb-text-secondary"
         style={{
           fontSize: '11px',
           marginBottom: '6px',
@@ -137,13 +137,13 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           }}
           style={{
             width: '72px',
-            background: 'var(--lf-bg-input)',
-            border: '1px solid var(--lf-border)',
+            background: 'var(--lb-bg-input)',
+            border: '1px solid var(--lb-border)',
             borderRadius: '4px',
             padding: '3px 6px',
             fontFamily: 'var(--font-mono)',
             fontSize: '11px',
-            color: 'var(--lf-text-primary)',
+            color: 'var(--lb-text-primary)',
             outline: 'none',
             flexShrink: 0,
           }}
@@ -157,7 +157,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
             width: '22px',
             height: '22px',
             borderRadius: '4px',
-            border: '1px solid var(--lf-border)',
+            border: '1px solid var(--lb-border)',
             background:
               'repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% / 8px 8px',
             overflow: 'hidden',
@@ -182,15 +182,15 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
       {/* Floating picker panel */}
       {open && (
         <div
-          className="lf-color-picker"
+          className="lb-color-picker"
           style={{
             position: 'absolute',
             top: '100%',
             left: 0,
             marginTop: '6px',
             zIndex: 50,
-            background: 'var(--lf-bg-card)',
-            border: '1px solid var(--lf-border)',
+            background: 'var(--lb-bg-card)',
+            border: '1px solid var(--lb-border)',
             borderRadius: '8px',
             padding: '10px',
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',

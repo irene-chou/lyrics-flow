@@ -33,7 +33,7 @@ export function VolumeControl() {
   return (
     <div className="flex items-center" style={{ gap: '4px' }}>
       <button
-        className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
+        className="flex text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input transition-colors cursor-pointer"
         onClick={handleToggleMute}
         style={{
           background: 'none',
@@ -62,7 +62,7 @@ export function VolumeControl() {
           height: '3px',
           appearance: 'none',
           WebkitAppearance: 'none',
-          background: `linear-gradient(to right, var(--lf-accent) ${displayVolume}%, var(--lf-border) ${displayVolume}%)`,
+          background: `linear-gradient(to right, var(--lb-accent) ${displayVolume}%, var(--lb-border) ${displayVolume}%)`,
           borderRadius: '2px',
           outline: 'none',
           cursor: 'pointer',

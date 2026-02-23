@@ -10,12 +10,12 @@ const groupLabelStyle: React.CSSProperties = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
-  color: 'var(--lf-text-dim)',
+  color: 'var(--lb-text-dim)',
 }
 
 const dividerStyle: React.CSSProperties = {
   height: '1px',
-  background: 'var(--lf-border)',
+  background: 'var(--lb-border)',
   margin: '2px 0',
 }
 
@@ -46,9 +46,9 @@ export function DisplaySettings() {
 
   return (
     <section
-      className="flex flex-col border border-lf-border"
+      className="flex flex-col border border-lb-border"
       style={{
-        borderRadius: 'var(--lf-radius)',
+        borderRadius: 'var(--lb-radius)',
         padding: '16px',
         gap: '10px',
       }}
@@ -56,7 +56,7 @@ export function DisplaySettings() {
       {/* Section header */}
       <div className="flex items-center justify-between">
         <h2
-          className="text-lf-text-dim"
+          className="text-lb-text-dim"
           style={{
             fontSize: '11px',
             fontWeight: 600,
@@ -68,7 +68,7 @@ export function DisplaySettings() {
         </h2>
         <button
           onClick={resetAll}
-          className="border border-lf-border bg-lf-bg-input text-lf-text-secondary hover:bg-lf-bg-card hover:border-lf-text-dim hover:text-lf-text-primary transition-colors"
+          className="border border-lb-border bg-lb-bg-input text-lb-text-secondary hover:bg-lb-bg-card hover:border-lb-text-dim hover:text-lb-text-primary transition-colors"
           style={{
             padding: '4px 10px',
             fontSize: '10px',
@@ -87,7 +87,7 @@ export function DisplaySettings() {
         <div className="flex items-center" style={{ gap: '8px' }}>
           <button
             onClick={() => setShowTitle(!showTitle)}
-            className="border border-lf-border bg-lf-bg-input text-lf-text-secondary hover:bg-lf-bg-card hover:border-lf-text-dim hover:text-lf-text-primary transition-colors cursor-pointer"
+            className="border border-lb-border bg-lb-bg-input text-lb-text-secondary hover:bg-lb-bg-card hover:border-lb-text-dim hover:text-lb-text-primary transition-colors cursor-pointer"
             style={{
               padding: '4px',
               borderRadius: '4px',

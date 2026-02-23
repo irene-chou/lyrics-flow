@@ -88,7 +88,7 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
       >
         {lyrics.length === 0 ? (
           <p
-            className="text-lf-text-dim"
+            className="text-lb-text-dim"
             style={{
               textAlign: 'center',
               fontSize: '15px',

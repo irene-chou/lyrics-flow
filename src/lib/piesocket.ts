@@ -2,12 +2,12 @@ const PIESOCKET_API_KEY = import.meta.env.VITE_PIESOCKET_API_KEY ?? ''
 const PIESOCKET_CLUSTER_ID = import.meta.env.VITE_PIESOCKET_CLUSTER_ID ?? 'demo'
 
 export function getSessionId(): string {
-  let id = localStorage.getItem('lf-session-id')
+  let id = localStorage.getItem('lb-session-id')
   if (!id) {
     id = crypto.randomUUID
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2, 10)
-    localStorage.setItem('lf-session-id', id)
+    localStorage.setItem('lb-session-id', id)
   }
   return id
 }

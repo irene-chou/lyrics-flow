@@ -21,7 +21,7 @@ export function OffsetControls() {
     debouncedSaveSong()
   }
 
-  const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+  const btnClass = 'border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer'
 
   const btnStyle: React.CSSProperties = {
     padding: '6px 10px',
@@ -34,7 +34,7 @@ export function OffsetControls() {
     <div style={{ marginTop: '4px' }}>
       <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
         <div
-          className="text-lf-text-dim"
+          className="text-lb-text-dim"
           style={{
             fontSize: '11px',
             fontWeight: 600,
@@ -45,7 +45,7 @@ export function OffsetControls() {
           歌詞偏移 (Offset)
         </div>
         <button
-          className="flex text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input transition-colors cursor-pointer"
+          className="flex text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input transition-colors cursor-pointer"
           onClick={resetOffset}
           title="重置偏移"
           style={{
@@ -70,7 +70,7 @@ export function OffsetControls() {
             fontFamily: 'var(--font-mono)',
             fontSize: '14px',
             fontWeight: 600,
-            color: 'var(--lf-text-primary)',
+            color: 'var(--lb-text-primary)',
             minWidth: '52px',
             textAlign: 'center',
           }}

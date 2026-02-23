@@ -37,7 +37,7 @@ export const useUISettingsStore = create<UISettingsState>()(
       resetAll: () => set({ ...DEFAULT_UI_SETTINGS }),
     }),
     {
-      name: 'lf-ui-settings',
+      name: 'lb-ui-settings',
     },
   ),
 )

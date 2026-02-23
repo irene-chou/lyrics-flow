@@ -82,21 +82,21 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
         style={{ display: 'none' }}
       />
       <DrawerContent
-        className="h-full bg-lf-bg-secondary border-l border-lf-border"
+        className="h-full bg-lb-bg-secondary border-l border-lb-border"
         style={{
           width: isMobile ? '100vw' : '380px',
         }}
       >
         {/* Header */}
         <DrawerHeader
-          className="flex-row items-center justify-between shrink-0 border-b border-lf-border"
+          className="flex-row items-center justify-between shrink-0 border-b border-lb-border"
           style={{
             padding: isMobile ? '16px' : '20px 24px',
           }}
         >
           <div>
             <DrawerTitle
-              className="text-lf-text-primary"
+              className="text-lb-text-primary"
               style={{
                 fontSize: '14px',
                 fontWeight: 600,
@@ -108,7 +108,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
           </div>
           <button
             onClick={() => onOpenChange(false)}
-            className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
+            className="flex items-center justify-center transition-colors cursor-pointer text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input"
             style={{
               width: '28px',
               height: '28px',
@@ -141,7 +141,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
           >
             {!songs ? (
               <p
-                className="text-lf-text-secondary"
+                className="text-lb-text-secondary"
                 style={{
                   fontSize: '12px',
                   textAlign: 'center',
@@ -152,7 +152,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
               </p>
             ) : filteredSongs.length === 0 ? (
               <p
-                className="text-lf-text-secondary"
+                className="text-lb-text-secondary"
                 style={{
                   fontSize: '12px',
                   textAlign: 'center',

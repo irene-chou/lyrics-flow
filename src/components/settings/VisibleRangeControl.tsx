@@ -14,7 +14,7 @@ export function VisibleRangeControl({
   onBeforeChange,
   onAfterChange,
 }: VisibleRangeControlProps) {
-  const btnClass = 'flex items-center justify-center border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+  const btnClass = 'flex items-center justify-center border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer'
 
   const btnStyle: React.CSSProperties = {
     width: '22px',
@@ -29,14 +29,14 @@ export function VisibleRangeControl({
     alignItems: 'center',
     height: '22px',
     fontSize: '11px',
-    color: 'var(--lf-text-secondary)',
+    color: 'var(--lb-text-secondary)',
     lineHeight: 1,
   }
 
   return (
     <div>
       <div
-        className="text-lf-text-secondary"
+        className="text-lb-text-secondary"
         style={{
           fontSize: '11px',
           marginBottom: '6px',
@@ -116,7 +116,7 @@ function EditableValue({
     fontFamily: 'var(--font-mono)',
     fontSize: '12px',
     lineHeight: 1,
-    color: 'var(--lf-text-primary)',
+    color: 'var(--lb-text-primary)',
     minWidth: '20px',
   }
 
@@ -136,8 +136,8 @@ function EditableValue({
         style={{
           ...baseStyle,
           width: '24px',
-          background: 'var(--lf-bg-input)',
-          border: '1px solid var(--lf-border)',
+          background: 'var(--lb-bg-input)',
+          border: '1px solid var(--lb-border)',
           borderRadius: '4px',
           padding: '1px 2px',
           outline: 'none',

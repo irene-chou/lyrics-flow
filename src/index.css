@@ -13,23 +13,23 @@
 
 /* ===== App custom colors (dark default) ===== */
 :root {
-  --lf-bg-primary: #0a0a0f;
-  --lf-bg-secondary: #12121a;
-  --lf-bg-card: #1a1a26;
-  --lf-bg-input: #22222e;
-  --lf-border: #2a2a3a;
-  --lf-text-primary: #e8e8f0;
-  --lf-text-secondary: #8888a0;
-  --lf-text-dim: #55556a;
-  --lf-accent: #7c6aef;
-  --lf-accent-glow: rgba(124, 106, 239, 0.3);
-  --lf-active-lyric: #ffffff;
-  --lf-active-bg: rgba(124, 106, 239, 0.15);
-  --lf-passed-lyric: #5a5a70;
-  --lf-upcoming-lyric: #9090a8;
-  --lf-danger: #ef4444;
-  --lf-success: #22c55e;
-  --lf-radius: 12px;
+  --lb-bg-primary: #0a0a0f;
+  --lb-bg-secondary: #12121a;
+  --lb-bg-card: #1a1a26;
+  --lb-bg-input: #22222e;
+  --lb-border: #2a2a3a;
+  --lb-text-primary: #e8e8f0;
+  --lb-text-secondary: #8888a0;
+  --lb-text-dim: #55556a;
+  --lb-accent: #7c6aef;
+  --lb-accent-glow: rgba(124, 106, 239, 0.3);
+  --lb-active-lyric: #ffffff;
+  --lb-active-bg: rgba(124, 106, 239, 0.15);
+  --lb-passed-lyric: #5a5a70;
+  --lb-upcoming-lyric: #9090a8;
+  --lb-danger: #ef4444;
+  --lb-success: #22c55e;
+  --lb-radius: 12px;
 
   /* shadcn tokens → aligned to our dark theme (default) */
   --radius: 0.625rem;
@@ -68,22 +68,22 @@
 
 /* ===== App custom colors (light) ===== */
 .light {
-  --lf-bg-primary: #f5f5f8;
-  --lf-bg-secondary: #ffffff;
-  --lf-bg-card: #eeeef2;
-  --lf-bg-input: #e4e4ea;
-  --lf-border: #d0d0da;
-  --lf-text-primary: #1a1a2e;
-  --lf-text-secondary: #5a5a70;
-  --lf-text-dim: #8888a0;
-  --lf-accent: #6b59de;
-  --lf-accent-glow: rgba(107, 89, 222, 0.2);
-  --lf-active-lyric: #1a1a2e;
-  --lf-active-bg: rgba(107, 89, 222, 0.1);
-  --lf-passed-lyric: #a0a0b8;
-  --lf-upcoming-lyric: #6a6a80;
-  --lf-danger: #dc2626;
-  --lf-success: #16a34a;
+  --lb-bg-primary: #f5f5f8;
+  --lb-bg-secondary: #ffffff;
+  --lb-bg-card: #eeeef2;
+  --lb-bg-input: #e4e4ea;
+  --lb-border: #d0d0da;
+  --lb-text-primary: #1a1a2e;
+  --lb-text-secondary: #5a5a70;
+  --lb-text-dim: #8888a0;
+  --lb-accent: #6b59de;
+  --lb-accent-glow: rgba(107, 89, 222, 0.2);
+  --lb-active-lyric: #1a1a2e;
+  --lb-active-bg: rgba(107, 89, 222, 0.1);
+  --lb-passed-lyric: #a0a0b8;
+  --lb-upcoming-lyric: #6a6a80;
+  --lb-danger: #dc2626;
+  --lb-success: #16a34a;
 
   /* shadcn tokens → aligned to our light theme */
   --background: #f5f5f8;
@@ -127,59 +127,59 @@ html, body, #root {
 
 body {
   font-family: var(--font-sans);
-  background: var(--lf-bg-primary) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-primary) !important;
+  color: var(--lb-text-primary) !important;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ===== Header icon buttons ===== */
 .header-btn {
-  color: var(--lf-text-secondary);
+  color: var(--lb-text-secondary);
 }
 .header-btn:hover {
-  color: var(--lf-text-primary);
+  color: var(--lb-text-primary);
 }
 
 .header-fab {
   color: #fff;
-  background: var(--lf-accent);
+  background: var(--lb-accent);
   border: none;
-  box-shadow: 0 2px 8px var(--lf-accent-glow);
+  box-shadow: 0 2px 8px var(--lb-accent-glow);
 }
 .header-fab:hover {
   background: #6b59de;
-  box-shadow: 0 4px 16px var(--lf-accent-glow);
+  box-shadow: 0 4px 16px var(--lb-accent-glow);
 }
 
 .header-accent-btn {
-  color: var(--lf-accent);
+  color: var(--lb-accent);
 }
 .header-accent-btn:hover {
-  color: var(--lf-text-primary);
+  color: var(--lb-text-primary);
 }
 
 /* ===== react-colorful picker overrides ===== */
-.lf-color-picker .react-colorful {
+.lb-color-picker .react-colorful {
   width: 100%;
   height: auto;
   gap: 8px;
 }
 
-.lf-color-picker .react-colorful__saturation {
+.lb-color-picker .react-colorful__saturation {
   border-radius: 6px;
   height: 120px;
 }
 
-.lf-color-picker .react-colorful__hue,
-.lf-color-picker .react-colorful__alpha {
+.lb-color-picker .react-colorful__hue,
+.lb-color-picker .react-colorful__alpha {
   height: 10px;
   border-radius: 5px;
 }
 
-.lf-color-picker .react-colorful__saturation-pointer,
-.lf-color-picker .react-colorful__hue-pointer,
-.lf-color-picker .react-colorful__alpha-pointer {
+.lb-color-picker .react-colorful__saturation-pointer,
+.lb-color-picker .react-colorful__hue-pointer,
+.lb-color-picker .react-colorful__alpha-pointer {
   width: 16px;
   height: 16px;
   border: 2px solid #fff;
@@ -204,25 +204,25 @@ body {
 /* ===== shadcn theme inline (radius + color mapping) ===== */
 @theme inline {
   /* Lyribox custom color tokens */
-  --color-lf-bg-primary: var(--lf-bg-primary);
-  --color-lf-bg-secondary: var(--lf-bg-secondary);
-  --color-lf-bg-card: var(--lf-bg-card);
-  --color-lf-bg-input: var(--lf-bg-input);
-  --color-lf-border: var(--lf-border);
-  --color-lf-text-primary: var(--lf-text-primary);
-  --color-lf-text-secondary: var(--lf-text-secondary);
-  --color-lf-text-dim: var(--lf-text-dim);
-  --color-lf-accent: var(--lf-accent);
-  --color-lf-accent-glow: var(--lf-accent-glow);
-  --color-lf-active-lyric: var(--lf-active-lyric);
-  --color-lf-active-bg: var(--lf-active-bg);
-  --color-lf-passed-lyric: var(--lf-passed-lyric);
-  --color-lf-upcoming-lyric: var(--lf-upcoming-lyric);
-  --color-lf-danger: var(--lf-danger);
-  --color-lf-success: var(--lf-success);
+  --color-lb-bg-primary: var(--lb-bg-primary);
+  --color-lb-bg-secondary: var(--lb-bg-secondary);
+  --color-lb-bg-card: var(--lb-bg-card);
+  --color-lb-bg-input: var(--lb-bg-input);
+  --color-lb-border: var(--lb-border);
+  --color-lb-text-primary: var(--lb-text-primary);
+  --color-lb-text-secondary: var(--lb-text-secondary);
+  --color-lb-text-dim: var(--lb-text-dim);
+  --color-lb-accent: var(--lb-accent);
+  --color-lb-accent-glow: var(--lb-accent-glow);
+  --color-lb-active-lyric: var(--lb-active-lyric);
+  --color-lb-active-bg: var(--lb-active-bg);
+  --color-lb-passed-lyric: var(--lb-passed-lyric);
+  --color-lb-upcoming-lyric: var(--lb-upcoming-lyric);
+  --color-lb-danger: var(--lb-danger);
+  --color-lb-success: var(--lb-success);
 
   /* Lyribox radius */
-  --radius-lf: var(--lf-radius);
+  --radius-lf: var(--lb-radius);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -281,9 +281,9 @@ body {
 /* --- Inputs & Textarea --- */
 [data-slot="input"],
 [data-slot="textarea"] {
-  background: var(--lf-bg-input) !important;
-  border-color: var(--lf-border) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-input) !important;
+  border-color: var(--lb-border) !important;
+  color: var(--lb-text-primary) !important;
   font-size: 13px !important;
   border-radius: 8px !important;
   padding: 10px 14px !important;
@@ -292,15 +292,15 @@ body {
 
 [data-slot="input"]::placeholder,
 [data-slot="textarea"]::placeholder {
-  color: var(--lf-text-dim) !important;
+  color: var(--lb-text-dim) !important;
 }
 
 [data-slot="input"]:focus,
 [data-slot="input"]:focus-visible,
 [data-slot="textarea"]:focus,
 [data-slot="textarea"]:focus-visible {
-  border-color: var(--lf-accent) !important;
-  box-shadow: 0 0 0 3px var(--lf-accent-glow) !important;
+  border-color: var(--lb-accent) !important;
+  box-shadow: 0 0 0 3px var(--lb-accent-glow) !important;
   outline: none !important;
   --tw-ring-shadow: none !important;
 }
@@ -317,9 +317,9 @@ body {
 }
 
 [data-slot="dialog-content"] {
-  background: var(--lf-bg-secondary) !important;
-  border: 1px solid var(--lf-border) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-secondary) !important;
+  border: 1px solid var(--lb-border) !important;
+  color: var(--lb-text-primary) !important;
   border-radius: 12px !important;
   max-width: 480px !important;
   padding: 0 !important;
@@ -328,30 +328,30 @@ body {
 
 [data-slot="dialog-header"] {
   padding: 16px 20px !important;
-  border-bottom: 1px solid var(--lf-border) !important;
+  border-bottom: 1px solid var(--lb-border) !important;
 }
 
 [data-slot="dialog-title"] {
-  color: var(--lf-text-primary) !important;
+  color: var(--lb-text-primary) !important;
   font-size: 16px !important;
   font-weight: 600 !important;
 }
 
 [data-slot="dialog-close"] {
-  color: var(--lf-text-secondary) !important;
+  color: var(--lb-text-secondary) !important;
   top: 16px !important;
   right: 16px !important;
 }
 
 [data-slot="dialog-close"]:hover {
-  color: var(--lf-text-primary) !important;
-  background: var(--lf-bg-input) !important;
+  color: var(--lb-text-primary) !important;
+  background: var(--lb-bg-input) !important;
   opacity: 1 !important;
 }
 
 [data-slot="dialog-footer"] {
   padding: 16px 20px !important;
-  border-top: 1px solid var(--lf-border) !important;
+  border-top: 1px solid var(--lb-border) !important;
 }
 
 /* Dialog body — the flex-col gap between header and footer */
@@ -365,31 +365,31 @@ body {
 }
 
 [data-slot="drawer-content"] {
-  background: var(--lf-bg-secondary) !important;
-  border-color: var(--lf-border) !important;
+  background: var(--lb-bg-secondary) !important;
+  border-color: var(--lb-border) !important;
 }
 
 [data-slot="drawer-header"] {
   padding: 20px 24px !important;
-  border-bottom: 1px solid var(--lf-border) !important;
+  border-bottom: 1px solid var(--lb-border) !important;
 }
 
 [data-slot="drawer-title"] {
-  color: var(--lf-text-primary) !important;
+  color: var(--lb-text-primary) !important;
   font-size: 14px !important;
   font-weight: 600 !important;
 }
 
 /* --- Tabs --- */
 [data-slot="tabs-list"] {
-  background: var(--lf-bg-input) !important;
+  background: var(--lb-bg-input) !important;
   padding: 3px !important;
   border-radius: 8px !important;
   height: auto !important;
 }
 
 [data-slot="tabs-trigger"] {
-  color: var(--lf-text-secondary) !important;
+  color: var(--lb-text-secondary) !important;
   font-size: 12px !important;
   font-weight: 500 !important;
   border-radius: 6px !important;
@@ -401,8 +401,8 @@ body {
 }
 
 [data-slot="tabs-trigger"][data-state="active"] {
-  background: var(--lf-bg-card) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-card) !important;
+  color: var(--lb-text-primary) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
   border-color: transparent !important;
 }
@@ -414,8 +414,8 @@ body {
 
 /* --- Dropdown Menu --- */
 [data-slot="dropdown-menu-content"] {
-  background: var(--lf-bg-card) !important;
-  border: 1px solid var(--lf-border) !important;
+  background: var(--lb-bg-card) !important;
+  border: 1px solid var(--lb-border) !important;
   border-radius: 8px !important;
   padding: 4px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
@@ -423,7 +423,7 @@ body {
 }
 
 [data-slot="dropdown-menu-item"] {
-  color: var(--lf-text-primary) !important;
+  color: var(--lb-text-primary) !important;
   font-size: 12px !important;
   border-radius: 6px !important;
   padding: 8px 12px !important;
@@ -432,8 +432,8 @@ body {
 
 [data-slot="dropdown-menu-item"]:hover,
 [data-slot="dropdown-menu-item"][data-highlighted] {
-  background: var(--lf-bg-input) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-input) !important;
+  color: var(--lb-text-primary) !important;
 }
 
 /* --- Buttons --- */
@@ -447,8 +447,8 @@ body {
 }
 
 [data-slot="button"][data-variant="default"] {
-  background: var(--lf-accent) !important;
-  border-color: var(--lf-accent) !important;
+  background: var(--lb-accent) !important;
+  border-color: var(--lb-accent) !important;
   color: #fff !important;
   font-weight: 600 !important;
 }
@@ -456,27 +456,27 @@ body {
 [data-slot="button"][data-variant="default"]:hover {
   background: #6b59de !important;
   border-color: #6b59de !important;
-  box-shadow: 0 4px 20px var(--lf-accent-glow) !important;
+  box-shadow: 0 4px 20px var(--lb-accent-glow) !important;
 }
 
 [data-slot="button"][data-variant="outline"] {
-  background: var(--lf-bg-input) !important;
-  border-color: var(--lf-border) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-input) !important;
+  border-color: var(--lb-border) !important;
+  color: var(--lb-text-primary) !important;
 }
 
 [data-slot="button"][data-variant="outline"]:hover {
-  background: var(--lf-bg-card) !important;
-  border-color: var(--lf-text-dim) !important;
+  background: var(--lb-bg-card) !important;
+  border-color: var(--lb-text-dim) !important;
 }
 
 [data-slot="button"][data-variant="ghost"] {
-  color: var(--lf-text-secondary) !important;
+  color: var(--lb-text-secondary) !important;
 }
 
 [data-slot="button"][data-variant="ghost"]:hover {
-  background: var(--lf-bg-input) !important;
-  color: var(--lf-text-primary) !important;
+  background: var(--lb-bg-input) !important;
+  color: var(--lb-text-primary) !important;
 }
 
 /* ===== Mobile responsive overrides ===== */

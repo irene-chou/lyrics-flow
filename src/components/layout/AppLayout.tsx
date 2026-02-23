@@ -115,11 +115,11 @@ export function AppLayout() {
                 width: '4px',
                 cursor: 'col-resize',
                 flexShrink: 0,
-                background: isDragging ? 'var(--lf-accent)' : 'transparent',
+                background: isDragging ? 'var(--lb-accent)' : 'transparent',
                 transition: isDragging ? 'none' : 'background 0.2s',
               }}
               onMouseEnter={(e) => {
-                if (!isDragging) e.currentTarget.style.background = 'var(--lf-border)'
+                if (!isDragging) e.currentTarget.style.background = 'var(--lb-border)'
               }}
               onMouseLeave={(e) => {
                 if (!isDragging) e.currentTarget.style.background = 'transparent'
@@ -154,7 +154,7 @@ export function AppLayout() {
       {/* FAB — New Song */}
       <button
         onClick={handleOpenNewSong}
-        className="flex items-center justify-center cursor-pointer bg-lf-accent"
+        className="flex items-center justify-center cursor-pointer bg-lb-accent"
         style={{
           position: 'fixed',
           bottom: isMobile ? '20px' : '28px',

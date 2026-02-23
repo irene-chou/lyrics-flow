@@ -15,7 +15,7 @@ export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
       }}
     >
       <div
-        className="text-lf-text-dim"
+        className="text-lb-text-dim"
         style={{
           fontSize: '13px',
           fontWeight: 700,
@@ -27,7 +27,7 @@ export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
         Now Singing
       </div>
       <div
-        className="text-lf-text-primary"
+        className="text-lb-text-primary"
         style={{
           fontSize: `${titleFontSize}px`,
           fontWeight: 600,

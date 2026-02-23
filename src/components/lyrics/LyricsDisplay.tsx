@@ -12,7 +12,7 @@ export function LyricsDisplay({ onSeekToLyric, isMobile }: LyricsDisplayProps) {
 
   return (
     <main
-      className="relative flex-1 overflow-hidden flex flex-col bg-lf-bg-primary"
+      className="relative flex-1 overflow-hidden flex flex-col bg-lb-bg-primary"
     >
       {currentSongId ? (
         <LyricsContainer onSeekToLyric={onSeekToLyric} isMobile={isMobile} />

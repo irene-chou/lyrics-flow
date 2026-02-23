@@ -3,11 +3,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { AudioSource } from '@/types'
 
 const inputStyle: React.CSSProperties = {
-  background: 'var(--lf-bg-input)',
-  border: '1px solid var(--lf-border)',
+  background: 'var(--lb-bg-input)',
+  border: '1px solid var(--lb-border)',
   borderRadius: '8px',
   padding: '10px 14px',
-  color: 'var(--lf-text-primary)',
+  color: 'var(--lb-text-primary)',
   fontFamily: 'var(--font-mono)',
   fontSize: '13px',
   outline: 'none',
@@ -16,12 +16,12 @@ const inputStyle: React.CSSProperties = {
 }
 
 function focusInput(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--lf-accent)'
-  e.currentTarget.style.boxShadow = '0 0 0 3px var(--lf-accent-glow)'
+  e.currentTarget.style.borderColor = 'var(--lb-accent)'
+  e.currentTarget.style.boxShadow = '0 0 0 3px var(--lb-accent-glow)'
 }
 
 function blurInput(e: React.FocusEvent<HTMLInputElement>) {
-  e.currentTarget.style.borderColor = 'var(--lf-border)'
+  e.currentTarget.style.borderColor = 'var(--lb-border)'
   e.currentTarget.style.boxShadow = 'none'
 }
 
@@ -53,7 +53,7 @@ export function AudioSourceTabs({
   return (
     <div className="flex flex-col" style={{ gap: '6px' }}>
       <label
-        className="text-lf-text-dim"
+        className="text-lb-text-dim"
         style={{
           fontSize: '11px',
           fontWeight: 600,
@@ -106,9 +106,9 @@ export function AudioSourceTabs({
                 padding: '6px 12px',
                 fontSize: '12px',
                 borderRadius: '8px',
-                border: '1px solid var(--lf-border)',
-                background: 'var(--lf-bg-input)',
-                color: 'var(--lf-text-primary)',
+                border: '1px solid var(--lb-border)',
+                background: 'var(--lb-bg-input)',
+                color: 'var(--lb-text-primary)',
                 fontFamily: 'var(--font-sans)',
                 fontWeight: 500,
                 cursor: 'pointer',

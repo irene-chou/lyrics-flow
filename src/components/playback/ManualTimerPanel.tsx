@@ -16,7 +16,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
     <div className="flex flex-col" style={{ gap: '8px' }}>
       {/* Header */}
       <div
-        className="text-lf-text-dim"
+        className="text-lb-text-dim"
         style={{
           fontSize: '11px',
           fontWeight: 600,
@@ -31,7 +31,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
         style={{ gap: '8px' }}
       >
         <button
-          className="border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
+          className="border border-lb-accent bg-lb-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lb-accent-glow)] transition-all cursor-pointer"
           onClick={() => engine.manual.togglePlay()}
           style={{
             padding: '8px 14px',
@@ -48,7 +48,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
             fontFamily: 'var(--font-mono)',
             fontSize: '16px',
             fontWeight: 600,
-            color: 'var(--lf-text-primary)',
+            color: 'var(--lb-text-primary)',
             minWidth: '52px',
             textAlign: 'center',
           }}
@@ -56,7 +56,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
           {formatTime(currentTime)}
         </span>
         <button
-          className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
+          className="border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer"
           onClick={() => engine.manual.seek(-5)}
           style={{
             padding: '6px 10px',
@@ -68,7 +68,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
           -5s
         </button>
         <button
-          className="border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
+          className="border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer"
           onClick={() => engine.manual.seek(5)}
           style={{
             padding: '6px 10px',
@@ -80,7 +80,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
           +5s
         </button>
         <button
-          className="border border-lf-border bg-lf-bg-input text-lf-danger hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer"
+          className="border border-lb-border bg-lb-bg-input text-lb-danger hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer"
           onClick={() => engine.manual.reset()}
           style={{
             padding: '6px 10px',
@@ -93,7 +93,7 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
         </button>
       </div>
       <p
-        className="text-lf-text-dim"
+        className="text-lb-text-dim"
         style={{
           fontSize: '11px',
           lineHeight: 1.5,

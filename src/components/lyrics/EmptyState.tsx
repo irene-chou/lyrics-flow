@@ -7,7 +7,7 @@ interface EmptyStateProps {
 export function EmptyState({ isMobile }: EmptyStateProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center text-center text-lf-text-dim"
+      className="flex flex-col items-center justify-center text-center text-lb-text-dim"
       style={{
         height: '100%',
         padding: isMobile ? '24px 16px' : '48px',
@@ -19,7 +19,7 @@ export function EmptyState({ isMobile }: EmptyStateProps) {
         載入歌曲開始使用
         <br />
         點擊右上角{' '}
-        <span className="text-lf-text-secondary">歌曲庫</span>{' '}
+        <span className="text-lb-text-secondary">歌曲庫</span>{' '}
         或按下方 + 按鈕新增歌曲
       </p>
     </div>

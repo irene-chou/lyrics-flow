@@ -16,10 +16,10 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
 
   const dotColor =
     status === 'PLAYING'
-      ? 'var(--lf-success)'
+      ? 'var(--lb-success)'
       : status === 'PAUSED'
         ? '#eab308'
-        : 'var(--lf-text-dim)'
+        : 'var(--lb-text-dim)'
 
   function handleBarClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!onSeek || duration <= 0) return
@@ -47,7 +47,7 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '11px',
-          color: 'var(--lf-text-secondary)',
+          color: 'var(--lb-text-secondary)',
           whiteSpace: 'nowrap',
           flexShrink: 0,
         }}
@@ -61,7 +61,7 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
         style={{
           flex: 1,
           height: '4px',
-          background: 'var(--lf-border)',
+          background: 'var(--lb-border)',
           borderRadius: '2px',
           cursor: onSeek ? 'pointer' : 'default',
           overflow: 'hidden',
@@ -71,7 +71,7 @@ export function PlaybackInfo({ onSeek }: PlaybackInfoProps) {
           style={{
             width: `${Math.min(100, progress)}%`,
             height: '100%',
-            background: 'var(--lf-accent)',
+            background: 'var(--lb-accent)',
             borderRadius: '2px',
             transition: 'width 0.1s linear',
           }}

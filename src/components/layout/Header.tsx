@@ -30,7 +30,7 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
 
   return (
     <header
-      className="flex items-center justify-between gap-4 bg-lf-bg-secondary border-b border-lf-border"
+      className="flex items-center justify-between gap-4 bg-lb-bg-secondary border-b border-lb-border"
       style={{ padding: isMobile ? '10px 12px' : '12px 20px' }}
     >
       {/* Left: Logo (desktop) / Menu+Logo (mobile) */}
@@ -38,7 +38,7 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
         {isMobile && onToggleMobilePanel ? (
           <button
             onClick={onToggleMobilePanel}
-            className="flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer text-lf-accent"
+            className="flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer text-lb-accent"
             title="控制面板"
           >
             <Menu size={20} />
@@ -46,11 +46,11 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
         ) : (
           <ListMusic
             size={22}
-            className="text-lf-accent"
+            className="text-lb-accent"
           />
         )}
         <h1
-          className="font-bold text-lf-text-primary tracking-tight"
+          className="font-bold text-lb-text-primary tracking-tight"
           style={{ fontSize: isMobile ? '15px' : '18px' }}
         >
           Lyribox
@@ -72,7 +72,7 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
         {!isMobile && (
           <button
             onClick={copyOBSUrl}
-            className={`header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${copied ? 'text-lf-success' : ''}`}
+            className={`header-btn flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${copied ? 'text-lb-success' : ''}`}
             title="複製 OBS 瀏覽器來源 URL"
           >
             {copied ? <Check size={20} /> : <Link size={20} />}

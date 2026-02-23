@@ -64,7 +64,7 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
         />
         <div className="flex flex-col" style={{ gap: '8px' }}>
           <p
-            className="text-lf-text-secondary"
+            className="text-lb-text-secondary"
             style={{ fontSize: '12px' }}
           >
             {audioFileName
@@ -72,7 +72,7 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
               : '請選擇音檔以開始播放'}
           </p>
           <button
-            className="border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
+            className="border border-lb-accent bg-lb-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lb-accent-glow)] transition-all cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
             style={{
               padding: '8px 14px',
@@ -94,7 +94,7 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   if (showManualTimer) {
     return (
       <div
-        className="flex flex-col bg-lf-bg-input rounded-lg"
+        className="flex flex-col bg-lb-bg-input rounded-lg"
         style={{ gap: '6px', padding: '10px 12px' }}
       >
         <ManualTimerPanel engine={engine} />
@@ -110,7 +110,7 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   // Local audio — file loaded
   return (
     <div
-      className="flex flex-col bg-lf-bg-input rounded-lg"
+      className="flex flex-col bg-lb-bg-input rounded-lg"
       style={{ gap: '6px', padding: '10px 12px' }}
     >
       <input
@@ -123,7 +123,7 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
       <PlaybackInfo onSeek={onSeek} />
       <div className="flex items-center justify-between" style={{ gap: '6px' }}>
         <button
-          className="flex items-center justify-center border border-lf-accent bg-lf-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lf-accent-glow)] transition-all cursor-pointer"
+          className="flex items-center justify-center border border-lb-accent bg-lb-accent text-white hover:bg-[#6b59de] hover:shadow-[0_4px_16px_var(--lb-accent-glow)] transition-all cursor-pointer"
           onClick={() => engine.togglePlay()}
           style={{
             width: '26px',

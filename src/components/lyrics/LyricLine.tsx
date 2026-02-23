@@ -39,7 +39,7 @@ export const LyricLine = memo(
 
     if (isInterlude) {
       fontSize = 16
-      color = 'var(--lf-text-dim)'
+      color = 'var(--lb-text-dim)'
       fontWeight = 400
     } else if (isActive) {
       fontSize = activeFontSize

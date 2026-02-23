@@ -12,11 +12,11 @@ export function SongSearchInput({ value, onChange }: SongSearchInputProps) {
       onChange={(e) => onChange(e.target.value)}
       style={{
         flexShrink: 0,
-        background: 'var(--lf-bg-input)',
-        border: '1px solid var(--lf-border)',
+        background: 'var(--lb-bg-input)',
+        border: '1px solid var(--lb-border)',
         borderRadius: '8px',
         padding: '6px 14px',
-        color: 'var(--lf-text-primary)',
+        color: 'var(--lb-text-primary)',
         fontFamily: 'var(--font-sans)',
         fontSize: '13px',
         outline: 'none',
@@ -24,11 +24,11 @@ export function SongSearchInput({ value, onChange }: SongSearchInputProps) {
         transition: 'border-color 0.2s',
       }}
       onFocus={(e) => {
-        e.currentTarget.style.borderColor = 'var(--lf-accent)'
-        e.currentTarget.style.boxShadow = '0 0 0 3px var(--lf-accent-glow)'
+        e.currentTarget.style.borderColor = 'var(--lb-accent)'
+        e.currentTarget.style.boxShadow = '0 0 0 3px var(--lb-accent-glow)'
       }}
       onBlur={(e) => {
-        e.currentTarget.style.borderColor = 'var(--lf-border)'
+        e.currentTarget.style.borderColor = 'var(--lb-border)'
         e.currentTarget.style.boxShadow = 'none'
       }}
     />

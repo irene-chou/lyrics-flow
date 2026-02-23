@@ -23,13 +23,13 @@ export function SongListItem({
         borderRadius: '8px',
         fontSize: '13px',
         transition: 'background 0.15s',
-        background: isActive ? 'var(--lf-accent)' : 'transparent',
-        color: isActive ? '#fff' : 'var(--lf-text-primary)',
+        background: isActive ? 'var(--lb-accent)' : 'transparent',
+        color: isActive ? '#fff' : 'var(--lb-text-primary)',
       }}
       onClick={() => onSelect(song)}
       onMouseEnter={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = 'var(--lf-bg-input)'
+          e.currentTarget.style.background = 'var(--lb-bg-input)'
         }
       }}
       onMouseLeave={(e) => {
@@ -50,7 +50,7 @@ export function SongListItem({
             border: 'none',
             padding: '2px',
             borderRadius: '4px',
-            color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--lf-text-secondary)',
+            color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--lb-text-secondary)',
             transition: 'all 0.15s',
           }}
           onClick={(e) => {
@@ -64,7 +64,7 @@ export function SongListItem({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'none'
-            e.currentTarget.style.color = isActive ? 'rgba(255,255,255,0.7)' : 'var(--lf-text-secondary)'
+            e.currentTarget.style.color = isActive ? 'rgba(255,255,255,0.7)' : 'var(--lb-text-secondary)'
           }}
         >
           <Trash2 size={14} />

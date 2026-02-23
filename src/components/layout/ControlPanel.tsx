@@ -40,7 +40,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
 
   return (
     <aside
-      className="flex flex-col overflow-y-auto bg-lf-bg-secondary border-r border-lf-border"
+      className="flex flex-col overflow-y-auto bg-lb-bg-secondary border-r border-lb-border"
       style={{
         width: isMobile ? '100%' : sidebarWidth,
         height: isMobile ? '100%' : undefined,
@@ -53,14 +53,14 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       {isMobile && onClose && (
         <div className="flex items-center justify-between">
           <h2
-            className="text-lf-text-primary"
+            className="text-lb-text-primary"
             style={{ fontSize: '14px', fontWeight: 600 }}
           >
             控制面板
           </h2>
           <button
             onClick={onClose}
-            className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
+            className="flex items-center justify-center transition-colors cursor-pointer text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input"
             style={{
               width: '28px',
               height: '28px',
@@ -78,16 +78,16 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
 
       {/* 歌曲設定 */}
       <section
-        className="flex flex-col border border-lf-border"
+        className="flex flex-col border border-lb-border"
         style={{
-          borderRadius: 'var(--lf-radius)',
+          borderRadius: 'var(--lb-radius)',
           padding: isMobile ? '12px' : '16px',
           gap: '12px',
         }}
       >
         <div className="flex items-center justify-between">
           <h2
-            className="text-lf-text-dim"
+            className="text-lb-text-dim"
             style={{
               fontSize: '11px',
               fontWeight: 600,
@@ -100,7 +100,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
           {currentSongId && (
             <button
               onClick={handleEdit}
-              className="flex items-center justify-center transition-colors cursor-pointer text-lf-text-secondary hover:text-lf-text-primary hover:bg-lf-bg-input"
+              className="flex items-center justify-center transition-colors cursor-pointer text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input"
               style={{
                 width: '24px',
                 height: '24px',
@@ -118,7 +118,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
           <>
             <div className="flex items-center gap-2">
               <span
-                className="flex-1 min-w-0 truncate text-lf-text-primary"
+                className="flex-1 min-w-0 truncate text-lb-text-primary"
                 style={{
                   fontSize: '14px',
                   fontWeight: 600,
@@ -134,7 +134,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
           </>
         ) : (
           <p
-            className="text-lf-text-secondary"
+            className="text-lb-text-secondary"
             style={{ fontSize: '13px' }}
           >
             尚未載入歌曲

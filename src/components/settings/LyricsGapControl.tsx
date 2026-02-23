@@ -26,7 +26,7 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
     setEditing(false)
   }
 
-  const btnClass = 'border border-lf-border bg-lf-bg-input text-lf-text-primary hover:bg-lf-bg-card hover:border-lf-text-dim transition-colors cursor-pointer'
+  const btnClass = 'border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer'
 
   const btnStyle: React.CSSProperties = {
     padding: '4px 8px',
@@ -40,7 +40,7 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
   return (
     <div className="flex items-center" style={{ gap: '8px' }}>
       <span
-        className="text-lf-text-secondary"
+        className="text-lb-text-secondary"
         style={{
           fontSize: '12px',
           flex: 1,
@@ -68,10 +68,10 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
             width: '36px',
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
-            color: 'var(--lf-text-primary)',
+            color: 'var(--lb-text-primary)',
             textAlign: 'center',
-            background: 'var(--lf-bg-input)',
-            border: '1px solid var(--lf-border)',
+            background: 'var(--lb-bg-input)',
+            border: '1px solid var(--lb-border)',
             borderRadius: '4px',
             padding: '1px 2px',
             outline: 'none',
@@ -83,7 +83,7 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
-            color: 'var(--lf-text-primary)',
+            color: 'var(--lb-text-primary)',
             minWidth: '36px',
             textAlign: 'center',
             cursor: 'text',
