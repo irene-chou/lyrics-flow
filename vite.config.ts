@@ -28,7 +28,7 @@ function envReplacementPlugin(env: Record<string, string>): Plugin {
       server.middlewares.use((req, res, next) => {
         const urlPath = (req.url || '').split('?')[0]
         if (urlPath.endsWith('.html') && urlPath !== '/') {
-          // Strip base path (e.g. /lyrics-flow/) to get the filename
+          // Strip base path (e.g. /lyribox/) to get the filename
           const base = server.config.base || '/'
           const relative = urlPath.startsWith(base) ? urlPath.slice(base.length) : urlPath.replace(/^\//, '')
           const filePath = path.resolve('public', relative)
@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
 
   return {
-    base: '/lyrics-flow/',
+    base: '/lyribox/',
     plugins: [react(), tailwindcss(), envReplacementPlugin(env)],
     resolve: {
       alias: {

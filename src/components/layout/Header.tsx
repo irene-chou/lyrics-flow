@@ -53,7 +53,7 @@ export function Header({ onOpenDrawer, isMobile, onToggleMobilePanel }: HeaderPr
           className="font-bold text-lf-text-primary tracking-tight"
           style={{ fontSize: isMobile ? '15px' : '18px' }}
         >
-          Lyrics Flow
+          Lyribox
         </h1>
       </div>
 

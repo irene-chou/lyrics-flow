@@ -1,4 +1,4 @@
-# Lyrics Flow
+# Lyribox
 
 即時歌詞同步顯示工具，支援 YouTube / 本地音檔播放，並可透過 OBS 瀏覽器來源進行直播歌詞投影。
 

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('App loads', () => {
   test('renders header with app title', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('h1')).toHaveText('Lyrics Flow')
+    await expect(page.locator('h1')).toHaveText('Lyribox')
   })
 
   test('renders FAB button', async ({ page }) => {

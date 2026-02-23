@@ -1,4 +1,4 @@
-# Lyrics Flow
+# Lyribox
 
 ## Quick Reference
 

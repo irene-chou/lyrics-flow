@@ -203,7 +203,7 @@ body {
 
 /* ===== shadcn theme inline (radius + color mapping) ===== */
 @theme inline {
-  /* Lyrics Flow custom color tokens */
+  /* Lyribox custom color tokens */
   --color-lf-bg-primary: var(--lf-bg-primary);
   --color-lf-bg-secondary: var(--lf-bg-secondary);
   --color-lf-bg-card: var(--lf-bg-card);
@@ -221,7 +221,7 @@ body {
   --color-lf-danger: var(--lf-danger);
   --color-lf-success: var(--lf-success);
 
-  /* Lyrics Flow radius */
+  /* Lyribox radius */
   --radius-lf: var(--lf-radius);
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -275,7 +275,7 @@ body {
 }
 
 /* ================================================================
-   Override shadcn component styles to match legacy Lyrics Flow theme
+   Override shadcn component styles to match legacy Lyribox theme
    ================================================================ */
 
 /* --- Inputs & Textarea --- */

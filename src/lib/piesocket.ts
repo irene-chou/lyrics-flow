@@ -13,7 +13,7 @@ export function getSessionId(): string {
 }
 
 export function getChannelName(): string {
-  return `lyrics-flow-${getSessionId()}`
+  return `lyribox-${getSessionId()}`
 }
 
 export function getOBSUrl(): string {

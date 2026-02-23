@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lyrics Flow - OBS Display</title>
+<title>Lyribox - OBS Display</title>
 <script src="https://unpkg.com/piesocket-js@5"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>@import url("https://font.emtech.cc/css/GenSenRoundedTW");</style>
@@ -149,7 +149,7 @@
   // ========== PieSocket (OBS Sync) ==========
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('s') || '';
-  const channelName = sessionId ? `lyrics-flow-${sessionId}` : 'lyrics-flow';
+  const channelName = sessionId ? `lyribox-${sessionId}` : 'lyribox';
 
   const piesocket = new PieSocket.default({
     clusterId: '__VITE_PIESOCKET_CLUSTER_ID__',

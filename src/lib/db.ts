@@ -1,7 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { Song } from '@/types'
 
-const db = new Dexie('lyrics-flow-db') as Dexie & {
+const db = new Dexie('lyribox-db') as Dexie & {
   songs: EntityTable<Song, 'id'>
 }
 
