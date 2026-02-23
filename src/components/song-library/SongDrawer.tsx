@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { X } from 'lucide-react'
+import { X, HardDrive, Cloud } from 'lucide-react'
 import {
   Drawer,
   DrawerContent,
@@ -10,10 +10,13 @@ import {
 import { SongSearchInput } from './SongSearchInput'
 import { SongListItem } from './SongListItem'
 import { SongDrawerMenu } from './SongDrawerMenu'
+import { CloudLibraryPanel } from '@/components/cloud-library/CloudLibraryPanel'
 import { useSongs, deleteSongFromDB } from '@/hooks/useSongLibrary'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import type { Song } from '@/types'
+
+type DrawerTab = 'local' | 'cloud'
 
 interface SongDrawerProps {
   open: boolean
@@ -22,6 +25,7 @@ interface SongDrawerProps {
 }
 
 export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
+  const [tab, setTab] = useState<DrawerTab>('local')
   const [search, setSearch] = useState('')
   const songs = useSongs()
   const { currentSongId, loadSong } = useSongStore()
@@ -123,56 +127,111 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
           </button>
         </DrawerHeader>
 
+        {/* Tab switcher */}
+        <div
+          className="flex shrink-0 border-b border-lb-border"
+          style={{
+            padding: isMobile ? '0 16px' : '0 24px',
+          }}
+        >
+          <button
+            className="flex items-center cursor-pointer transition-colors"
+            style={{
+              gap: '6px',
+              padding: '10px 0',
+              marginRight: '20px',
+              fontSize: '12px',
+              fontWeight: tab === 'local' ? 600 : 400,
+              color: tab === 'local' ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)',
+              borderBottom: tab === 'local' ? '2px solid var(--lb-accent)' : '2px solid transparent',
+              background: 'none',
+              border: 'none',
+              borderBottomWidth: '2px',
+              borderBottomStyle: 'solid',
+              borderBottomColor: tab === 'local' ? 'var(--lb-accent)' : 'transparent',
+            }}
+            onClick={() => setTab('local')}
+          >
+            <HardDrive size={13} />
+            本機歌曲
+          </button>
+          <button
+            className="flex items-center cursor-pointer transition-colors"
+            style={{
+              gap: '6px',
+              padding: '10px 0',
+              fontSize: '12px',
+              fontWeight: tab === 'cloud' ? 600 : 400,
+              color: tab === 'cloud' ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)',
+              background: 'none',
+              border: 'none',
+              borderBottomWidth: '2px',
+              borderBottomStyle: 'solid',
+              borderBottomColor: tab === 'cloud' ? 'var(--lb-accent)' : 'transparent',
+            }}
+            onClick={() => setTab('cloud')}
+          >
+            <Cloud size={13} />
+            雲端歌詞
+          </button>
+        </div>
+
         {/* Body */}
         <div
           className="flex flex-col flex-1 overflow-hidden"
           style={{ padding: isMobile ? '12px 16px' : '16px 24px', gap: '12px' }}
         >
-          <div className="flex items-center" style={{ gap: '8px' }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <SongSearchInput value={search} onChange={setSearch} />
-            </div>
-            <SongDrawerMenu />
-          </div>
+          {tab === 'local' ? (
+            <>
+              <div className="flex items-center" style={{ gap: '8px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <SongSearchInput value={search} onChange={setSearch} />
+                </div>
+                <SongDrawerMenu />
+              </div>
 
-          <div
-            className="flex-1 overflow-y-auto flex flex-col"
-            style={{ gap: '2px' }}
-          >
-            {!songs ? (
-              <p
-                className="text-lb-text-secondary"
-                style={{
-                  fontSize: '12px',
-                  textAlign: 'center',
-                  padding: '24px 0',
-                }}
+              <div
+                className="flex-1 overflow-y-auto flex flex-col"
+                style={{ gap: '2px' }}
               >
-                載入中...
-              </p>
-            ) : filteredSongs.length === 0 ? (
-              <p
-                className="text-lb-text-secondary"
-                style={{
-                  fontSize: '12px',
-                  textAlign: 'center',
-                  padding: '24px 0',
-                }}
-              >
-                {search.trim() ? '找不到符合的歌曲' : '尚無歌曲'}
-              </p>
-            ) : (
-              filteredSongs.map((song) => (
-                <SongListItem
-                  key={song.id}
-                  song={song}
-                  isActive={currentSongId === song.id}
-                  onSelect={handleSelect}
-                  onDelete={handleDelete}
-                />
-              ))
-            )}
-          </div>
+                {!songs ? (
+                  <p
+                    className="text-lb-text-secondary"
+                    style={{
+                      fontSize: '12px',
+                      textAlign: 'center',
+                      padding: '24px 0',
+                    }}
+                  >
+                    載入中...
+                  </p>
+                ) : filteredSongs.length === 0 ? (
+                  <p
+                    className="text-lb-text-secondary"
+                    style={{
+                      fontSize: '12px',
+                      textAlign: 'center',
+                      padding: '24px 0',
+                    }}
+                  >
+                    {search.trim() ? '找不到符合的歌曲' : '尚無歌曲'}
+                  </p>
+                ) : (
+                  filteredSongs.map((song) => (
+                    <SongListItem
+                      key={song.id}
+                      song={song}
+                      isActive={currentSongId === song.id}
+                      onSelect={handleSelect}
+                      onDelete={handleDelete}
+                    />
+                  ))
+                )}
+              </div>
+            </>
+          ) : (
+            <CloudLibraryPanel />
+          )}
         </div>
       </DrawerContent>
     </Drawer>

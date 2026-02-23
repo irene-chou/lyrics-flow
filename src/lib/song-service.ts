@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import type { Song } from '@/types'
+import type { Song, CloudSong } from '@/types'
 import { useSongStore } from '@/stores/useSongStore'
 
 /**
@@ -71,6 +71,34 @@ function isValidSong(obj: unknown): obj is Song {
     typeof s.createdAt === 'number' &&
     typeof s.updatedAt === 'number'
   )
+}
+
+/**
+ * Import a cloud song into the local library.
+ * Converts CloudSong to Song and saves to IndexedDB.
+ * Returns the created Song.
+ */
+export async function importCloudSong(cloudSong: CloudSong): Promise<Song> {
+  const lrcText = cloudSong.syncedLyrics || cloudSong.plainLyrics || ''
+  const now = Date.now()
+  const name = cloudSong.artistName
+    ? `${cloudSong.trackName} - ${cloudSong.artistName}`
+    : cloudSong.trackName
+
+  const song: Song = {
+    id: now,
+    name,
+    lrcText,
+    offset: 0,
+    audioSource: 'youtube',
+    youtubeId: null,
+    audioFileName: null,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  await saveSongToDB(song)
+  return song
 }
 
 /**

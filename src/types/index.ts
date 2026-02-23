@@ -33,6 +33,39 @@ export interface UISettings {
 
 export type Theme = 'light' | 'dark'
 
+// --- Cloud Music Library ---
+
+/** A song result from a cloud lyrics provider (e.g. LRCLIB). */
+export interface CloudSong {
+  /** Provider-specific unique ID */
+  id: number
+  trackName: string
+  artistName: string
+  albumName: string
+  /** Duration in seconds */
+  duration: number
+  instrumental: boolean
+  /** Plain (unsynced) lyrics, may be null */
+  plainLyrics: string | null
+  /** Synced LRC lyrics, may be null */
+  syncedLyrics: string | null
+}
+
+export interface CloudSearchParams {
+  /** Free-text search query */
+  q?: string
+  trackName?: string
+  artistName?: string
+  albumName?: string
+}
+
+/** Abstract interface for a cloud lyrics provider. */
+export interface CloudLyricsProvider {
+  readonly name: string
+  search(params: CloudSearchParams): Promise<CloudSong[]>
+  getById(id: number): Promise<CloudSong | null>
+}
+
 export type PlaybackStatus = 'IDLE' | 'PLAYING' | 'PAUSED' | 'ENDED'
 
 export type SyncMessageType =

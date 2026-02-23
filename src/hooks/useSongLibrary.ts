@@ -11,4 +11,4 @@ export function useSongs() {
 }
 
 // Re-export service functions for backward compatibility
-export { saveSongToDB, debouncedSaveSong, deleteSongFromDB, exportSongs, importSongs } from '@/lib/song-service'
+export { saveSongToDB, debouncedSaveSong, deleteSongFromDB, exportSongs, importSongs, importCloudSong } from '@/lib/song-service'
