@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { FontSizeControl } from './FontSizeControl'
 import { LyricsGapControl } from './LyricsGapControl'
@@ -42,7 +43,31 @@ export function DisplaySettings() {
     setOtherColor,
     setLyricsBgColor,
     resetAll,
-  } = useUISettingsStore()
+  } = useUISettingsStore(
+    useShallow((s) => ({
+      activeFontSize: s.activeFontSize,
+      otherFontSize: s.otherFontSize,
+      titleFontSize: s.titleFontSize,
+      showTitle: s.showTitle,
+      lyricsGap: s.lyricsGap,
+      visibleBefore: s.visibleBefore,
+      visibleAfter: s.visibleAfter,
+      activeColor: s.activeColor,
+      otherColor: s.otherColor,
+      lyricsBgColor: s.lyricsBgColor,
+      setActiveFontSize: s.setActiveFontSize,
+      setOtherFontSize: s.setOtherFontSize,
+      setTitleFontSize: s.setTitleFontSize,
+      setShowTitle: s.setShowTitle,
+      setLyricsGap: s.setLyricsGap,
+      setVisibleBefore: s.setVisibleBefore,
+      setVisibleAfter: s.setVisibleAfter,
+      setActiveColor: s.setActiveColor,
+      setOtherColor: s.setOtherColor,
+      setLyricsBgColor: s.setLyricsBgColor,
+      resetAll: s.resetAll,
+    }))
+  )
 
   return (
     <section

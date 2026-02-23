@@ -74,14 +74,20 @@ export function AppLayout() {
     const iframes = document.querySelectorAll('iframe')
     iframes.forEach((f) => (f.style.pointerEvents = 'none'))
 
+    let rafId: number | null = null
     const onMouseMove = (ev: MouseEvent) => {
       if (!draggingRef.current) return
-      const newWidth = Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, ev.clientX))
-      useUISettingsStore.getState().setSidebarWidth(newWidth)
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        const newWidth = Math.min(MAX_SIDEBAR, Math.max(MIN_SIDEBAR, ev.clientX))
+        useUISettingsStore.getState().setSidebarWidth(newWidth)
+      })
     }
 
     const onMouseUp = () => {
       draggingRef.current = false
+      if (rafId) cancelAnimationFrame(rafId)
       setIsDragging(false)
       document.body.style.userSelect = ''
       document.body.style.cursor = ''

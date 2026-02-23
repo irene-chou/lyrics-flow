@@ -27,7 +27,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [audioFileName, setAudioFileName] = useState('')
   const [lrcText, setLrcText] = useState('')
-  const [_audioFile, setAudioFile] = useState<File | null>(null)
+  const [audioFile, setAudioFile] = useState<File | null>(null)
 
   const isEditMode = !!editSong
   const loadSong = useSongStore((s) => s.loadSong)
@@ -76,8 +76,8 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
     loadSong(song)
 
     // If local audio, create object URL for playback
-    if (audioSource === 'local' && _audioFile) {
-      const objectUrl = URL.createObjectURL(_audioFile)
+    if (audioSource === 'local' && audioFile) {
+      const objectUrl = URL.createObjectURL(audioFile)
       usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
     }
 

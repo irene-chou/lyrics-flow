@@ -1,4 +1,4 @@
-import { memo, forwardRef } from 'react'
+import { memo, useMemo, forwardRef } from 'react'
 import type { LyricLine as LyricLineType } from '@/types'
 
 export type LyricStatus = 'passed' | 'active' | 'upcoming'
@@ -56,22 +56,22 @@ export const LyricLine = memo(
       fontWeight = 400
     }
 
+    const style = useMemo(
+      () => ({
+        fontSize: `${fontSize}px`,
+        fontWeight,
+        lineHeight: 1.4,
+        color,
+        fontStyle: isInterlude ? ('italic' as const) : ('normal' as const),
+        letterSpacing: isInterlude ? '0.05em' : 'normal',
+        transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+        cursor: onClick ? 'pointer' : ('default' as const),
+      }),
+      [fontSize, fontWeight, color, isInterlude, onClick],
+    )
+
     return (
-      <div
-        ref={ref}
-        onClick={onClick}
-        className="font-lyrics"
-        style={{
-          fontSize: `${fontSize}px`,
-          fontWeight,
-          lineHeight: 1.4,
-          color,
-          fontStyle: isInterlude ? 'italic' : 'normal',
-          letterSpacing: isInterlude ? '0.05em' : 'normal',
-          transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-          cursor: onClick ? 'pointer' : 'default',
-        }}
-      >
+      <div ref={ref} onClick={onClick} className="font-lyrics" style={style}>
         {isInterlude ? '♪' : line.text}
       </div>
     )

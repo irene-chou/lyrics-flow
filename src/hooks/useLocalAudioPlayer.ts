@@ -49,9 +49,15 @@ export function useLocalAudioPlayer() {
     }
   }, [])
 
-  // Sync volume/muted from store
+  // Sync volume/muted from store (with guard to skip no-op writes)
   useEffect(() => {
+    let prevVolume = usePlaybackStore.getState().volume
+    let prevMuted = usePlaybackStore.getState().muted
+
     const unsub = usePlaybackStore.subscribe((state) => {
+      if (state.volume === prevVolume && state.muted === prevMuted) return
+      prevVolume = state.volume
+      prevMuted = state.muted
       const el = audioRef.current
       if (!el) return
       el.volume = state.muted ? 0 : state.volume / 100

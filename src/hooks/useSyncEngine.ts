@@ -35,8 +35,10 @@ interface UseSyncEngineOptions {
 
 export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
   const workerRef = useRef<Worker | null>(null)
+  const getCurrentTimeRef = useRef(getCurrentTime)
+  getCurrentTimeRef.current = getCurrentTime
 
-  // Initialize worker
+  // Initialize worker — runs once (getCurrentTime accessed via ref)
   useEffect(() => {
     const { worker, blobUrl } = createSyncWorker()
     workerRef.current = worker
@@ -45,7 +47,7 @@ export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
       const { lyrics, offset } = useSongStore.getState()
       if (!lyrics.length) return
 
-      const rawTime = getCurrentTime()
+      const rawTime = getCurrentTimeRef.current()
       const currentTime = rawTime + offset
 
       // Reverse scan to find active line (same algorithm as legacy)
@@ -72,7 +74,7 @@ export function useSyncEngine({ getCurrentTime }: UseSyncEngineOptions) {
       URL.revokeObjectURL(blobUrl)
       workerRef.current = null
     }
-  }, [getCurrentTime])
+  }, [])
 
   const startSync = useCallback(() => {
     workerRef.current?.postMessage('start')

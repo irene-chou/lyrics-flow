@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import { formatTime } from '@/lib/format'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
@@ -6,7 +7,7 @@ interface ManualTimerPanelProps {
   engine: ReturnType<typeof usePlaybackEngine>
 }
 
-export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
+export const ManualTimerPanel = memo(function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
   const currentTime = usePlaybackStore((s) => s.currentTime)
   const status = usePlaybackStore((s) => s.status)
 
@@ -103,4 +104,4 @@ export function ManualTimerPanel({ engine }: ManualTimerPanelProps) {
       </p>
     </div>
   )
-}
+})

@@ -141,17 +141,6 @@ body {
   color: var(--lb-text-primary);
 }
 
-.header-fab {
-  color: #fff;
-  background: var(--lb-accent);
-  border: none;
-  box-shadow: 0 2px 8px var(--lb-accent-glow);
-}
-.header-fab:hover {
-  background: #6b59de;
-  box-shadow: 0 4px 16px var(--lb-accent-glow);
-}
-
 .header-accent-btn {
   color: var(--lb-accent);
 }

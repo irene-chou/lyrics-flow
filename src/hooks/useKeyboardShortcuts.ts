@@ -93,7 +93,7 @@ export function useKeyboardShortcuts({
                 audioSource: song.audioSource,
                 youtubeId: song.youtubeId,
                 audioFileName: song.audioFileName,
-                createdAt: 0,
+                createdAt: song.currentSongCreatedAt || Date.now(),
                 updatedAt: Date.now(),
               })
               useSongStore.getState().captureState()

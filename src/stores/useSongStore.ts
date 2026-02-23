@@ -17,6 +17,7 @@ interface SongState {
   // Current song
   currentSongId: number | null
   currentSongTitle: string
+  currentSongCreatedAt: number
   lyrics: LyricLine[]
   offset: number
   lrcText: string
@@ -43,6 +44,7 @@ interface SongState {
 export const useSongStore = create<SongState>((set, get) => ({
   currentSongId: null,
   currentSongTitle: '',
+  currentSongCreatedAt: 0,
   lyrics: [],
   offset: 0,
   lrcText: '',
@@ -62,6 +64,7 @@ export const useSongStore = create<SongState>((set, get) => ({
     set({
       currentSongId: song.id,
       currentSongTitle: songTitle,
+      currentSongCreatedAt: song.createdAt,
       lyrics,
       offset: song.offset,
       lrcText: song.lrcText,
@@ -85,6 +88,7 @@ export const useSongStore = create<SongState>((set, get) => ({
     set({
       currentSongId: null,
       currentSongTitle: '',
+      currentSongCreatedAt: 0,
       lyrics: [],
       offset: 0,
       lrcText: '',

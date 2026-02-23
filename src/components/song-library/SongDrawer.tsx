@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import { X } from 'lucide-react'
 import {
   Drawer,
@@ -35,7 +35,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     return songs.filter((s) => s.name.toLowerCase().includes(query))
   }, [songs, search])
 
-  function handleSelect(song: Song) {
+  const handleSelect = useCallback((song: Song) => {
     loadSong(song)
     // If local audio, trigger file picker in the same user gesture (synchronous)
     if (song.audioSource === 'local') {
@@ -43,7 +43,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
       localFileInputRef.current?.click()
     }
     onOpenChange(false)
-  }
+  }, [loadSong, onOpenChange])
 
   function handleLocalFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -62,14 +62,14 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     e.target.value = ''
   }
 
-  async function handleDelete(song: Song) {
+  const handleDelete = useCallback(async (song: Song) => {
     const confirmed = confirm(`確定要刪除「${song.name}」嗎？`)
     if (!confirmed) return
     await deleteSongFromDB(song.id)
-    if (currentSongId === song.id) {
+    if (useSongStore.getState().currentSongId === song.id) {
       useSongStore.getState().clearSong()
     }
-  }
+  }, [])
 
   return (
     <Drawer direction="right" open={open} onOpenChange={onOpenChange}>

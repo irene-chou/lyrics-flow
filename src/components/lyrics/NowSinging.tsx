@@ -1,16 +1,19 @@
+import { memo } from 'react'
+
 interface NowSingingProps {
   title: string
   titleFontSize?: number
+  isMobile?: boolean
 }
 
-export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
+export const NowSinging = memo(function NowSinging({ title, titleFontSize = 18, isMobile }: NowSingingProps) {
   if (!title) return null
 
   return (
     <div
       className="shrink-0"
       style={{
-        padding: '16px 48px',
+        padding: isMobile ? '16px' : '16px 48px',
         fontFamily: 'var(--font-lyrics)',
       }}
     >
@@ -38,4 +41,4 @@ export function NowSinging({ title, titleFontSize = 18 }: NowSingingProps) {
       </div>
     </div>
   )
-}
+})

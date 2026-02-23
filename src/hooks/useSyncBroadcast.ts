@@ -8,6 +8,16 @@ interface UseSyncBroadcastOptions {
   broadcast: (type: SyncMessageType, data: Record<string, unknown>) => void
 }
 
+// Module-level selectors — stable references that never change
+const selectSyncUpdate = (s: { currentLineIndex: number }) => ({ currentLineIndex: s.currentLineIndex })
+const selectLyricsLoaded = (s: { lyrics: unknown; currentSongTitle: string }) => ({ lyrics: s.lyrics, songTitle: s.currentSongTitle })
+const selectOffset = (s: { offset: number }) => ({ offset: s.offset })
+const selectFontSize = (s: { activeFontSize: number; otherFontSize: number }) => ({ activeFontSize: s.activeFontSize, otherFontSize: s.otherFontSize })
+const selectTitleFontSize = (s: { titleFontSize: number; showTitle: boolean }) => ({ titleFontSize: s.titleFontSize, showTitle: s.showTitle })
+const selectLyricColors = (s: { activeColor: string; otherColor: string; lyricsBgColor: string }) => ({ activeColor: s.activeColor, otherColor: s.otherColor, lyricsBgColor: s.lyricsBgColor })
+const selectLyricsGap = (s: { lyricsGap: number }) => ({ lyricsGap: s.lyricsGap })
+const selectVisibleRange = (s: { visibleBefore: number; visibleAfter: number }) => ({ visibleBefore: s.visibleBefore, visibleAfter: s.visibleAfter })
+
 /**
  * Generic store watcher: subscribes to a Zustand store and broadcasts
  * when selected fields change.
@@ -38,59 +48,12 @@ export function useSyncBroadcast({ broadcast }: UseSyncBroadcastOptions) {
   const broadcastRef = useRef(broadcast)
   broadcastRef.current = broadcast
 
-  useStoreWatcher(
-    useSyncStore,
-    (s) => ({ currentLineIndex: s.currentLineIndex }),
-    'SYNC_UPDATE',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useSongStore,
-    (s) => ({ lyrics: s.lyrics, songTitle: s.currentSongTitle }),
-    'LYRICS_LOADED',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useSongStore,
-    (s) => ({ offset: s.offset }),
-    'OFFSET',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useUISettingsStore,
-    (s) => ({ activeFontSize: s.activeFontSize, otherFontSize: s.otherFontSize }),
-    'FONT_SIZE',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useUISettingsStore,
-    (s) => ({ titleFontSize: s.titleFontSize, showTitle: s.showTitle }),
-    'TITLE_FONT_SIZE',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useUISettingsStore,
-    (s) => ({ activeColor: s.activeColor, otherColor: s.otherColor, lyricsBgColor: s.lyricsBgColor }),
-    'LYRIC_COLORS',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useUISettingsStore,
-    (s) => ({ lyricsGap: s.lyricsGap }),
-    'LYRICS_GAP',
-    broadcastRef,
-  )
-
-  useStoreWatcher(
-    useUISettingsStore,
-    (s) => ({ visibleBefore: s.visibleBefore, visibleAfter: s.visibleAfter }),
-    'VISIBLE_RANGE',
-    broadcastRef,
-  )
+  useStoreWatcher(useSyncStore, selectSyncUpdate, 'SYNC_UPDATE', broadcastRef)
+  useStoreWatcher(useSongStore, selectLyricsLoaded, 'LYRICS_LOADED', broadcastRef)
+  useStoreWatcher(useSongStore, selectOffset, 'OFFSET', broadcastRef)
+  useStoreWatcher(useUISettingsStore, selectFontSize, 'FONT_SIZE', broadcastRef)
+  useStoreWatcher(useUISettingsStore, selectTitleFontSize, 'TITLE_FONT_SIZE', broadcastRef)
+  useStoreWatcher(useUISettingsStore, selectLyricColors, 'LYRIC_COLORS', broadcastRef)
+  useStoreWatcher(useUISettingsStore, selectLyricsGap, 'LYRICS_GAP', broadcastRef)
+  useStoreWatcher(useUISettingsStore, selectVisibleRange, 'VISIBLE_RANGE', broadcastRef)
 }

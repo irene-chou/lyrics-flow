@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Trash2 } from 'lucide-react'
 import type { Song } from '@/types'
 
@@ -8,7 +9,7 @@ interface SongListItemProps {
   onDelete: (song: Song) => void
 }
 
-export function SongListItem({
+export const SongListItem = memo(function SongListItem({
   song,
   isActive,
   onSelect,
@@ -98,4 +99,4 @@ export function SongListItem({
       )}
     </div>
   )
-}
+})

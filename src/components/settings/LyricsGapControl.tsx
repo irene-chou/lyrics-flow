@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { CONTROL_BTN_CLASS, CONTROL_BTN_STYLE } from '@/lib/constants'
 
 interface LyricsGapControlProps {
   value: number
@@ -26,17 +27,6 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
     setEditing(false)
   }
 
-  const btnClass = 'border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer'
-
-  const btnStyle: React.CSSProperties = {
-    padding: '4px 8px',
-    fontSize: '12px',
-    fontWeight: 600,
-    borderRadius: '4px',
-    fontFamily: 'var(--font-sans)',
-    lineHeight: 1,
-  }
-
   return (
     <div className="flex items-center" style={{ gap: '8px' }}>
       <span
@@ -49,7 +39,7 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
       >
         歌詞間距
       </span>
-      <button className={btnClass} onClick={() => adjust(-2)} style={btnStyle}>
+      <button className={CONTROL_BTN_CLASS} onClick={() => adjust(-2)} style={CONTROL_BTN_STYLE}>
         -
       </button>
       {editing ? (
@@ -92,7 +82,7 @@ export function LyricsGapControl({ value, onChange }: LyricsGapControlProps) {
           {value}px
         </span>
       )}
-      <button className={btnClass} onClick={() => adjust(2)} style={btnStyle}>
+      <button className={CONTROL_BTN_CLASS} onClick={() => adjust(2)} style={CONTROL_BTN_STYLE}>
         +
       </button>
     </div>

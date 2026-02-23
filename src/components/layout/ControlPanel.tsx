@@ -1,4 +1,5 @@
 import { Pencil, X } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { AudioPlayer } from '../playback/AudioPlayer'
@@ -15,7 +16,18 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlPanelProps) {
-  const { currentSongId, currentSongTitle, lrcText, offset, audioSource, youtubeId, audioFileName } = useSongStore()
+  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, audioSource, youtubeId, audioFileName } = useSongStore(
+    useShallow((s) => ({
+      currentSongId: s.currentSongId,
+      currentSongTitle: s.currentSongTitle,
+      currentSongCreatedAt: s.currentSongCreatedAt,
+      lrcText: s.lrcText,
+      offset: s.offset,
+      audioSource: s.audioSource,
+      youtubeId: s.youtubeId,
+      audioFileName: s.audioFileName,
+    }))
+  )
   const sidebarWidth = useUISettingsStore((s) => s.sidebarWidth)
 
   function handleEdit() {
@@ -28,8 +40,8 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       audioSource,
       youtubeId,
       audioFileName,
-      createdAt: 0,
-      updatedAt: 0,
+      createdAt: currentSongCreatedAt || Date.now(),
+      updatedAt: Date.now(),
     }
     onEditSong(song)
   }

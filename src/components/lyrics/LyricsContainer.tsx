@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useMemo } from 'react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { useSyncStore } from '@/stores/useSyncStore'
@@ -46,46 +46,56 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
     }
   }, [currentLineIndex])
 
-  // Reset refs when lyrics change
-  useEffect(() => {
-    lineRefs.current = new Array(lyrics.length).fill(null)
-  }, [lyrics])
-
-  const handleLineClick = useCallback(
+  // Use ref for handleLineClick so per-line handlers stay stable across offset/lyrics changes
+  const handleLineClickRef = useRef<(index: number) => void>(() => {})
+  handleLineClickRef.current = useCallback(
     (index: number) => {
       if (!onSeekToLyric) return
       const line = lyrics[index]
       if (!line) return
-      // Seek to the lyric time minus offset (so that applying offset later = correct time)
       onSeekToLyric(line.time - offset)
     },
     [lyrics, offset, onSeekToLyric],
   )
 
-  const getStatus = (index: number): LyricStatus => {
-    if (currentLineIndex < 0) return 'upcoming'
-    if (index < currentLineIndex) return 'passed'
-    if (index === currentLineIndex) return 'active'
-    return 'upcoming'
-  }
+  // Pre-compute statuses so only lines whose status changed will re-render
+  const statuses = useMemo<LyricStatus[]>(() => {
+    return lyrics.map((_, i) => {
+      if (currentLineIndex < 0) return 'upcoming'
+      if (i < currentLineIndex) return 'passed'
+      if (i === currentLineIndex) return 'active'
+      return 'upcoming'
+    })
+  }, [lyrics, currentLineIndex])
+
+  // Stable per-line ref setters — only rebuilt when lyrics array changes
+  const lineRefSetters = useRef<((el: HTMLDivElement | null) => void)[]>([])
+
+  // Stable per-line click handlers — only rebuilt when lyrics array changes
+  const lineClickHandlers = useRef<(() => void)[]>([])
+
+  useEffect(() => {
+    lineRefs.current = new Array(lyrics.length).fill(null)
+    lineRefSetters.current = lyrics.map((_, i) => (el: HTMLDivElement | null) => {
+      lineRefs.current[i] = el
+    })
+    lineClickHandlers.current = onSeekToLyric
+      ? lyrics.map((_, i) => () => handleLineClickRef.current(i))
+      : []
+  }, [lyrics, onSeekToLyric])
+
+  const containerStyle = useMemo(() => ({ background: lyricsBgColor }), [lyricsBgColor])
+  const scrollStyle = useMemo(
+    () => ({ padding: isMobile ? '20vh 16px' : '30vh 48px', scrollBehavior: 'smooth' as const }),
+    [isMobile],
+  )
+  const gapStyle = useMemo(() => ({ gap: `${lyricsGap}px` }), [lyricsGap])
 
   return (
-    <div
-      className="flex flex-col h-full"
-      style={{
-        background: lyricsBgColor,
-      }}
-    >
-      {showTitle && <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} />}
+    <div className="flex flex-col h-full" style={containerStyle}>
+      {showTitle && <NowSinging title={currentSongTitle} titleFontSize={titleFontSize} isMobile={isMobile} />}
 
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto"
-        style={{
-          padding: isMobile ? '20vh 16px' : '30vh 48px',
-          scrollBehavior: 'smooth',
-        }}
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto" style={scrollStyle}>
         {lyrics.length === 0 ? (
           <p
             className="text-lb-text-dim"
@@ -98,21 +108,19 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
             無歌詞內容
           </p>
         ) : (
-          <div className="flex flex-col" style={{ gap: `${lyricsGap}px` }}>
+          <div className="flex flex-col" style={gapStyle}>
             {lyrics.map((line, i) => (
               <LyricLine
                 key={`${line.time}-${i}`}
-                ref={(el) => {
-                  lineRefs.current[i] = el
-                }}
+                ref={lineRefSetters.current[i]}
                 line={line}
-                status={getStatus(i)}
+                status={statuses[i]}
                 activeFontSize={activeFontSize}
                 otherFontSize={otherFontSize}
                 activeColor={activeColor}
                 otherColor={otherColor}
                 passedColor={otherColor}
-                onClick={onSeekToLyric ? () => handleLineClick(i) : undefined}
+                onClick={lineClickHandlers.current[i]}
               />
             ))}
           </div>

@@ -28,7 +28,7 @@ export function debouncedSaveSong(delay = 600) {
       audioSource: state.audioSource,
       youtubeId: state.youtubeId,
       audioFileName: state.audioFileName,
-      createdAt: 0,
+      createdAt: state.currentSongCreatedAt || Date.now(),
       updatedAt: Date.now(),
     })
     useSongStore.getState().captureState()

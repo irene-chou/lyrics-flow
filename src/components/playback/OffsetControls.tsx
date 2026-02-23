@@ -2,9 +2,11 @@ import { RotateCcw } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useSyncStore } from '@/stores/useSyncStore'
 import { debouncedSaveSong } from '@/hooks/useSongLibrary'
+import { CONTROL_BTN_CLASS, OFFSET_BTN_STYLE } from '@/lib/constants'
 
 export function OffsetControls() {
-  const { currentSongId, offset } = useSongStore()
+  const currentSongId = useSongStore((s) => s.currentSongId)
+  const offset = useSongStore((s) => s.offset)
 
   if (!currentSongId) return null
 
@@ -19,15 +21,6 @@ export function OffsetControls() {
     useSongStore.getState().setOffset(0)
     useSyncStore.getState().setCurrentLineIndex(-1)
     debouncedSaveSong()
-  }
-
-  const btnClass = 'border border-lb-border bg-lb-bg-input text-lb-text-primary hover:bg-lb-bg-card hover:border-lb-text-dim transition-colors cursor-pointer'
-
-  const btnStyle: React.CSSProperties = {
-    padding: '6px 10px',
-    fontSize: '11px',
-    borderRadius: '6px',
-    fontFamily: 'var(--font-sans)',
   }
 
   return (
@@ -59,10 +52,10 @@ export function OffsetControls() {
         </button>
       </div>
       <div className="flex items-center justify-center" style={{ gap: '6px' }}>
-        <button className={btnClass} onClick={() => adjustOffset(-0.5)} style={btnStyle}>
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(-0.5)} style={OFFSET_BTN_STYLE}>
           -0.5s
         </button>
-        <button className={btnClass} onClick={() => adjustOffset(-0.1)} style={btnStyle}>
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(-0.1)} style={OFFSET_BTN_STYLE}>
           -0.1s
         </button>
         <span
@@ -78,10 +71,10 @@ export function OffsetControls() {
           {offset >= 0 ? '+' : ''}
           {offset.toFixed(1)}s
         </span>
-        <button className={btnClass} onClick={() => adjustOffset(0.1)} style={btnStyle}>
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(0.1)} style={OFFSET_BTN_STYLE}>
           +0.1s
         </button>
-        <button className={btnClass} onClick={() => adjustOffset(0.5)} style={btnStyle}>
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(0.5)} style={OFFSET_BTN_STYLE}>
           +0.5s
         </button>
       </div>

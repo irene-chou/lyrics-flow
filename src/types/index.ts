@@ -3,12 +3,14 @@ export interface LyricLine {
   text: string
 }
 
+export type AudioSource = 'youtube' | 'local'
+
 export interface Song {
   id: number
   name: string
   lrcText: string
   offset: number
-  audioSource: 'youtube' | 'local'
+  audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
   createdAt: number
@@ -31,8 +33,6 @@ export interface UISettings {
 
 export type Theme = 'light' | 'dark'
 
-export type AudioSource = 'youtube' | 'local'
-
 export type PlaybackStatus = 'IDLE' | 'PLAYING' | 'PAUSED' | 'ENDED'
 
 export type SyncMessageType =
@@ -47,7 +47,14 @@ export type SyncMessageType =
   | 'OFFSET'
   | 'REQUEST_STATE'
 
-export interface SyncMessage {
-  type: SyncMessageType
-  data: Record<string, unknown> | null
-}
+export type SyncMessage =
+  | { type: 'SYNC_UPDATE'; data: { currentLineIndex: number } }
+  | { type: 'LYRICS_LOADED'; data: { lyrics: LyricLine[]; songTitle: string } }
+  | { type: 'OFFSET'; data: { offset: number } }
+  | { type: 'FONT_SIZE'; data: { activeFontSize: number; otherFontSize: number } }
+  | { type: 'TITLE_FONT_SIZE'; data: { titleFontSize: number; showTitle: boolean } }
+  | { type: 'LYRIC_COLORS'; data: { activeColor: string; otherColor: string; lyricsBgColor: string } }
+  | { type: 'LYRICS_GAP'; data: { lyricsGap: number } }
+  | { type: 'VISIBLE_RANGE'; data: { visibleBefore: number; visibleAfter: number } }
+  | { type: 'FULL_STATE'; data: Record<string, unknown> }
+  | { type: 'REQUEST_STATE'; data: null }
