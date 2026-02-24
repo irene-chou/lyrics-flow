@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
 
   return {
-    base: '/lyribox/',
+    base: '/',
     plugins: [react(), tailwindcss(), envReplacementPlugin(env)],
     resolve: {
       alias: {
