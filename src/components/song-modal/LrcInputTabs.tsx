@@ -44,14 +44,14 @@ export function LrcInputTabs({
       </label>
       <Tabs value={activeTab} defaultValue="paste" onValueChange={onTabChange}>
         <TabsList className="w-full">
+          <TabsTrigger value="search" className="flex-1">
+            線上搜尋
+          </TabsTrigger>
           <TabsTrigger value="paste" className="flex-1">
-            貼上歌詞
+            手動貼上
           </TabsTrigger>
           <TabsTrigger value="file" className="flex-1">
             讀取檔案
-          </TabsTrigger>
-          <TabsTrigger value="search" className="flex-1">
-            線上搜尋
           </TabsTrigger>
         </TabsList>
 
