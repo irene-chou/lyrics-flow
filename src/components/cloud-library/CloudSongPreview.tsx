@@ -7,14 +7,13 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import type { CloudSong } from '@/types'
-import { formatDuration } from '@/lib/format-duration'
+import type { SharedSong } from '@/types'
 
 interface CloudSongPreviewProps {
-  song: CloudSong | null
+  song: SharedSong | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onImport: (song: CloudSong) => void
+  onImport: (song: SharedSong) => void
   isImporting: boolean
 }
 
@@ -27,14 +26,14 @@ export function CloudSongPreview({
 }: CloudSongPreviewProps) {
   if (!song) return null
 
-  const lyricsText = song.syncedLyrics || song.plainLyrics || '（無歌詞）'
+  const lyricsText = song.lrc_text || '（無歌詞）'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[80vh]">
         <DialogHeader>
           <DialogTitle style={{ fontSize: '14px' }}>
-            {song.trackName}
+            {song.name}
           </DialogTitle>
           <DialogDescription
             style={{
@@ -42,9 +41,8 @@ export function CloudSongPreview({
               color: 'var(--lb-text-secondary)',
             }}
           >
-            {song.artistName}
-            {song.albumName ? ` · ${song.albumName}` : ''}
-            {song.duration > 0 ? ` · ${formatDuration(song.duration)}` : ''}
+            {song.artist || '未知歌手'}
+            {song.youtube_id ? ' · 含 YouTube 連結' : ''}
           </DialogDescription>
         </DialogHeader>
 
@@ -74,6 +72,7 @@ export function CloudSongPreview({
         <DialogFooter>
           <button
             onClick={() => onOpenChange(false)}
+            className="cursor-pointer"
             style={{
               padding: '10px 18px',
               borderRadius: '8px',
@@ -83,7 +82,6 @@ export function CloudSongPreview({
               fontFamily: 'var(--font-sans)',
               fontSize: '13px',
               fontWeight: 500,
-              cursor: 'pointer',
               transition: 'all 0.2s',
             }}
           >
@@ -92,6 +90,7 @@ export function CloudSongPreview({
           <button
             onClick={() => onImport(song)}
             disabled={isImporting}
+            className="cursor-pointer"
             style={{
               padding: '10px 18px',
               borderRadius: '8px',
@@ -110,7 +109,7 @@ export function CloudSongPreview({
             }}
           >
             <Download size={14} />
-            {isImporting ? '匯入中...' : '匯入到歌曲庫'}
+            {isImporting ? '匯入中...' : '匯入到本機'}
           </button>
         </DialogFooter>
       </DialogContent>

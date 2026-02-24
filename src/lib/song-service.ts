@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import type { Song, CloudSong } from '@/types'
+import type { Song, SharedSong } from '@/types'
 import { useSongStore } from '@/stores/useSongStore'
 
 /**
@@ -74,24 +74,23 @@ function isValidSong(obj: unknown): obj is Song {
 }
 
 /**
- * Import a cloud song into the local library.
- * Converts CloudSong to Song and saves to IndexedDB.
+ * Import a shared cloud song into the local library.
+ * Converts SharedSong to Song and saves to IndexedDB.
  * Returns the created Song.
  */
-export async function importCloudSong(cloudSong: CloudSong): Promise<Song> {
-  const lrcText = cloudSong.syncedLyrics || cloudSong.plainLyrics || ''
+export async function importSharedSong(shared: SharedSong): Promise<Song> {
   const now = Date.now()
-  const name = cloudSong.artistName
-    ? `${cloudSong.trackName} - ${cloudSong.artistName}`
-    : cloudSong.trackName
+  const name = shared.artist
+    ? `${shared.name} - ${shared.artist}`
+    : shared.name
 
   const song: Song = {
     id: now,
     name,
-    lrcText,
-    offset: 0,
+    lrcText: shared.lrc_text,
+    offset: shared.offset,
     audioSource: 'youtube',
-    youtubeId: null,
+    youtubeId: shared.youtube_id,
     audioFileName: null,
     createdAt: now,
     updatedAt: now,

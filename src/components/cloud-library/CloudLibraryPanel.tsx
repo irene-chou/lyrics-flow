@@ -1,51 +1,67 @@
-import { useState, useCallback, useRef } from 'react'
-import { Search, Loader2, CloudOff } from 'lucide-react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { Search, Loader2, CloudOff, CloudUpload } from 'lucide-react'
 import { CloudSongItem } from './CloudSongItem'
 import { CloudSongPreview } from './CloudSongPreview'
 import { useCloudLibraryStore } from '@/stores/useCloudLibraryStore'
-import { importCloudSong } from '@/lib/song-service'
+import { importSharedSong } from '@/lib/song-service'
+import { publishSong, isCloudConfigured } from '@/lib/supabase'
 import { useSongStore } from '@/stores/useSongStore'
-import type { CloudSong } from '@/types'
+import type { SharedSong } from '@/types'
 
 export function CloudLibraryPanel() {
   const {
     query,
     results,
-    isSearching,
+    isLoading,
     error,
     importingId,
+    isPublishing,
+    hasLoadedLatest,
     setQuery,
     search,
+    loadLatest,
     setImportingId,
+    setIsPublishing,
   } = useCloudLibraryStore()
 
-  const [previewSong, setPreviewSong] = useState<CloudSong | null>(null)
+  const currentSongId = useSongStore((s) => s.currentSongId)
+
+  const [previewSong, setPreviewSong] = useState<SharedSong | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Load latest songs on first mount
+  useEffect(() => {
+    if (!hasLoadedLatest && isCloudConfigured()) {
+      loadLatest()
+    }
+  }, [hasLoadedLatest, loadLatest])
+
   const handleQueryChange = useCallback((value: string) => {
     setQuery(value)
-    // Debounced auto-search
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     if (value.trim()) {
       searchTimerRef.current = setTimeout(() => {
-        search({ q: value.trim() })
+        search(value.trim())
       }, 500)
+    } else {
+      // Clear search → show latest
+      searchTimerRef.current = setTimeout(() => {
+        loadLatest()
+      }, 300)
     }
-  }, [setQuery, search])
+  }, [setQuery, search, loadLatest])
 
   const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
-    if (query.trim()) {
-      search({ q: query.trim() })
-    }
+    search(query.trim() || undefined)
   }, [query, search])
 
-  const handleImport = useCallback(async (song: CloudSong) => {
+  const handleImport = useCallback(async (song: SharedSong) => {
     setImportingId(song.id)
     try {
-      const localSong = await importCloudSong(song)
+      const localSong = await importSharedSong(song)
       useSongStore.getState().loadSong(localSong)
       setPreviewOpen(false)
     } catch {
@@ -55,13 +71,74 @@ export function CloudLibraryPanel() {
     }
   }, [setImportingId])
 
-  const handlePreview = useCallback((song: CloudSong) => {
+  const handlePreview = useCallback((song: SharedSong) => {
     setPreviewSong(song)
     setPreviewOpen(true)
   }, [])
 
+  const handlePublish = useCallback(async () => {
+    const state = useSongStore.getState()
+    if (!state.currentSongId) {
+      alert('請先載入一首歌曲再發布。')
+      return
+    }
+    if (!state.lrcText.trim()) {
+      alert('歌詞為空，無法發布。')
+      return
+    }
+
+    const confirmed = confirm(`確定要將「${state.currentSongTitle}」發布到雲端共用歌曲庫嗎？`)
+    if (!confirmed) return
+
+    setIsPublishing(true)
+    try {
+      await publishSong({
+        id: state.currentSongId,
+        name: state.currentSongTitle,
+        lrcText: state.lrcText,
+        offset: state.offset,
+        audioSource: state.audioSource,
+        youtubeId: state.youtubeId,
+        audioFileName: state.audioFileName,
+        createdAt: state.currentSongCreatedAt,
+        updatedAt: Date.now(),
+      })
+      alert('發布成功！')
+      // Refresh latest list
+      loadLatest()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '發布失敗'
+      alert(msg)
+    } finally {
+      setIsPublishing(false)
+    }
+  }, [setIsPublishing, loadLatest])
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden" style={{ gap: '12px' }}>
+      {/* Publish button */}
+      <button
+        className="flex items-center justify-center cursor-pointer transition-colors"
+        style={{
+          gap: '6px',
+          padding: '8px 14px',
+          borderRadius: '8px',
+          border: '1px solid var(--lb-accent)',
+          background: currentSongId ? 'var(--lb-accent)' : 'var(--lb-bg-input)',
+          color: currentSongId ? '#fff' : 'var(--lb-text-dim)',
+          fontFamily: 'var(--font-sans)',
+          fontSize: '12px',
+          fontWeight: 600,
+          opacity: isPublishing ? 0.6 : 1,
+          cursor: isPublishing || !currentSongId ? 'not-allowed' : 'pointer',
+        }}
+        onClick={handlePublish}
+        disabled={isPublishing || !currentSongId}
+      >
+        <CloudUpload size={14} />
+        {isPublishing ? '發布中...' : '發布目前歌曲到雲端'}
+      </button>
+
       {/* Search form */}
       <form onSubmit={handleSearchSubmit} className="flex items-center" style={{ gap: '8px' }}>
         <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
@@ -78,7 +155,7 @@ export function CloudLibraryPanel() {
           />
           <input
             type="text"
-            placeholder="搜尋雲端歌詞（歌名、歌手）..."
+            placeholder="搜尋共用歌曲（歌名、歌手）..."
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
             style={{
@@ -106,35 +183,15 @@ export function CloudLibraryPanel() {
         </div>
       </form>
 
-      {/* Provider attribution */}
-      <div
-        style={{
-          fontSize: '10px',
-          color: 'var(--lb-text-dim)',
-          textAlign: 'center',
-          padding: '0 4px',
-        }}
-      >
-        歌詞來源：
-        <a
-          href="https://lrclib.net"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'var(--lb-accent)', textDecoration: 'none' }}
-        >
-          LRCLIB
-        </a>
-      </div>
-
       {/* Results */}
       <div className="flex-1 overflow-y-auto flex flex-col" style={{ gap: '2px' }}>
-        {isSearching ? (
+        {isLoading ? (
           <div
             className="flex items-center justify-center"
             style={{ padding: '32px 0', color: 'var(--lb-text-secondary)' }}
           >
             <Loader2 size={18} style={{ animation: 'spin 1s linear infinite', marginRight: '8px' }} />
-            <span style={{ fontSize: '12px' }}>搜尋中...</span>
+            <span style={{ fontSize: '12px' }}>載入中...</span>
           </div>
         ) : error ? (
           <div
@@ -147,21 +204,28 @@ export function CloudLibraryPanel() {
             </p>
           </div>
         ) : results.length > 0 ? (
-          results.map((song) => (
-            <CloudSongItem
-              key={song.id}
-              song={song}
-              isImporting={importingId === song.id}
-              onImport={handleImport}
-              onPreview={handlePreview}
-            />
-          ))
+          <>
+            {!query.trim() && (
+              <p style={{ fontSize: '11px', color: 'var(--lb-text-dim)', padding: '0 4px 6px' }}>
+                最近發布
+              </p>
+            )}
+            {results.map((song) => (
+              <CloudSongItem
+                key={song.id}
+                song={song}
+                isImporting={importingId === song.id}
+                onImport={handleImport}
+                onPreview={handlePreview}
+              />
+            ))}
+          </>
         ) : query.trim() ? (
           <p
             className="text-lb-text-secondary"
             style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}
           >
-            找不到符合的雲端歌詞
+            找不到符合的共用歌曲
           </p>
         ) : (
           <div
@@ -170,7 +234,7 @@ export function CloudLibraryPanel() {
           >
             <Search size={24} style={{ color: 'var(--lb-text-dim)' }} />
             <p style={{ fontSize: '12px', color: 'var(--lb-text-secondary)', textAlign: 'center' }}>
-              輸入歌名或歌手名稱搜尋
+              尚無共用歌曲
             </p>
           </div>
         )}

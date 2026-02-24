@@ -172,7 +172,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
             onClick={() => setTab('cloud')}
           >
             <Cloud size={13} />
-            雲端歌詞
+            共用歌曲
           </button>
         </div>
 

@@ -1,13 +1,12 @@
 import { memo } from 'react'
-import { Download, Music } from 'lucide-react'
-import type { CloudSong } from '@/types'
-import { formatDuration } from '@/lib/format-duration'
+import { Download, Youtube } from 'lucide-react'
+import type { SharedSong } from '@/types'
 
 interface CloudSongItemProps {
-  song: CloudSong
+  song: SharedSong
   isImporting: boolean
-  onImport: (song: CloudSong) => void
-  onPreview: (song: CloudSong) => void
+  onImport: (song: SharedSong) => void
+  onPreview: (song: SharedSong) => void
 }
 
 export const CloudSongItem = memo(function CloudSongItem({
@@ -16,8 +15,6 @@ export const CloudSongItem = memo(function CloudSongItem({
   onImport,
   onPreview,
 }: CloudSongItemProps) {
-  const hasSyncedLyrics = !!song.syncedLyrics
-
   return (
     <div
       className="group flex items-start"
@@ -41,47 +38,32 @@ export const CloudSongItem = memo(function CloudSongItem({
     >
       {/* Song info */}
       <div className="flex-1 min-w-0 flex flex-col" style={{ gap: '2px' }}>
-        <span className="truncate font-medium">{song.trackName}</span>
-        <span
-          className="truncate"
-          style={{ color: 'var(--lb-text-secondary)', fontSize: '12px' }}
-        >
-          {song.artistName}
-          {song.albumName ? ` · ${song.albumName}` : ''}
-        </span>
+        <span className="truncate font-medium">{song.name}</span>
+        {song.artist && (
+          <span
+            className="truncate"
+            style={{ color: 'var(--lb-text-secondary)', fontSize: '12px' }}
+          >
+            {song.artist}
+          </span>
+        )}
         <div className="flex items-center" style={{ gap: '6px', marginTop: '2px' }}>
-          {song.duration > 0 && (
-            <span style={{ color: 'var(--lb-text-dim)', fontSize: '11px' }}>
-              {formatDuration(song.duration)}
-            </span>
-          )}
-          {hasSyncedLyrics && (
+          {song.youtube_id && (
             <span
               style={{
                 fontSize: '10px',
                 fontWeight: 600,
-                color: 'var(--lb-accent)',
-                background: 'var(--lb-accent-glow)',
+                color: '#ff0000',
+                background: 'rgba(255, 0, 0, 0.08)',
                 padding: '1px 5px',
                 borderRadius: '4px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px',
               }}
             >
-              <Music size={9} style={{ display: 'inline', marginRight: '2px', verticalAlign: 'middle' }} />
-              同步歌詞
-            </span>
-          )}
-          {song.instrumental && (
-            <span
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--lb-text-dim)',
-                background: 'var(--lb-bg-input)',
-                padding: '1px 5px',
-                borderRadius: '4px',
-              }}
-            >
-              純音樂
+              <Youtube size={9} />
+              YT
             </span>
           )}
         </div>
@@ -106,7 +88,7 @@ export const CloudSongItem = memo(function CloudSongItem({
           onImport(song)
         }}
         disabled={isImporting}
-        title="匯入到歌曲庫"
+        title="匯入到本機歌曲庫"
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = 'var(--lb-accent)'
           e.currentTarget.style.color = 'var(--lb-accent)'
