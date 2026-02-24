@@ -4,10 +4,11 @@ import { searchLyrics, type LrclibSearchResult } from '@/lib/lrclib'
 
 interface LyricsSearchTabProps {
   onSelect: (lrcText: string, trackName: string) => void
+  initialQuery?: string
 }
 
-export function LyricsSearchTab({ onSelect }: LyricsSearchTabProps) {
-  const [query, setQuery] = useState('')
+export function LyricsSearchTab({ onSelect, initialQuery = '' }: LyricsSearchTabProps) {
+  const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState<LrclibSearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

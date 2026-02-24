@@ -8,6 +8,7 @@ interface LrcInputTabsProps {
   activeTab?: string
   onTabChange?: (tab: string) => void
   onSearchSelect?: (lrcText: string, trackName: string) => void
+  songName?: string
 }
 
 export function LrcInputTabs({
@@ -16,6 +17,7 @@ export function LrcInputTabs({
   activeTab,
   onTabChange,
   onSearchSelect,
+  songName,
 }: LrcInputTabsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -113,7 +115,7 @@ export function LrcInputTabs({
         </TabsContent>
 
         <TabsContent value="search">
-          {onSearchSelect && <LyricsSearchTab onSelect={onSearchSelect} />}
+          {onSearchSelect && <LyricsSearchTab onSelect={onSearchSelect} initialQuery={songName} />}
         </TabsContent>
       </Tabs>
     </div>

@@ -174,6 +174,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
             activeTab={lrcTab}
             onTabChange={setLrcTab}
             onSearchSelect={handleSearchSelect}
+            songName={name}
           />
         </div>
 
