@@ -27,7 +27,6 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [audioFileName, setAudioFileName] = useState('')
   const [lrcText, setLrcText] = useState('')
-  const [lrcTab, setLrcTab] = useState('paste')
   const [audioFile, setAudioFile] = useState<File | null>(null)
 
   const isEditMode = !!editSong
@@ -47,7 +46,6 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       setYoutubeUrl('')
       setAudioFileName('')
       setLrcText('')
-      setLrcTab('paste')
       setAudioFile(null)
     }
   }, [open, editSong])
@@ -96,13 +94,12 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
     if (!name.trim()) {
       setName(trackName)
     }
-    setLrcTab('paste')
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh]">
-        <DialogHeader>
+      <DialogContent className="flex flex-col max-h-[80dvh]" onInteractOutside={(e) => e.preventDefault()}>
+        <DialogHeader className="shrink-0">
           <DialogTitle>
             {isEditMode ? '編輯歌曲' : '新增歌曲'}
           </DialogTitle>
@@ -113,7 +110,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
 
         {/* Body */}
         <div
-          className="flex flex-col overflow-y-auto"
+          className="flex flex-col overflow-y-auto min-h-0 flex-1"
           style={{ padding: '20px', gap: '16px' }}
         >
           {/* Song name */}
@@ -171,13 +168,11 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
           <LrcInputTabs
             lrcText={lrcText}
             onLrcTextChange={setLrcText}
-            activeTab={lrcTab}
-            onTabChange={setLrcTab}
             onSearchSelect={handleSearchSelect}
           />
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           <button
             onClick={() => onOpenChange(false)}
             style={{

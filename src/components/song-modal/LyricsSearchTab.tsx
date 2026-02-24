@@ -23,7 +23,7 @@ export function LyricsSearchTab({ onSelect }: LyricsSearchTabProps) {
 
     try {
       const data = await searchLyrics(q)
-      setResults(data)
+      setResults(data.filter((r) => r.syncedLyrics))
     } catch {
       setError('搜尋失敗，請稍後再試。')
       setResults([])
@@ -39,8 +39,7 @@ export function LyricsSearchTab({ onSelect }: LyricsSearchTabProps) {
   }
 
   function handleSelect(result: LrclibSearchResult) {
-    const text = result.syncedLyrics ?? result.plainLyrics ?? ''
-    onSelect(text, result.trackName)
+    onSelect(result.syncedLyrics!, result.trackName)
   }
 
   function formatDuration(seconds: number): string {
@@ -49,17 +48,8 @@ export function LyricsSearchTab({ onSelect }: LyricsSearchTabProps) {
     return `${m}:${String(s).padStart(2, '0')}`
   }
 
-  function getLyricsTag(result: LrclibSearchResult) {
-    if (result.instrumental) {
-      return { label: '純音樂', color: '#8b8b9e', bg: 'rgba(139,139,158,0.15)' }
-    }
-    if (result.syncedLyrics) {
-      return { label: '同步歌詞', color: '#4ade80', bg: 'rgba(74,222,128,0.12)' }
-    }
-    if (result.plainLyrics) {
-      return { label: '純文字', color: '#a0a0b8', bg: 'rgba(160,160,184,0.12)' }
-    }
-    return null
+  function getLyricsTag() {
+    return { label: '同步歌詞', color: '#4ade80', bg: 'rgba(74,222,128,0.12)' }
   }
 
   return (
@@ -175,24 +165,20 @@ export function LyricsSearchTab({ onSelect }: LyricsSearchTabProps) {
         {/* Results list */}
         {!loading &&
           results.map((result) => {
-            const tag = getLyricsTag(result)
-            const disabled = result.instrumental && !result.syncedLyrics && !result.plainLyrics
+            const tag = getLyricsTag()
 
             return (
               <div
                 key={result.id}
-                onClick={() => !disabled && handleSelect(result)}
+                onClick={() => handleSelect(result)}
                 style={{
                   padding: '10px 12px',
-                  cursor: disabled ? 'default' : 'pointer',
-                  opacity: disabled ? 0.5 : 1,
+                  cursor: 'pointer',
                   borderBottom: '1px solid var(--lb-border)',
                   transition: 'background 0.15s',
                 }}
                 onMouseEnter={(e) => {
-                  if (!disabled) {
-                    e.currentTarget.style.background = 'var(--lb-bg-input)'
-                  }
+                  e.currentTarget.style.background = 'var(--lb-bg-input)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent'
