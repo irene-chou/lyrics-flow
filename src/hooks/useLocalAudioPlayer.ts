@@ -1,8 +1,12 @@
 import { useRef, useCallback, useEffect, useMemo } from 'react'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { PitchShifter } from 'soundtouchjs'
 
 export function useLocalAudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null)
+  const shifterRef = useRef<PitchShifter | null>(null)
 
   // Create audio element once
   useEffect(() => {
@@ -46,10 +50,24 @@ export function useLocalAudioPlayer() {
       el.removeEventListener('loadedmetadata', onLoadedMetadata)
       el.pause()
       el.src = ''
+
+      // Cleanup Web Audio nodes
+      if (shifterRef.current) {
+        shifterRef.current.disconnect()
+        shifterRef.current = null
+      }
+      if (sourceNodeRef.current) {
+        sourceNodeRef.current.disconnect()
+        sourceNodeRef.current = null
+      }
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close()
+        audioCtxRef.current = null
+      }
     }
   }, [])
 
-  // Sync volume/muted from store (with guard to skip no-op writes)
+  // Sync volume/muted from store
   useEffect(() => {
     let prevVolume = usePlaybackStore.getState().volume
     let prevMuted = usePlaybackStore.getState().muted
@@ -65,6 +83,42 @@ export function useLocalAudioPlayer() {
     return unsub
   }, [])
 
+  // Sync pitchSemitones from store to PitchShifter
+  useEffect(() => {
+    let prevPitch = usePlaybackStore.getState().pitchSemitones
+
+    const unsub = usePlaybackStore.subscribe((state) => {
+      if (state.pitchSemitones === prevPitch) return
+      prevPitch = state.pitchSemitones
+      if (shifterRef.current) {
+        shifterRef.current.pitch = Math.pow(2, state.pitchSemitones / 12)
+      }
+    })
+    return unsub
+  }, [])
+
+  /**
+   * Initialize Web Audio API pipeline: AudioElement → MediaElementSource → PitchShifter → Destination
+   * Must be called after a user gesture (for AudioContext policy) and only once per audio element.
+   */
+  const ensureAudioPipeline = useCallback(() => {
+    const el = audioRef.current
+    if (!el || sourceNodeRef.current) return // already initialized
+
+    const ctx = new AudioContext()
+    audioCtxRef.current = ctx
+
+    const source = ctx.createMediaElementSource(el)
+    sourceNodeRef.current = source
+
+    const shifter = new PitchShifter(ctx, source, 4096)
+    const currentPitch = usePlaybackStore.getState().pitchSemitones
+    shifter.pitch = Math.pow(2, currentPitch / 12)
+    shifterRef.current = shifter
+
+    shifter.connect(ctx.destination)
+  }, [])
+
   const loadFile = useCallback((objectUrl: string) => {
     const el = audioRef.current
     if (!el) return
@@ -74,8 +128,13 @@ export function useLocalAudioPlayer() {
   }, [])
 
   const play = useCallback(() => {
+    ensureAudioPipeline()
+    const ctx = audioCtxRef.current
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume()
+    }
     audioRef.current?.play()
-  }, [])
+  }, [ensureAudioPipeline])
 
   const pause = useCallback(() => {
     audioRef.current?.pause()
