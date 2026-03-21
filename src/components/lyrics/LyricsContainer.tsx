@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useMemo } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { useSyncStore } from '@/stores/useSyncStore'
@@ -46,17 +46,14 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
     }
   }, [currentLineIndex])
 
-  // Use ref for handleLineClick so per-line handlers stay stable across offset/lyrics changes
+  // Ref to always point to latest seek handler (avoids re-creating per-line handlers on offset change)
   const handleLineClickRef = useRef<(index: number) => void>(() => {})
-  handleLineClickRef.current = useCallback(
-    (index: number) => {
-      if (!onSeekToLyric) return
-      const line = lyrics[index]
-      if (!line) return
-      onSeekToLyric(line.time - offset)
-    },
-    [lyrics, offset, onSeekToLyric],
-  )
+  handleLineClickRef.current = (index: number) => {
+    if (!onSeekToLyric) return
+    const line = lyrics[index]
+    if (!line) return
+    onSeekToLyric(line.time - offset)
+  }
 
   // Pre-compute statuses so only lines whose status changed will re-render
   const statuses = useMemo<LyricStatus[]>(() => {
@@ -68,20 +65,18 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
     })
   }, [lyrics, currentLineIndex])
 
-  // Stable per-line ref setters — only rebuilt when lyrics array changes
-  const lineRefSetters = useRef<((el: HTMLDivElement | null) => void)[]>([])
-
-  // Stable per-line click handlers — only rebuilt when lyrics array changes
-  const lineClickHandlers = useRef<(() => void)[]>([])
-
-  useEffect(() => {
+  // Stable per-line ref setters — only rebuilt when lyrics array changes (useMemo so available during render)
+  const lineRefSetters = useMemo(() => {
     lineRefs.current = new Array(lyrics.length).fill(null)
-    lineRefSetters.current = lyrics.map((_, i) => (el: HTMLDivElement | null) => {
+    return lyrics.map((_, i) => (el: HTMLDivElement | null) => {
       lineRefs.current[i] = el
     })
-    lineClickHandlers.current = onSeekToLyric
-      ? lyrics.map((_, i) => () => handleLineClickRef.current(i))
-      : []
+  }, [lyrics])
+
+  // Per-line click handlers — useMemo so they're available during render (not post-render like useEffect)
+  const lineClickHandlers = useMemo(() => {
+    if (!onSeekToLyric) return []
+    return lyrics.map((_, i) => () => handleLineClickRef.current(i))
   }, [lyrics, onSeekToLyric])
 
   const containerStyle = useMemo(() => ({ background: lyricsBgColor }), [lyricsBgColor])
@@ -112,7 +107,7 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
             {lyrics.map((line, i) => (
               <LyricLine
                 key={`${line.time}-${i}`}
-                ref={lineRefSetters.current[i]}
+                ref={lineRefSetters[i]}
                 line={line}
                 status={statuses[i]}
                 activeFontSize={activeFontSize}
@@ -120,7 +115,7 @@ export function LyricsContainer({ onSeekToLyric, isMobile }: LyricsContainerProp
                 activeColor={activeColor}
                 otherColor={otherColor}
                 passedColor={otherColor}
-                onClick={lineClickHandlers.current[i]}
+                onClick={lineClickHandlers[i]}
               />
             ))}
           </div>
