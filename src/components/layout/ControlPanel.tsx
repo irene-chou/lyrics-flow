@@ -4,6 +4,7 @@ import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { AudioPlayer } from '../playback/AudioPlayer'
 import { OffsetControls } from '../playback/OffsetControls'
+import { PitchControls } from '../playback/PitchControls'
 import { DisplaySettings } from '../settings/DisplaySettings'
 import type { Song } from '@/types'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
@@ -16,13 +17,14 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlPanelProps) {
-  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, audioSource, youtubeId, audioFileName } = useSongStore(
+  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, pitch, audioSource, youtubeId, audioFileName } = useSongStore(
     useShallow((s) => ({
       currentSongId: s.currentSongId,
       currentSongTitle: s.currentSongTitle,
       currentSongCreatedAt: s.currentSongCreatedAt,
       lrcText: s.lrcText,
       offset: s.offset,
+      pitch: s.pitch,
       audioSource: s.audioSource,
       youtubeId: s.youtubeId,
       audioFileName: s.audioFileName,
@@ -37,6 +39,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       name: currentSongTitle,
       lrcText,
       offset,
+      pitch,
       audioSource,
       youtubeId,
       audioFileName,
@@ -143,6 +146,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
             {/* Audio Player */}
             <AudioPlayer engine={engine} onSeek={handleSeek} />
             <OffsetControls />
+            <PitchControls />
           </>
         ) : (
           <p

@@ -1,25 +1,26 @@
 import { RotateCcw } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
-import { useSyncStore } from '@/stores/useSyncStore'
 import { debouncedSaveSong } from '@/hooks/useSongLibrary'
 import { CONTROL_BTN_CLASS, OFFSET_BTN_STYLE } from '@/lib/constants'
 
-export function OffsetControls() {
+export function PitchControls() {
   const currentSongId = useSongStore((s) => s.currentSongId)
-  const offset = useSongStore((s) => s.offset)
+  const audioSource = useSongStore((s) => s.audioSource)
+  const pitch = useSongStore((s) => s.pitch)
 
-  if (!currentSongId) return null
+  // Only show for local audio (YouTube doesn't support pitch shifting)
+  if (!currentSongId || audioSource !== 'local') return null
 
-  function adjustOffset(delta: number) {
-    const newOffset = Math.round((offset + delta) * 10) / 10
-    useSongStore.getState().setOffset(newOffset)
-    useSyncStore.getState().setCurrentLineIndex(-1)
+  function adjustPitch(delta: number) {
+    const current = useSongStore.getState().pitch
+    const newPitch = Math.round((current + delta) * 2) / 2 // round to 0.5
+    const clamped = Math.max(-12, Math.min(12, newPitch))
+    useSongStore.getState().setPitch(clamped)
     debouncedSaveSong()
   }
 
-  function resetOffset() {
-    useSongStore.getState().setOffset(0)
-    useSyncStore.getState().setCurrentLineIndex(-1)
+  function resetPitch() {
+    useSongStore.getState().setPitch(0)
     debouncedSaveSong()
   }
 
@@ -35,12 +36,12 @@ export function OffsetControls() {
             letterSpacing: '0.08em',
           }}
         >
-          歌詞偏移 (Offset)
+          升降 Key (Pitch)
         </div>
         <button
           className="flex text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input transition-colors cursor-pointer"
-          onClick={resetOffset}
-          title="重置偏移"
+          onClick={resetPitch}
+          title="重置 Key"
           style={{
             padding: '4px',
             borderRadius: '4px',
@@ -52,11 +53,11 @@ export function OffsetControls() {
         </button>
       </div>
       <div className="flex items-center justify-center" style={{ gap: '6px' }}>
-        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(-0.5)} style={OFFSET_BTN_STYLE}>
-          -0.5s
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustPitch(-1)} style={OFFSET_BTN_STYLE}>
+          -1
         </button>
-        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(-0.1)} style={OFFSET_BTN_STYLE}>
-          -0.1s
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustPitch(-0.5)} style={OFFSET_BTN_STYLE}>
+          -½
         </button>
         <span
           style={{
@@ -68,14 +69,14 @@ export function OffsetControls() {
             textAlign: 'center',
           }}
         >
-          {offset >= 0 ? '+' : ''}
-          {offset.toFixed(1)}s
+          {pitch >= 0 ? '+' : ''}
+          {pitch % 1 === 0 ? pitch.toFixed(0) : pitch.toFixed(1)}
         </span>
-        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(0.1)} style={OFFSET_BTN_STYLE}>
-          +0.1s
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustPitch(0.5)} style={OFFSET_BTN_STYLE}>
+          +½
         </button>
-        <button className={CONTROL_BTN_CLASS} onClick={() => adjustOffset(0.5)} style={OFFSET_BTN_STYLE}>
-          +0.5s
+        <button className={CONTROL_BTN_CLASS} onClick={() => adjustPitch(1)} style={OFFSET_BTN_STYLE}>
+          +1
         </button>
       </div>
     </div>

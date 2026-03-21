@@ -10,6 +10,7 @@ export interface Song {
   name: string
   lrcText: string
   offset: number
+  pitch: number
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
