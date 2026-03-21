@@ -12,10 +12,24 @@ export function useLocalAudioPlayer() {
   const rafIdRef = useRef(0)
   const loadingRef = useRef<Promise<void> | null>(null)
 
+  const stopTimeUpdatesRef = useRef(() => {})
+
   const startTimeUpdates = useCallback(() => {
     const update = () => {
       if (shifterRef.current) {
-        usePlaybackStore.getState().setCurrentTime(shifterRef.current.timePlayed)
+        const time = shifterRef.current.timePlayed
+        const perc = shifterRef.current.percentagePlayed
+        usePlaybackStore.getState().setCurrentTime(time)
+
+        // Detect end-of-track via source position instead of relying on
+        // PitchShifter's onEnd callback, which fires spuriously after
+        // seek/recreate due to empty SoundTouch internal buffers.
+        if (perc >= 99.9) {
+          stopTimeUpdatesRef.current()
+          usePlaybackStore.getState().setStatus('ENDED')
+          savedPositionRef.current = 0
+          return
+        }
       }
       rafIdRef.current = requestAnimationFrame(update)
     }
@@ -25,6 +39,9 @@ export function useLocalAudioPlayer() {
   const stopTimeUpdates = useCallback(() => {
     cancelAnimationFrame(rafIdRef.current)
   }, [])
+
+  // Keep ref in sync so the RAF loop can call stopTimeUpdates without stale closures
+  stopTimeUpdatesRef.current = stopTimeUpdates
 
   const ensureAudioContext = useCallback(() => {
     if (!audioCtxRef.current) {
@@ -57,17 +74,15 @@ export function useLocalAudioPlayer() {
 
     const pitch = useSongStore.getState().pitch
 
-    const shifter = new PitchShifter(ctx, buffer, 4096, () => {
-      // onEnd callback
-      stopTimeUpdates()
-      usePlaybackStore.getState().setStatus('ENDED')
-      savedPositionRef.current = 0
-    })
+    // Pass no-op for onEnd — SoundTouch fires it spuriously after seek/recreate
+    // (empty internal buffers → extract returns 0 frames). End-of-track is
+    // detected reliably in the RAF time-update loop via percentagePlayed instead.
+    const shifter = new PitchShifter(ctx, buffer, 4096, () => {})
     shifter.pitchSemitones = pitch
     shifter.connect(gainNodeRef.current)
     shifterRef.current = shifter
     return true
-  }, [destroyShifter, stopTimeUpdates])
+  }, [destroyShifter])
 
   // Sync volume/muted from store to GainNode
   useEffect(() => {
@@ -143,15 +158,15 @@ export function useLocalAudioPlayer() {
 
     const ctx = ensureAudioContext()
 
-    if (!shifterRef.current) {
-      const created = createShifter()
-      if (!created) return // no buffer yet
-    }
+    // Always recreate shifter to avoid stale SoundTouch buffers that
+    // cause spurious onEnd callbacks after pause/seek.
+    const created = createShifter()
+    if (!created) return // no buffer yet
 
-    // Seek to saved position if resuming
+    // Seek to saved position if resuming.
+    // NOTE: percentagePlayed setter expects a 0–1 fraction, NOT 0–100.
     if (savedPositionRef.current > 0 && shifterRef.current && audioBufferRef.current) {
-      const perc = (savedPositionRef.current / audioBufferRef.current.duration) * 100
-      shifterRef.current.percentagePlayed = perc
+      shifterRef.current.percentagePlayed = savedPositionRef.current / audioBufferRef.current.duration
     }
 
     if (ctx.state === 'suspended') {
@@ -176,13 +191,25 @@ export function useLocalAudioPlayer() {
     if (!buffer) return
     const clamped = Math.max(0, Math.min(buffer.duration, seconds))
     savedPositionRef.current = clamped
-
-    if (shifterRef.current) {
-      const perc = (clamped / buffer.duration) * 100
-      shifterRef.current.percentagePlayed = perc
-    }
     usePlaybackStore.getState().setCurrentTime(clamped)
-  }, [])
+
+    // Always recreate shifter to flush stale SoundTouch internal buffers.
+    // Without this, setting percentagePlayed on an existing shifter causes
+    // the onEnd callback to fire spuriously (SoundTouch returns 0 frames).
+    const status = usePlaybackStore.getState().status
+    if (status === 'PLAYING' || status === 'PAUSED') {
+      destroyShifter()
+      createShifter()
+      // NOTE: percentagePlayed setter expects a 0–1 fraction, NOT 0–100.
+      if (shifterRef.current) {
+        shifterRef.current.percentagePlayed = clamped / buffer.duration
+      }
+      // If paused, suspend context so new shifter doesn't start playing
+      if (status === 'PAUSED') {
+        audioCtxRef.current?.suspend()
+      }
+    }
+  }, [destroyShifter, createShifter])
 
   const getCurrentTime = useCallback((): number => {
     if (shifterRef.current) {
