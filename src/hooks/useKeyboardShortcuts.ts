@@ -90,6 +90,7 @@ export function useKeyboardShortcuts({
                 name: song.currentSongTitle,
                 lrcText: song.lrcText,
                 offset: song.offset,
+                pitch: song.pitch,
                 audioSource: song.audioSource,
                 youtubeId: song.youtubeId,
                 audioFileName: song.audioFileName,

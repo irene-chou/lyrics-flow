@@ -8,6 +8,7 @@ interface SongSavedState {
   name: string
   lrcText: string
   offset: number
+  pitch: number
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
@@ -20,6 +21,7 @@ interface SongState {
   currentSongCreatedAt: number
   lyrics: LyricLine[]
   offset: number
+  pitch: number
   lrcText: string
   audioSource: AudioSource
   youtubeId: string | null
@@ -32,6 +34,7 @@ interface SongState {
   loadSong: (song: Song) => void
   clearSong: () => void
   setOffset: (offset: number) => void
+  setPitch: (pitch: number) => void
   setLyrics: (lyrics: LyricLine[]) => void
   setLrcText: (text: string) => void
   setAudioSource: (source: AudioSource) => void
@@ -47,6 +50,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   currentSongCreatedAt: 0,
   lyrics: [],
   offset: 0,
+  pitch: 0,
   lrcText: '',
   audioSource: 'youtube',
   youtubeId: null,
@@ -67,6 +71,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       currentSongCreatedAt: song.createdAt,
       lyrics,
       offset: song.offset,
+      pitch: song.pitch ?? 0,
       lrcText: song.lrcText,
       audioSource: song.audioSource,
       youtubeId: song.youtubeId,
@@ -75,6 +80,7 @@ export const useSongStore = create<SongState>((set, get) => ({
         name: songTitle,
         lrcText: song.lrcText,
         offset: song.offset,
+        pitch: song.pitch ?? 0,
         audioSource: song.audioSource,
         youtubeId: song.youtubeId,
         audioFileName: song.audioFileName,
@@ -91,6 +97,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       currentSongCreatedAt: 0,
       lyrics: [],
       offset: 0,
+      pitch: 0,
       lrcText: '',
       audioSource: 'youtube',
       youtubeId: null,
@@ -100,6 +107,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   },
 
   setOffset: (offset: number) => set({ offset }),
+  setPitch: (pitch: number) => set({ pitch }),
   setLyrics: (lyrics: LyricLine[]) => set({ lyrics }),
   setLrcText: (text: string) => set({ lrcText: text }),
   setAudioSource: (source: AudioSource) => set({ audioSource: source }),
@@ -113,6 +121,7 @@ export const useSongStore = create<SongState>((set, get) => ({
         name: state.currentSongTitle,
         lrcText: state.lrcText,
         offset: state.offset,
+        pitch: state.pitch,
         audioSource: state.audioSource,
         youtubeId: state.youtubeId,
         audioFileName: state.audioFileName,
@@ -128,6 +137,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       state.currentSongTitle !== saved.name ||
       state.lrcText !== saved.lrcText ||
       state.offset !== saved.offset ||
+      state.pitch !== saved.pitch ||
       state.audioSource !== saved.audioSource ||
       state.youtubeId !== saved.youtubeId ||
       state.audioFileName !== saved.audioFileName
