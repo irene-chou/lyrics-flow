@@ -8,7 +8,6 @@ interface PlaybackState {
   volume: number
   muted: boolean
   audioFileObjectUrl: string | null
-  pitchSemitones: number
 
   // Actions
   setStatus: (status: PlaybackStatus) => void
@@ -18,7 +17,6 @@ interface PlaybackState {
   setMuted: (muted: boolean) => void
   toggleMute: () => void
   setAudioFileObjectUrl: (url: string | null) => void
-  setPitchSemitones: (semitones: number) => void
   reset: () => void
 }
 
@@ -29,7 +27,6 @@ const initialState = {
   volume: 100,
   muted: false,
   audioFileObjectUrl: null,
-  pitchSemitones: 0,
 }
 
 export const usePlaybackStore = create<PlaybackState>((set, get) => ({
@@ -52,7 +49,6 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
     }
     set({ audioFileObjectUrl })
   },
-  setPitchSemitones: (pitchSemitones) => set({ pitchSemitones }),
   reset: () => {
     const prev = get().audioFileObjectUrl
     if (prev) {

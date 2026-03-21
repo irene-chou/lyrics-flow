@@ -4,7 +4,6 @@ import { useSongStore } from '@/stores/useSongStore'
 import { useUISettingsStore } from '@/stores/useUISettingsStore'
 import { AudioPlayer } from '../playback/AudioPlayer'
 import { OffsetControls } from '../playback/OffsetControls'
-import { PitchControls } from '../playback/PitchControls'
 import { DisplaySettings } from '../settings/DisplaySettings'
 import type { Song } from '@/types'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
@@ -144,7 +143,6 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
             {/* Audio Player */}
             <AudioPlayer engine={engine} onSeek={handleSeek} />
             <OffsetControls />
-            <PitchControls />
           </>
         ) : (
           <p
