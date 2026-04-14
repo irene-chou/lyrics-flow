@@ -26,6 +26,7 @@ interface SongState {
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
+  folderId: number | null
 
   // Saved state for dirty tracking
   lastSavedState: SongSavedState | null
@@ -40,6 +41,7 @@ interface SongState {
   setAudioSource: (source: AudioSource) => void
   setYoutubeId: (id: string | null) => void
   setAudioFileName: (name: string | null) => void
+  setFolderId: (folderId: number | null) => void
   captureState: () => void
   hasUnsavedChanges: () => boolean
 }
@@ -55,6 +57,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   audioSource: 'youtube',
   youtubeId: null,
   audioFileName: null,
+  folderId: null,
   lastSavedState: null,
 
   loadSong: (song: Song) => {
@@ -76,6 +79,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       audioSource: song.audioSource,
       youtubeId: song.youtubeId,
       audioFileName: song.audioFileName,
+      folderId: song.folderId ?? null,
       lastSavedState: {
         name: songTitle,
         lrcText: song.lrcText,
@@ -102,6 +106,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       audioSource: 'youtube',
       youtubeId: null,
       audioFileName: null,
+      folderId: null,
       lastSavedState: null,
     })
   },
@@ -113,6 +118,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   setAudioSource: (source: AudioSource) => set({ audioSource: source }),
   setYoutubeId: (id: string | null) => set({ youtubeId: id }),
   setAudioFileName: (name: string | null) => set({ audioFileName: name }),
+  setFolderId: (folderId: number | null) => set({ folderId }),
 
   captureState: () => {
     const state = get()
