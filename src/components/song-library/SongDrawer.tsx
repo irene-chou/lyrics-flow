@@ -38,6 +38,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
   const localFileInputRef = useRef<HTMLInputElement>(null)
   const pendingSongRef = useRef<Song | null>(null)
 
+  // Uncategorized section drag-over state
+  const [unfolderDragOver, setUnfolderDragOver] = useState(false)
+  const unfolderDragCounterRef = useRef(0)
+
   const filteredSongs = useMemo(() => {
     if (!songs) return []
     if (!search.trim()) return songs
@@ -45,10 +49,8 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     return songs.filter((s) => s.name.toLowerCase().includes(query))
   }, [songs, search])
 
-  // When searching, show a flat list; otherwise group by folder
   const isSearching = search.trim().length > 0
 
-  // Group songs by folder (only used when not searching)
   const { folderSongs, unfolderSongs } = useMemo(() => {
     if (!songs || !folders) return { folderSongs: new Map<number, Song[]>(), unfolderSongs: [] }
     const folderMap = new Map<number, Song[]>()
@@ -66,7 +68,6 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
 
   const handleSelect = useCallback((song: Song) => {
     loadSong(song)
-    // If local audio, trigger file picker in the same user gesture (synchronous)
     if (song.audioSource === 'local') {
       pendingSongRef.current = song
       localFileInputRef.current?.click()
@@ -82,12 +83,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     }
     const objectUrl = URL.createObjectURL(file)
     usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
-    // Update file name if different
     if (pendingSongRef.current && file.name !== pendingSongRef.current.audioFileName) {
       useSongStore.getState().setAudioFileName(file.name)
     }
     pendingSongRef.current = null
-    // Reset input so re-selecting same file triggers change
     e.target.value = ''
   }
 
@@ -102,8 +101,15 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
 
   const handleMove = useCallback(async (song: Song, folderId: number | null) => {
     await moveSongToFolder(song.id, folderId)
-    // If this is the currently loaded song, update its folderId in the store
     if (useSongStore.getState().currentSongId === song.id) {
+      useSongStore.getState().setFolderId(folderId)
+    }
+  }, [])
+
+  // Used by drag-and-drop: receives songId instead of Song object
+  const handleDropSong = useCallback(async (songId: number, folderId: number | null) => {
+    await moveSongToFolder(songId, folderId)
+    if (useSongStore.getState().currentSongId === songId) {
       useSongStore.getState().setFolderId(folderId)
     }
   }, [])
@@ -122,7 +128,6 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     const confirmed = confirm(`確定要刪除資料夾「${folder.name}」嗎？\n資料夾內的歌曲將移至未分類。`)
     if (!confirmed) return
     await deleteFolder(folder.id)
-    // If current song was in this folder, update store
     const state = useSongStore.getState()
     if (state.folderId === folder.id) {
       state.setFolderId(null)
@@ -131,10 +136,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
 
   const folderList = folders ?? []
   const isLoading = !songs
+  const hasFolders = folderList.length > 0
 
   return (
     <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
-      {/* Hidden file input for local audio re-selection */}
       <input
         ref={localFileInputRef}
         type="file"
@@ -144,24 +149,17 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
       />
       <DrawerContent
         className="h-full bg-lb-bg-secondary border-l border-lb-border"
-        style={{
-          width: isMobile ? '100vw' : '380px',
-        }}
+        style={{ width: isMobile ? '100vw' : '380px' }}
       >
         {/* Header */}
         <DrawerHeader
           className="flex-row items-center justify-between shrink-0 border-b border-lb-border"
-          style={{
-            padding: isMobile ? '16px' : '20px 24px',
-          }}
+          style={{ padding: isMobile ? '16px' : '20px 24px' }}
         >
           <div>
             <DrawerTitle
               className="text-lb-text-primary"
-              style={{
-                fontSize: '14px',
-                fontWeight: 600,
-              }}
+              style={{ fontSize: '14px', fontWeight: 600 }}
             >
               歌曲庫
             </DrawerTitle>
@@ -170,14 +168,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
           <button
             onClick={() => onOpenChange(false)}
             className="flex items-center justify-center transition-colors cursor-pointer text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input"
-            style={{
-              width: '28px',
-              height: '28px',
-              padding: 0,
-              border: 'none',
-              borderRadius: '6px',
-              background: 'none',
-            }}
+            style={{ width: '28px', height: '28px', padding: 0, border: 'none', borderRadius: '6px', background: 'none' }}
             title="關閉"
           >
             <X size={16} />
@@ -196,15 +187,7 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
             <button
               onClick={handleCreateFolder}
               className="flex items-center justify-center transition-colors cursor-pointer text-lb-text-secondary hover:text-lb-text-primary hover:bg-lb-bg-input"
-              style={{
-                width: '32px',
-                height: '32px',
-                padding: 0,
-                border: 'none',
-                borderRadius: '6px',
-                background: 'none',
-                flexShrink: 0,
-              }}
+              style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', background: 'none', flexShrink: 0 }}
               title="新增資料夾"
             >
               <FolderPlus size={16} />
@@ -212,24 +195,15 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
             <SongDrawerMenu />
           </div>
 
-          <div
-            className="flex-1 overflow-y-auto flex flex-col"
-            style={{ gap: '2px' }}
-          >
+          <div className="flex-1 overflow-y-auto flex flex-col" style={{ gap: '2px' }}>
             {isLoading ? (
-              <p
-                className="text-lb-text-secondary"
-                style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}
-              >
+              <p className="text-lb-text-secondary" style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}>
                 載入中...
               </p>
             ) : isSearching ? (
               // Flat search results
               filteredSongs.length === 0 ? (
-                <p
-                  className="text-lb-text-secondary"
-                  style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}
-                >
+                <p className="text-lb-text-secondary" style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}>
                   找不到符合的歌曲
                 </p>
               ) : (
@@ -259,25 +233,46 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                     onSelectSong={handleSelect}
                     onDeleteSong={handleDelete}
                     onMoveSong={handleMove}
+                    onDropSong={handleDropSong}
                     onRenameFolder={handleRenameFolder}
                     onDeleteFolder={handleDeleteFolder}
                   />
                 ))}
 
-                {/* Uncategorized songs */}
-                {unfolderSongs.length > 0 && (
-                  <>
-                    {folderList.length > 0 && (
+                {/* Uncategorized drop zone — shown when there are folders */}
+                {hasFolders && (
+                  <div
+                    onDragEnter={(e) => {
+                      e.preventDefault()
+                      unfolderDragCounterRef.current++
+                      setUnfolderDragOver(true)
+                    }}
+                    onDragLeave={() => {
+                      unfolderDragCounterRef.current--
+                      if (unfolderDragCounterRef.current === 0) setUnfolderDragOver(false)
+                    }}
+                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      unfolderDragCounterRef.current = 0
+                      setUnfolderDragOver(false)
+                      const songId = parseInt(e.dataTransfer.getData('text/plain'), 10)
+                      if (!isNaN(songId)) handleDropSong(songId, null)
+                    }}
+                    style={{
+                      borderRadius: '8px',
+                      outline: unfolderDragOver ? '2px dashed var(--lb-accent)' : '2px solid transparent',
+                      background: unfolderDragOver ? 'rgba(124, 106, 239, 0.08)' : 'transparent',
+                      transition: 'outline 0.1s, background 0.1s',
+                    }}
+                  >
+                    {/* "未分類" label */}
+                    {(unfolderSongs.length > 0 || unfolderDragOver) && (
                       <div
                         className="text-lb-text-secondary"
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          padding: '8px 8px 4px',
-                          letterSpacing: '0.05em',
-                        }}
+                        style={{ fontSize: '11px', fontWeight: 600, padding: '8px 8px 4px', letterSpacing: '0.05em' }}
                       >
-                        未分類
+                        {unfolderDragOver && unfolderSongs.length === 0 ? '放開以移出資料夾' : '未分類'}
                       </div>
                     )}
                     {unfolderSongs.map((song) => (
@@ -291,15 +286,31 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                         onMove={handleMove}
                       />
                     ))}
-                  </>
+                    {/* Drop hint when dragging over empty uncategorized area */}
+                    {unfolderDragOver && unfolderSongs.length > 0 && (
+                      <p className="text-lb-text-secondary" style={{ fontSize: '11px', padding: '6px 12px', fontStyle: 'italic' }}>
+                        放開以移出資料夾
+                      </p>
+                    )}
+                  </div>
                 )}
+
+                {/* When no folders: plain uncategorized list */}
+                {!hasFolders && unfolderSongs.map((song) => (
+                  <SongListItem
+                    key={song.id}
+                    song={song}
+                    isActive={currentSongId === song.id}
+                    folders={folderList}
+                    onSelect={handleSelect}
+                    onDelete={handleDelete}
+                    onMove={handleMove}
+                  />
+                ))}
 
                 {/* Empty state */}
                 {folderList.length === 0 && unfolderSongs.length === 0 && (
-                  <p
-                    className="text-lb-text-secondary"
-                    style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}
-                  >
+                  <p className="text-lb-text-secondary" style={{ fontSize: '12px', textAlign: 'center', padding: '24px 0' }}>
                     尚無歌曲
                   </p>
                 )}

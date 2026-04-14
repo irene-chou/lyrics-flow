@@ -17,6 +17,7 @@ interface FolderSectionProps {
   onSelectSong: (song: Song) => void
   onDeleteSong: (song: Song) => void
   onMoveSong: (song: Song, folderId: number | null) => void
+  onDropSong: (songId: number, folderId: number | null) => void
   onRenameFolder: (folder: FolderType, newName: string) => void
   onDeleteFolder: (folder: FolderType) => void
 }
@@ -29,13 +30,16 @@ export function FolderSection({
   onSelectSong,
   onDeleteSong,
   onMoveSong,
+  onDropSong,
   onRenameFolder,
   onDeleteFolder,
 }: FolderSectionProps) {
   const [expanded, setExpanded] = useState(true)
   const [isRenaming, setIsRenaming] = useState(false)
   const [renameValue, setRenameValue] = useState(folder.name)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dragCounterRef = useRef(0)
 
   function startRename() {
     setRenameValue(folder.name)
@@ -59,8 +63,49 @@ export function FolderSection({
     if (e.key === 'Escape') setIsRenaming(false)
   }
 
+  function handleDragEnter(e: React.DragEvent) {
+    e.preventDefault()
+    dragCounterRef.current++
+    setIsDraggingOver(true)
+    // Auto-expand collapsed folder when dragging over it
+    if (!expanded) setExpanded(true)
+  }
+
+  function handleDragLeave() {
+    dragCounterRef.current--
+    if (dragCounterRef.current === 0) {
+      setIsDraggingOver(false)
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    dragCounterRef.current = 0
+    setIsDraggingOver(false)
+    const songId = parseInt(e.dataTransfer.getData('text/plain'), 10)
+    if (!isNaN(songId)) {
+      onDropSong(songId, folder.id)
+    }
+  }
+
   return (
-    <div>
+    <div
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      style={{
+        borderRadius: '8px',
+        outline: isDraggingOver ? '2px dashed var(--lb-accent)' : '2px solid transparent',
+        background: isDraggingOver ? 'rgba(124, 106, 239, 0.08)' : 'transparent',
+        transition: 'outline 0.1s, background 0.1s',
+      }}
+    >
       {/* Folder header */}
       <div
         className="group flex items-center"
@@ -71,7 +116,7 @@ export function FolderSection({
           cursor: 'pointer',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'var(--lb-bg-input)'
+          if (!isDraggingOver) e.currentTarget.style.background = 'var(--lb-bg-input)'
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'transparent'
@@ -180,7 +225,7 @@ export function FolderSection({
               className="text-lb-text-secondary"
               style={{ fontSize: '11px', padding: '6px 12px', fontStyle: 'italic' }}
             >
-              （空的）
+              {isDraggingOver ? '放開以移入' : '（空的）'}
             </p>
           ) : (
             songs.map((song) => (

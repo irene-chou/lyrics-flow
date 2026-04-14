@@ -1,5 +1,5 @@
-import { memo } from 'react'
-import { Trash2, FolderInput, FolderMinus } from 'lucide-react'
+import { memo, useState } from 'react'
+import { Trash2, FolderInput, FolderMinus, GripVertical } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,31 +27,51 @@ export const SongListItem = memo(function SongListItem({
   onMove,
 }: SongListItemProps) {
   const hasFolders = folders.length > 0
+  const [isDragging, setIsDragging] = useState(false)
 
   return (
     <div
       className="group flex items-center cursor-pointer"
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', String(song.id))
+        e.dataTransfer.effectAllowed = 'move'
+        setIsDragging(true)
+      }}
+      onDragEnd={() => setIsDragging(false)}
       style={{
-        gap: '8px',
+        gap: '4px',
         padding: '10px 12px',
         borderRadius: '8px',
         fontSize: '13px',
-        transition: 'background 0.15s',
+        transition: isDragging ? 'none' : 'background 0.15s',
         background: isActive ? 'var(--lb-accent)' : 'transparent',
         color: isActive ? '#fff' : 'var(--lb-text-primary)',
+        opacity: isDragging ? 0.4 : 1,
       }}
       onClick={() => onSelect(song)}
       onMouseEnter={(e) => {
-        if (!isActive) {
+        if (!isActive && !isDragging) {
           e.currentTarget.style.background = 'var(--lb-bg-input)'
         }
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = 'transparent'
+          e.currentTarget.style.background = isActive ? 'var(--lb-accent)' : 'transparent'
         }
       }}
     >
+      {/* Drag handle */}
+      <span
+        className="hidden group-hover:flex items-center shrink-0 text-lb-text-secondary"
+        style={{ cursor: 'grab', marginLeft: '-4px' }}
+        title="拖曳移動"
+      >
+        <GripVertical size={14} />
+      </span>
+      {/* Spacer when handle is hidden */}
+      <span className="flex group-hover:hidden shrink-0" style={{ width: '10px' }} />
+
       <span className="flex-1 min-w-0 truncate">{song.name}</span>
 
       {/* Actions shown on hover */}
@@ -147,7 +167,7 @@ export const SongListItem = memo(function SongListItem({
         </button>
       </span>
 
-      {/* Always show actions on active item (non-hover) */}
+      {/* Always show delete on active item (non-hover) */}
       {isActive && (
         <span
           className="flex items-center group-hover:hidden shrink-0"

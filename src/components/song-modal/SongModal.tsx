@@ -69,6 +69,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       audioSource,
       youtubeId: isYoutube ? extractVideoId(youtubeUrl) : null,
       audioFileName: isYoutube ? null : audioFileName || null,
+      folderId: isEditMode ? editSong!.folderId : null,
       createdAt: isEditMode ? editSong!.createdAt : now,
       updatedAt: now,
     }
