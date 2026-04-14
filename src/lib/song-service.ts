@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import type { Song } from '@/types'
+import type { Song, AudioFile } from '@/types'
 import { useSongStore } from '@/stores/useSongStore'
 
 /**
@@ -37,10 +37,34 @@ export function debouncedSaveSong(delay = 600) {
 }
 
 /**
- * Delete a song from IndexedDB by id.
+ * Delete a song and its cached audio file from IndexedDB by id.
  */
 export async function deleteSongFromDB(id: number): Promise<void> {
-  await db.songs.delete(id)
+  await db.transaction('rw', db.songs, db.audioFiles, async () => {
+    await db.songs.delete(id)
+    await db.audioFiles.delete(id)
+  })
+}
+
+/**
+ * Save an audio file blob to IndexedDB, keyed by song ID.
+ */
+export async function saveAudioFile(songId: number, blob: Blob, fileName: string): Promise<void> {
+  await db.audioFiles.put({ songId, blob, fileName })
+}
+
+/**
+ * Get a cached audio file from IndexedDB by song ID.
+ */
+export async function getAudioFile(songId: number): Promise<AudioFile | undefined> {
+  return db.audioFiles.get(songId)
+}
+
+/**
+ * Delete a cached audio file from IndexedDB by song ID.
+ */
+export async function deleteAudioFile(songId: number): Promise<void> {
+  await db.audioFiles.delete(songId)
 }
 
 /**

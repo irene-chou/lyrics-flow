@@ -5,6 +5,12 @@ export interface LyricLine {
 
 export type AudioSource = 'youtube' | 'local'
 
+export interface AudioFile {
+  songId: number
+  blob: Blob
+  fileName: string
+}
+
 export interface Song {
   id: number
   name: string

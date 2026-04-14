@@ -10,6 +10,7 @@ import {
 import { AudioSourceTabs } from './AudioSourceTabs'
 import { LrcInputTabs } from './LrcInputTabs'
 import { saveSongToDB } from '@/hooks/useSongLibrary'
+import { saveAudioFile, deleteAudioFile } from '@/lib/song-service'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import { extractVideoId } from '@/lib/format'
@@ -76,10 +77,16 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
     await saveSongToDB(song)
     loadSong(song)
 
-    // If local audio, create object URL for playback
+    // If local audio, cache blob in IndexedDB and create object URL for playback
     if (audioSource === 'local' && audioFile) {
       const objectUrl = URL.createObjectURL(audioFile)
       usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
+      saveAudioFile(song.id, audioFile, audioFile.name).catch(console.error)
+    }
+
+    // Clean up cached audio if switching from local to youtube
+    if (isEditMode && editSong!.audioSource === 'local' && audioSource === 'youtube') {
+      deleteAudioFile(editSong!.id).catch(console.error)
     }
 
     onOpenChange(false)

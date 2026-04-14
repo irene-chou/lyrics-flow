@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { Play, Pause } from 'lucide-react'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
+import { saveAudioFile } from '@/lib/song-service'
 import { YouTubePlayer } from './YouTubePlayer'
 import { ManualTimerPanel } from './ManualTimerPanel'
 import { PlaybackInfo } from './PlaybackInfo'
@@ -36,6 +37,11 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
     usePlaybackStore.getState().setAudioFileObjectUrl(objectUrl)
     if (file.name !== audioFileName) {
       useSongStore.getState().setAudioFileName(file.name)
+    }
+    // Cache blob in IndexedDB for auto-load next time
+    const songId = useSongStore.getState().currentSongId
+    if (songId) {
+      saveAudioFile(songId, file, file.name).catch(console.error)
     }
     e.target.value = ''
   }, [audioFileName])

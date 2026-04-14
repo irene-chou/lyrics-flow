@@ -1,8 +1,9 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Song } from '@/types'
+import type { Song, AudioFile } from '@/types'
 
 const db = new Dexie('lyribox-db') as Dexie & {
   songs: EntityTable<Song, 'id'>
+  audioFiles: EntityTable<AudioFile, 'songId'>
 }
 
 db.version(1).stores({
@@ -17,6 +18,11 @@ db.version(2).stores({
       song.pitch = 0
     }
   })
+})
+
+db.version(3).stores({
+  songs: 'id',
+  audioFiles: 'songId',
 })
 
 export { db }
