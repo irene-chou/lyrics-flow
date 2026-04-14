@@ -94,6 +94,7 @@ export function useKeyboardShortcuts({
                 audioSource: song.audioSource,
                 youtubeId: song.youtubeId,
                 audioFileName: song.audioFileName,
+                folderId: song.folderId,
                 createdAt: song.currentSongCreatedAt || Date.now(),
                 updatedAt: Date.now(),
               })

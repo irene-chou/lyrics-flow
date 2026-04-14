@@ -5,6 +5,13 @@ export interface LyricLine {
 
 export type AudioSource = 'youtube' | 'local'
 
+export interface Folder {
+  id: number
+  name: string
+  createdAt: number
+  updatedAt: number
+}
+
 export interface Song {
   id: number
   name: string
@@ -14,6 +21,7 @@ export interface Song {
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
+  folderId: number | null
   createdAt: number
   updatedAt: number
 }

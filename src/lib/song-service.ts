@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import type { Song } from '@/types'
+import type { Song, Folder } from '@/types'
 import { useSongStore } from '@/stores/useSongStore'
 
 /**
@@ -29,6 +29,7 @@ export function debouncedSaveSong(delay = 600) {
       audioSource: state.audioSource,
       youtubeId: state.youtubeId,
       audioFileName: state.audioFileName,
+      folderId: state.folderId,
       createdAt: state.currentSongCreatedAt || Date.now(),
       updatedAt: Date.now(),
     })
@@ -44,11 +45,12 @@ export async function deleteSongFromDB(id: number): Promise<void> {
 }
 
 /**
- * Export all songs as a JSON file download.
+ * Export all songs and folders as a JSON file download.
  */
 export async function exportSongs(): Promise<void> {
   const songs = await db.songs.toArray()
-  const json = JSON.stringify(songs, null, 2)
+  const folders = await db.folders.toArray()
+  const json = JSON.stringify({ songs, folders }, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -70,13 +72,26 @@ function isValidSong(obj: unknown): obj is Song {
     (s.audioSource === 'youtube' || s.audioSource === 'local') &&
     (s.youtubeId === null || typeof s.youtubeId === 'string') &&
     (s.audioFileName === null || typeof s.audioFileName === 'string') &&
+    (s.folderId === undefined || s.folderId === null || typeof s.folderId === 'number') &&
     typeof s.createdAt === 'number' &&
     typeof s.updatedAt === 'number'
   )
 }
 
+function isValidFolder(obj: unknown): obj is Folder {
+  if (typeof obj !== 'object' || obj === null) return false
+  const f = obj as Record<string, unknown>
+  return (
+    typeof f.id === 'number' && f.id > 0 &&
+    typeof f.name === 'string' && f.name.length > 0 && f.name.length <= 200 &&
+    typeof f.createdAt === 'number' &&
+    typeof f.updatedAt === 'number'
+  )
+}
+
 /**
- * Import songs from a JSON file, merging into IndexedDB.
+ * Import songs (and optionally folders) from a JSON file, merging into IndexedDB.
+ * Supports both old format (array of songs) and new format ({ songs, folders }).
  */
 export async function importSongs(file: File): Promise<number> {
   const text = await file.text()
@@ -87,17 +102,61 @@ export async function importSongs(file: File): Promise<number> {
     throw new Error('無效的 JSON 格式')
   }
 
-  if (!Array.isArray(parsed)) {
+  let songList: unknown[]
+  let folderList: unknown[] = []
+
+  if (Array.isArray(parsed)) {
+    // Legacy format: plain array of songs
+    songList = parsed
+  } else if (typeof parsed === 'object' && parsed !== null && Array.isArray((parsed as Record<string, unknown>).songs)) {
+    // New format: { songs, folders }
+    const p = parsed as Record<string, unknown>
+    songList = p.songs as unknown[]
+    if (Array.isArray(p.folders)) {
+      folderList = p.folders as unknown[]
+    }
+  } else {
     throw new Error('無效的匯入檔案格式')
   }
 
+  // Import folders first so songs can reference them
+  for (const item of folderList) {
+    if (isValidFolder(item)) {
+      const { id, name, createdAt, updatedAt } = item
+      await db.folders.put({ id, name, createdAt, updatedAt })
+    }
+  }
+
   let count = 0
-  for (const item of parsed) {
+  for (const item of songList) {
     if (isValidSong(item)) {
-      const { id, name, lrcText, offset, pitch = 0, audioSource, youtubeId, audioFileName, createdAt, updatedAt } = item
-      await db.songs.put({ id, name, lrcText, offset, pitch, audioSource, youtubeId, audioFileName, createdAt, updatedAt })
+      const { id, name, lrcText, offset, pitch = 0, audioSource, youtubeId, audioFileName, folderId = null, createdAt, updatedAt } = item
+      await db.songs.put({ id, name, lrcText, offset, pitch, audioSource, youtubeId, audioFileName, folderId, createdAt, updatedAt })
       count++
     }
   }
   return count
+}
+
+// ─── Folder operations ───────────────────────────────────────────────────────
+
+export async function createFolder(name: string): Promise<Folder> {
+  const now = Date.now()
+  const folder: Folder = { id: now, name, createdAt: now, updatedAt: now }
+  await db.folders.put(folder)
+  return folder
+}
+
+export async function updateFolder(id: number, name: string): Promise<void> {
+  await db.folders.update(id, { name, updatedAt: Date.now() })
+}
+
+export async function deleteFolder(id: number): Promise<void> {
+  // Unassign all songs from this folder
+  await db.songs.where('folderId').equals(id).modify({ folderId: null })
+  await db.folders.delete(id)
+}
+
+export async function moveSongToFolder(songId: number, folderId: number | null): Promise<void> {
+  await db.songs.update(songId, { folderId, updatedAt: Date.now() })
 }
