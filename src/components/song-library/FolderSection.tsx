@@ -177,8 +177,8 @@ export function FolderSection({
           {songs.length}
         </span>
 
-        {/* Folder actions menu */}
-        <span className="hidden group-hover:flex shrink-0">
+        {/* Folder actions menu — always in layout so Radix can measure trigger position */}
+        <span className="opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button

@@ -239,7 +239,8 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                   />
                 ))}
 
-                {/* Uncategorized drop zone — shown when there are folders */}
+                {/* Uncategorized drop zone — always rendered when folders exist so
+                    onDragEnter can fire even when the section is empty */}
                 {hasFolders && (
                   <div
                     onDragEnter={(e) => {
@@ -264,17 +265,18 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                       outline: unfolderDragOver ? '2px dashed var(--lb-accent)' : '2px solid transparent',
                       background: unfolderDragOver ? 'rgba(124, 106, 239, 0.08)' : 'transparent',
                       transition: 'outline 0.1s, background 0.1s',
+                      // Ensure minimum tappable height even when empty
+                      minHeight: unfolderSongs.length === 0 ? '40px' : undefined,
                     }}
                   >
-                    {/* "未分類" label */}
-                    {(unfolderSongs.length > 0 || unfolderDragOver) && (
-                      <div
-                        className="text-lb-text-secondary"
-                        style={{ fontSize: '11px', fontWeight: 600, padding: '8px 8px 4px', letterSpacing: '0.05em' }}
-                      >
-                        {unfolderDragOver && unfolderSongs.length === 0 ? '放開以移出資料夾' : '未分類'}
-                      </div>
-                    )}
+                    {/* Section label */}
+                    <div
+                      className="text-lb-text-secondary"
+                      style={{ fontSize: '11px', fontWeight: 600, padding: '8px 8px 4px', letterSpacing: '0.05em' }}
+                    >
+                      未分類
+                    </div>
+
                     {unfolderSongs.map((song) => (
                       <SongListItem
                         key={song.id}
@@ -286,9 +288,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                         onMove={handleMove}
                       />
                     ))}
-                    {/* Drop hint when dragging over empty uncategorized area */}
-                    {unfolderDragOver && unfolderSongs.length > 0 && (
-                      <p className="text-lb-text-secondary" style={{ fontSize: '11px', padding: '6px 12px', fontStyle: 'italic' }}>
+
+                    {/* Drop hint shown only while dragging over empty section */}
+                    {unfolderSongs.length === 0 && unfolderDragOver && (
+                      <p className="text-lb-text-secondary" style={{ fontSize: '11px', padding: '2px 12px 8px', fontStyle: 'italic' }}>
                         放開以移出資料夾
                       </p>
                     )}

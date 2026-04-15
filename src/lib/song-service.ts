@@ -152,8 +152,9 @@ export async function updateFolder(id: number, name: string): Promise<void> {
 }
 
 export async function deleteFolder(id: number): Promise<void> {
-  // Unassign all songs from this folder
-  await db.songs.where('folderId').equals(id).modify({ folderId: null })
+  // Unassign all songs from this folder.
+  // folderId is not an indexed field, so use .filter() for a full-table scan.
+  await db.songs.filter(s => s.folderId === id).modify({ folderId: null })
   await db.folders.delete(id)
 }
 
