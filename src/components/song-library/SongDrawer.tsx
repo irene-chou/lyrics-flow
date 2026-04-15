@@ -289,10 +289,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                       />
                     ))}
 
-                    {/* Placeholder shown when empty */}
-                    {unfolderSongs.length === 0 && (
+                    {/* Drop hint shown only while dragging over empty section */}
+                    {unfolderSongs.length === 0 && unfolderDragOver && (
                       <p className="text-lb-text-secondary" style={{ fontSize: '11px', padding: '2px 12px 8px', fontStyle: 'italic' }}>
-                        {unfolderDragOver ? '放開以移出資料夾' : '拖曳歌曲至此以移出資料夾'}
+                        放開以移出資料夾
                       </p>
                     )}
                   </div>
