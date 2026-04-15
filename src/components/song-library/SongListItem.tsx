@@ -57,26 +57,26 @@ export const SongListItem = memo(function SongListItem({
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          e.currentTarget.style.background = isActive ? 'var(--lb-accent)' : 'transparent'
+          e.currentTarget.style.background = 'transparent'
         }
       }}
     >
-      {/* Drag handle */}
+      {/* Drag handle — always in layout so it doesn't shift other elements;
+          invisible until hover so it doesn't clutter the resting state */}
       <span
-        className="hidden group-hover:flex items-center shrink-0 text-lb-text-secondary"
-        style={{ cursor: 'grab', marginLeft: '-4px' }}
+        className="opacity-0 group-hover:opacity-100 flex items-center shrink-0 text-lb-text-secondary"
+        style={{ cursor: 'grab' }}
         title="拖曳移動"
       >
         <GripVertical size={14} />
       </span>
-      {/* Spacer when handle is hidden */}
-      <span className="flex group-hover:hidden shrink-0" style={{ width: '10px' }} />
 
       <span className="flex-1 min-w-0 truncate">{song.name}</span>
 
-      {/* Actions shown on hover */}
+      {/* Action buttons — always in layout (visibility via opacity) so Radix
+          DropdownMenu can measure the trigger position correctly */}
       <span
-        className="hidden group-hover:flex items-center shrink-0"
+        className="opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto flex items-center shrink-0"
         style={{ gap: '4px' }}
       >
         {/* Move to folder */}
@@ -167,10 +167,10 @@ export const SongListItem = memo(function SongListItem({
         </button>
       </span>
 
-      {/* Always show delete on active item (non-hover) */}
+      {/* Active item: show delete when NOT hovering (hover shows the span above) */}
       {isActive && (
         <span
-          className="flex items-center group-hover:hidden shrink-0"
+          className="flex group-hover:hidden items-center shrink-0"
           style={{ gap: '4px' }}
         >
           <button
