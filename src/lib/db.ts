@@ -1,9 +1,10 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Song, AudioFile } from '@/types'
+import type { Song, AudioFile, Folder } from '@/types'
 
 const db = new Dexie('lyribox-db') as Dexie & {
   songs: EntityTable<Song, 'id'>
   audioFiles: EntityTable<AudioFile, 'songId'>
+  folders: EntityTable<Folder, 'id'>
 }
 
 db.version(1).stores({
@@ -32,6 +33,18 @@ db.version(4).stores({
   return tx.table('songs').toCollection().modify(song => {
     if (song.audioUrl === undefined) {
       song.audioUrl = null
+    }
+  })
+})
+
+db.version(5).stores({
+  songs: 'id',
+  audioFiles: 'songId',
+  folders: 'id',
+}).upgrade(tx => {
+  return tx.table('songs').toCollection().modify(song => {
+    if (song.folderId === undefined) {
+      song.folderId = null
     }
   })
 })

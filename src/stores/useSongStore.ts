@@ -28,6 +28,7 @@ interface SongState {
   youtubeId: string | null
   audioFileName: string | null
   audioUrl: string | null
+  folderId: number | null
 
   // Saved state for dirty tracking
   lastSavedState: SongSavedState | null
@@ -43,6 +44,7 @@ interface SongState {
   setYoutubeId: (id: string | null) => void
   setAudioFileName: (name: string | null) => void
   setAudioUrl: (url: string | null) => void
+  setFolderId: (folderId: number | null) => void
   captureState: () => void
   hasUnsavedChanges: () => boolean
 }
@@ -59,6 +61,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   youtubeId: null,
   audioFileName: null,
   audioUrl: null,
+  folderId: null,
   lastSavedState: null,
 
   loadSong: (song: Song) => {
@@ -80,7 +83,8 @@ export const useSongStore = create<SongState>((set, get) => ({
       audioSource: song.audioSource,
       youtubeId: song.youtubeId,
       audioFileName: song.audioFileName,
-      audioUrl: song.audioUrl,
+      audioUrl: song.audioUrl ?? null,
+      folderId: song.folderId ?? null,
       lastSavedState: {
         name: songTitle,
         lrcText: song.lrcText,
@@ -89,7 +93,7 @@ export const useSongStore = create<SongState>((set, get) => ({
         audioSource: song.audioSource,
         youtubeId: song.youtubeId,
         audioFileName: song.audioFileName,
-        audioUrl: song.audioUrl,
+        audioUrl: song.audioUrl ?? null,
       },
     })
   },
@@ -109,6 +113,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       youtubeId: null,
       audioFileName: null,
       audioUrl: null,
+      folderId: null,
       lastSavedState: null,
     })
   },
@@ -121,6 +126,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   setYoutubeId: (id: string | null) => set({ youtubeId: id }),
   setAudioFileName: (name: string | null) => set({ audioFileName: name }),
   setAudioUrl: (url: string | null) => set({ audioUrl: url }),
+  setFolderId: (folderId: number | null) => set({ folderId }),
 
   captureState: () => {
     const state = get()

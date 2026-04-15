@@ -18,7 +18,7 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlPanelProps) {
-  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, pitch, audioSource, youtubeId, audioFileName, audioUrl } = useSongStore(
+  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, pitch, audioSource, youtubeId, audioFileName, audioUrl, folderId } = useSongStore(
     useShallow((s) => ({
       currentSongId: s.currentSongId,
       currentSongTitle: s.currentSongTitle,
@@ -30,6 +30,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       youtubeId: s.youtubeId,
       audioFileName: s.audioFileName,
       audioUrl: s.audioUrl,
+      folderId: s.folderId,
     }))
   )
   const sidebarWidth = useUISettingsStore((s) => s.sidebarWidth)
@@ -46,6 +47,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       youtubeId,
       audioFileName,
       audioUrl,
+      folderId,
       createdAt: currentSongCreatedAt || Date.now(),
       updatedAt: Date.now(),
     }

@@ -11,6 +11,13 @@ export interface AudioFile {
   fileName: string
 }
 
+export interface Folder {
+  id: number
+  name: string
+  createdAt: number
+  updatedAt: number
+}
+
 export interface Song {
   id: number
   name: string
@@ -21,6 +28,7 @@ export interface Song {
   youtubeId: string | null
   audioFileName: string | null
   audioUrl: string | null
+  folderId: number | null
   createdAt: number
   updatedAt: number
 }
