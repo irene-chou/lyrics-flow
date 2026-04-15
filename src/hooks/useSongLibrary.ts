@@ -10,5 +10,14 @@ export function useSongs() {
   )
 }
 
+/**
+ * Live query: returns a Set of song IDs that have cached audio files.
+ */
+export function useCachedSongIds() {
+  return useLiveQuery(() =>
+    db.audioFiles.toCollection().primaryKeys().then(keys => new Set(keys)),
+  )
+}
+
 // Re-export service functions for backward compatibility
 export { saveSongToDB, debouncedSaveSong, deleteSongFromDB, exportSongs, importSongs } from '@/lib/song-service'

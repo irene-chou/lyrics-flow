@@ -1,20 +1,26 @@
 import { memo } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, HardDrive, X } from 'lucide-react'
 import type { Song } from '@/types'
 
 interface SongListItemProps {
   song: Song
   isActive: boolean
+  hasCachedAudio: boolean
   onSelect: (song: Song) => void
   onDelete: (song: Song) => void
+  onClearCache: (song: Song) => void
 }
 
 export const SongListItem = memo(function SongListItem({
   song,
   isActive,
+  hasCachedAudio,
   onSelect,
   onDelete,
+  onClearCache,
 }: SongListItemProps) {
+  const actionColor = isActive ? 'rgba(255,255,255,0.7)' : 'var(--lb-text-secondary)'
+
   return (
     <div
       className="group flex items-center cursor-pointer"
@@ -40,10 +46,49 @@ export const SongListItem = memo(function SongListItem({
       }}
     >
       <span className="flex-1 min-w-0 truncate">{song.name}</span>
+      {/* Cache status indicator (visible when not hovered) */}
+      {hasCachedAudio && (
+        <span
+          className="flex items-center shrink-0 group-hover:hidden"
+          title="已快取音檔"
+          style={{ color: actionColor }}
+        >
+          <HardDrive size={12} />
+        </span>
+      )}
+      {/* Hover actions */}
       <span
         className="hidden group-hover:flex items-center shrink-0"
-        style={{ gap: '4px' }}
+        style={{ gap: '2px' }}
       >
+        {hasCachedAudio && (
+          <button
+            className="flex items-center cursor-pointer"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '2px',
+              borderRadius: '4px',
+              color: actionColor,
+              transition: 'all 0.15s',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onClearCache(song)
+            }}
+            title="清除音檔快取"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+              e.currentTarget.style.color = '#fff'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'none'
+              e.currentTarget.style.color = actionColor
+            }}
+          >
+            <X size={14} />
+          </button>
+        )}
         <button
           className="flex items-center cursor-pointer"
           style={{
@@ -51,7 +96,7 @@ export const SongListItem = memo(function SongListItem({
             border: 'none',
             padding: '2px',
             borderRadius: '4px',
-            color: isActive ? 'rgba(255,255,255,0.7)' : 'var(--lb-text-secondary)',
+            color: actionColor,
             transition: 'all 0.15s',
           }}
           onClick={(e) => {
@@ -65,38 +110,12 @@ export const SongListItem = memo(function SongListItem({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'none'
-            e.currentTarget.style.color = isActive ? 'rgba(255,255,255,0.7)' : 'var(--lb-text-secondary)'
+            e.currentTarget.style.color = actionColor
           }}
         >
           <Trash2 size={14} />
         </button>
       </span>
-      {/* Always show actions on active item */}
-      {isActive && (
-        <span
-          className="flex items-center group-hover:hidden shrink-0"
-          style={{ gap: '4px' }}
-        >
-          <button
-            className="flex items-center cursor-pointer"
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: '2px',
-              borderRadius: '4px',
-              color: 'rgba(255,255,255,0.7)',
-              transition: 'all 0.15s',
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(song)
-            }}
-            title="刪除"
-          >
-            <Trash2 size={14} />
-          </button>
-        </span>
-      )}
     </div>
   )
 })

@@ -6,6 +6,7 @@ import { AudioPlayer } from '../playback/AudioPlayer'
 import { OffsetControls } from '../playback/OffsetControls'
 import { PitchControls } from '../playback/PitchControls'
 import { DisplaySettings } from '../settings/DisplaySettings'
+import { StorageInfo } from '../settings/StorageInfo'
 import type { Song } from '@/types'
 import type { usePlaybackEngine } from '@/hooks/usePlaybackEngine'
 
@@ -17,7 +18,7 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlPanelProps) {
-  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, pitch, audioSource, youtubeId, audioFileName } = useSongStore(
+  const { currentSongId, currentSongTitle, currentSongCreatedAt, lrcText, offset, pitch, audioSource, youtubeId, audioFileName, audioUrl } = useSongStore(
     useShallow((s) => ({
       currentSongId: s.currentSongId,
       currentSongTitle: s.currentSongTitle,
@@ -28,6 +29,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       audioSource: s.audioSource,
       youtubeId: s.youtubeId,
       audioFileName: s.audioFileName,
+      audioUrl: s.audioUrl,
     }))
   )
   const sidebarWidth = useUISettingsStore((s) => s.sidebarWidth)
@@ -43,6 +45,7 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
       audioSource,
       youtubeId,
       audioFileName,
+      audioUrl,
       createdAt: currentSongCreatedAt || Date.now(),
       updatedAt: Date.now(),
     }
@@ -160,6 +163,9 @@ export function ControlPanel({ onEditSong, engine, isMobile, onClose }: ControlP
 
       {/* 顯示設定 */}
       <DisplaySettings />
+
+      {/* 儲存空間 */}
+      <StorageInfo />
     </aside>
   )
 }

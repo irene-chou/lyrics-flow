@@ -16,10 +16,11 @@ export function usePlaybackEngine() {
 
     const hasAudio =
       (audioSource === 'youtube' && !!youtubeId) ||
-      (audioSource === 'local' && !!audioFileObjectUrl)
+      (audioSource === 'local' && !!audioFileObjectUrl) ||
+      (audioSource === 'url' && !!audioFileObjectUrl)
 
     if (!hasAudio && lyrics.length > 0) return 'manual'
-    if (audioSource === 'local') return 'local'
+    if (audioSource === 'local' || audioSource === 'url') return 'local'
     return 'youtube'
   }, [])
 

@@ -23,9 +23,9 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   const status = usePlaybackStore((s) => s.status)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Load local audio file when URL changes
+  // Load local/URL audio when source URL changes
   useEffect(() => {
-    if (audioSource === 'local' && audioFileObjectUrl) {
+    if ((audioSource === 'local' || audioSource === 'url') && audioFileObjectUrl) {
       engine.localAudio.loadFile(audioFileObjectUrl)
     }
   }, [audioFileObjectUrl, audioSource, engine.localAudio])
@@ -52,10 +52,25 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
   // Determine if there's an actual audio source available
   const hasAudio =
     (audioSource === 'youtube' && !!youtubeId) ||
-    (audioSource === 'local' && !!audioFileObjectUrl)
+    (audioSource === 'local' && !!audioFileObjectUrl) ||
+    (audioSource === 'url' && !!audioFileObjectUrl)
 
   // Show manual timer when there are lyrics but no audio
   const showManualTimer = hasLyrics && !hasAudio
+
+  // URL audio — no URL loaded: should not happen (URL is stored in song), but handle gracefully
+  if (audioSource === 'url' && !audioFileObjectUrl && !showManualTimer) {
+    return (
+      <div>
+        <p
+          className="text-lb-text-secondary"
+          style={{ fontSize: '12px' }}
+        >
+          請在歌曲設定中填入音檔網址
+        </p>
+      </div>
+    )
+  }
 
   // Local audio — no file loaded yet: show prompt without player container
   if (audioSource === 'local' && !audioFileObjectUrl && !showManualTimer) {
@@ -113,19 +128,21 @@ export function AudioPlayer({ engine, onSeek }: AudioPlayerProps) {
     return <YouTubePlayer engine={engine} />
   }
 
-  // Local audio — file loaded
+  // Local/URL audio — file loaded
   return (
     <div
       className="flex flex-col bg-lb-bg-input rounded-lg"
       style={{ gap: '6px', padding: '10px 12px' }}
     >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="audio/*"
-        onChange={handleFileSelect}
-        style={{ display: 'none' }}
-      />
+      {audioSource === 'local' && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="audio/*"
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+        />
+      )}
       <PlaybackInfo onSeek={onSeek} />
       <div className="flex items-center justify-between" style={{ gap: '6px' }}>
         <button

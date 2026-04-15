@@ -25,4 +25,15 @@ db.version(3).stores({
   audioFiles: 'songId',
 })
 
+db.version(4).stores({
+  songs: 'id',
+  audioFiles: 'songId',
+}).upgrade(tx => {
+  return tx.table('songs').toCollection().modify(song => {
+    if (song.audioUrl === undefined) {
+      song.audioUrl = null
+    }
+  })
+})
+
 export { db }

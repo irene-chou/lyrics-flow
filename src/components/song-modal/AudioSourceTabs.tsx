@@ -32,6 +32,8 @@ interface AudioSourceTabsProps {
   onYoutubeUrlChange: (url: string) => void
   audioFileName: string
   onAudioFileChange: (file: File, fileName: string) => void
+  audioUrl: string
+  onAudioUrlChange: (url: string) => void
 }
 
 export function AudioSourceTabs({
@@ -41,6 +43,8 @@ export function AudioSourceTabs({
   onYoutubeUrlChange,
   audioFileName,
   onAudioFileChange,
+  audioUrl,
+  onAudioUrlChange,
 }: AudioSourceTabsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -73,6 +77,9 @@ export function AudioSourceTabs({
           </TabsTrigger>
           <TabsTrigger value="local" className="flex-1">
             本地音檔
+          </TabsTrigger>
+          <TabsTrigger value="url" className="flex-1">
+            音檔網址
           </TabsTrigger>
         </TabsList>
 
@@ -125,6 +132,18 @@ export function AudioSourceTabs({
             accept="audio/*"
             onChange={handleFileSelect}
             style={{ display: 'none' }}
+          />
+        </TabsContent>
+
+        <TabsContent value="url">
+          <input
+            type="text"
+            placeholder="貼上音檔網址（需支援 CORS）"
+            value={audioUrl}
+            onChange={(e) => onAudioUrlChange(e.target.value)}
+            style={inputStyle}
+            onFocus={focusInput}
+            onBlur={blurInput}
           />
         </TabsContent>
       </Tabs>

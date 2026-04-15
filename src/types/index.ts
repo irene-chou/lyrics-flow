@@ -3,7 +3,7 @@ export interface LyricLine {
   text: string
 }
 
-export type AudioSource = 'youtube' | 'local'
+export type AudioSource = 'youtube' | 'local' | 'url'
 
 export interface AudioFile {
   songId: number
@@ -20,6 +20,7 @@ export interface Song {
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
+  audioUrl: string | null
   createdAt: number
   updatedAt: number
 }

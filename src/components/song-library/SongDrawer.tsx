@@ -10,8 +10,8 @@ import {
 import { SongSearchInput } from './SongSearchInput'
 import { SongListItem } from './SongListItem'
 import { SongDrawerMenu } from './SongDrawerMenu'
-import { useSongs, deleteSongFromDB } from '@/hooks/useSongLibrary'
-import { getAudioFile } from '@/lib/song-service'
+import { useSongs, useCachedSongIds, deleteSongFromDB } from '@/hooks/useSongLibrary'
+import { getAudioFile, deleteAudioFile } from '@/lib/song-service'
 import { useSongStore } from '@/stores/useSongStore'
 import { usePlaybackStore } from '@/stores/usePlaybackStore'
 import type { Song } from '@/types'
@@ -25,6 +25,7 @@ interface SongDrawerProps {
 export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
   const [search, setSearch] = useState('')
   const songs = useSongs()
+  const cachedSongIds = useCachedSongIds()
   const { currentSongId, loadSong } = useSongStore()
 
   const filteredSongs = useMemo(() => {
@@ -49,6 +50,8 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
         console.error('Failed to load cached audio:', err)
       }
       // If no cached blob, AudioPlayer shows "選擇音檔" button as fallback
+    } else if (song.audioSource === 'url' && song.audioUrl) {
+      usePlaybackStore.getState().setAudioFileObjectUrl(song.audioUrl)
     }
   }, [loadSong, onOpenChange])
 
@@ -59,6 +62,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
     if (useSongStore.getState().currentSongId === song.id) {
       useSongStore.getState().clearSong()
     }
+  }, [])
+
+  const handleClearCache = useCallback(async (song: Song) => {
+    await deleteAudioFile(song.id)
   }, [])
 
   return (
@@ -149,8 +156,10 @@ export function SongDrawer({ open, onOpenChange, isMobile }: SongDrawerProps) {
                   key={song.id}
                   song={song}
                   isActive={currentSongId === song.id}
+                  hasCachedAudio={cachedSongIds?.has(song.id) ?? false}
                   onSelect={handleSelect}
                   onDelete={handleDelete}
+                  onClearCache={handleClearCache}
                 />
               ))
             )}

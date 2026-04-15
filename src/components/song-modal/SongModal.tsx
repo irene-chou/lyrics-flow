@@ -29,6 +29,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
   const [audioFileName, setAudioFileName] = useState('')
   const [lrcText, setLrcText] = useState('')
   const [audioFile, setAudioFile] = useState<File | null>(null)
+  const [audioUrl, setAudioUrl] = useState('')
 
   const isEditMode = !!editSong
   const loadSong = useSongStore((s) => s.loadSong)
@@ -39,6 +40,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       setAudioSource(editSong.audioSource)
       setYoutubeUrl(editSong.youtubeId || '')
       setAudioFileName(editSong.audioFileName || '')
+      setAudioUrl(editSong.audioUrl || '')
       setLrcText(editSong.lrcText)
       setAudioFile(null)
     } else if (open && !editSong) {
@@ -46,6 +48,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       setAudioSource('youtube')
       setYoutubeUrl('')
       setAudioFileName('')
+      setAudioUrl('')
       setLrcText('')
       setAudioFile(null)
     }
@@ -59,6 +62,7 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
 
     const songName = name.trim() || '未命名歌曲'
     const isYoutube = audioSource === 'youtube'
+    const isUrl = audioSource === 'url'
     const now = Date.now()
 
     const song: Song = {
@@ -69,7 +73,8 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       pitch: isEditMode ? editSong!.pitch : 0,
       audioSource,
       youtubeId: isYoutube ? extractVideoId(youtubeUrl) : null,
-      audioFileName: isYoutube ? null : audioFileName || null,
+      audioFileName: audioSource === 'local' ? (audioFileName || null) : null,
+      audioUrl: isUrl ? (audioUrl.trim() || null) : null,
       createdAt: isEditMode ? editSong!.createdAt : now,
       updatedAt: now,
     }
@@ -84,8 +89,13 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
       saveAudioFile(song.id, audioFile, audioFile.name).catch(console.error)
     }
 
-    // Clean up cached audio if switching from local to youtube
-    if (isEditMode && editSong!.audioSource === 'local' && audioSource === 'youtube') {
+    // If URL audio, set the URL directly for playback
+    if (isUrl && audioUrl.trim()) {
+      usePlaybackStore.getState().setAudioFileObjectUrl(audioUrl.trim())
+    }
+
+    // Clean up cached audio if switching away from local
+    if (isEditMode && editSong!.audioSource === 'local' && audioSource !== 'local') {
       deleteAudioFile(editSong!.id).catch(console.error)
     }
 
@@ -170,6 +180,8 @@ export function SongModal({ open, onOpenChange, editSong }: SongModalProps) {
             onYoutubeUrlChange={setYoutubeUrl}
             audioFileName={audioFileName}
             onAudioFileChange={handleAudioFileChange}
+            audioUrl={audioUrl}
+            onAudioUrlChange={setAudioUrl}
           />
 
           {/* LRC input */}

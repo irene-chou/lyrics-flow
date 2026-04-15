@@ -12,6 +12,7 @@ interface SongSavedState {
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
+  audioUrl: string | null
 }
 
 interface SongState {
@@ -26,6 +27,7 @@ interface SongState {
   audioSource: AudioSource
   youtubeId: string | null
   audioFileName: string | null
+  audioUrl: string | null
 
   // Saved state for dirty tracking
   lastSavedState: SongSavedState | null
@@ -40,6 +42,7 @@ interface SongState {
   setAudioSource: (source: AudioSource) => void
   setYoutubeId: (id: string | null) => void
   setAudioFileName: (name: string | null) => void
+  setAudioUrl: (url: string | null) => void
   captureState: () => void
   hasUnsavedChanges: () => boolean
 }
@@ -55,6 +58,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   audioSource: 'youtube',
   youtubeId: null,
   audioFileName: null,
+  audioUrl: null,
   lastSavedState: null,
 
   loadSong: (song: Song) => {
@@ -76,6 +80,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       audioSource: song.audioSource,
       youtubeId: song.youtubeId,
       audioFileName: song.audioFileName,
+      audioUrl: song.audioUrl,
       lastSavedState: {
         name: songTitle,
         lrcText: song.lrcText,
@@ -84,6 +89,7 @@ export const useSongStore = create<SongState>((set, get) => ({
         audioSource: song.audioSource,
         youtubeId: song.youtubeId,
         audioFileName: song.audioFileName,
+        audioUrl: song.audioUrl,
       },
     })
   },
@@ -102,6 +108,7 @@ export const useSongStore = create<SongState>((set, get) => ({
       audioSource: 'youtube',
       youtubeId: null,
       audioFileName: null,
+      audioUrl: null,
       lastSavedState: null,
     })
   },
@@ -113,6 +120,7 @@ export const useSongStore = create<SongState>((set, get) => ({
   setAudioSource: (source: AudioSource) => set({ audioSource: source }),
   setYoutubeId: (id: string | null) => set({ youtubeId: id }),
   setAudioFileName: (name: string | null) => set({ audioFileName: name }),
+  setAudioUrl: (url: string | null) => set({ audioUrl: url }),
 
   captureState: () => {
     const state = get()
@@ -125,6 +133,7 @@ export const useSongStore = create<SongState>((set, get) => ({
         audioSource: state.audioSource,
         youtubeId: state.youtubeId,
         audioFileName: state.audioFileName,
+        audioUrl: state.audioUrl,
       },
     })
   },
@@ -140,7 +149,8 @@ export const useSongStore = create<SongState>((set, get) => ({
       state.pitch !== saved.pitch ||
       state.audioSource !== saved.audioSource ||
       state.youtubeId !== saved.youtubeId ||
-      state.audioFileName !== saved.audioFileName
+      state.audioFileName !== saved.audioFileName ||
+      state.audioUrl !== saved.audioUrl
     )
   },
 }))
